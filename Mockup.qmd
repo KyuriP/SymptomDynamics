@@ -1,0 +1,103 @@
+---
+title: "Example: Study on Dynamics of Depression"
+subtitle: "This is an illustrative example to convey the concept of the study, focusing on the dynamics of depression using mechanistic models and statistical network models."
+format: 
+  html:
+    toc: true
+    code-fold: true
+    code-summary: "Show the code"
+editor: visual
+theme: cosmo  
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      warning = FALSE)
+library(pracma)
+library(dplyr)
+library(magrittr)
+library(ggplot2)
+library(GGally)
+library(psychonetrics)
+library(qgraph)
+```
+
+## 1. Underlying mechanism
+
+![](mechanism.png){width="400" fig-align="center"}
+
+$\dot S_a = 0.29\times S_a(1-S_a/3)(0.41 \times S_c - 0.33 \times SS)$\
+$\dot S_b = 0.44 \times S_b(1-S_b/3)(0.32 \times S_1)$\
+$\dot S_c = 0.2 \times S_c(1-S_c/3)(0.4 \times S_b - 0.33 \times SS)$
+
+$S_a$ = insomnia, $S_b$ = fatigue, $S_c$ = feeldown, $SS$ = social support.
+
+## 2. Simulating mechanism
+
+```{r}
+#| layout-nrow: 2
+
+fn1 <- function(t, y, p, ss) {
+    a <- p[1]; b <- p[2]
+    c <- p[3]; d <- p[4]
+    e <- p[4]; f <- p[5]
+    g <- p[6]; h <- p[7]
+    dx <- a*y[1]*(1 - y[1]/3) * (b*y[3] - p[6]*ss)
+    dy <- c*y[2]*(1 - y[2]/3) * d*y[1]
+    dz <- e*y[3]*(1 - y[3]/3) * (f*y[2] - p[7]*ss)
+    c(dx, dy, dz)
+}
+
+p0 <- c(0.29, 0.41, 0.44, 0.32, 0.20, 0.4, 0.33, 0.33)
+ic <- c(1.0, 0.5, 0.5)
+ss <- 1 # social support
+
+sol1 <- pracma::ode45(fn1, 0, 1000, ic, p = p0, ss = ss) |> 
+  as.data.frame() |> 
+  rename(insomnia = y.1, fatigue = y.2, feeldown = y.3)
+# sol1$jittered <- apply(sol1$y, 2, function(x) x + rnorm(nrow(sol1$y), sd = 0.03))
+
+sol1 |> tidyr::pivot_longer(!t, names_to = "symptom") |>
+  ggplot(aes(x = t, y = value, group = symptom)) + 
+  geom_line(aes(color=symptom)) + theme_minimal() +
+  labs(title = "Trajectory of each symptom", y = "") +
+  theme(legend.position = "bottom")
+
+sol1 |> 
+  rowwise() |> 
+  mutate(total = sum(c_across(fatigue:feeldown))) |>
+  ggplot(aes(x = t, y = total)) +
+  geom_line(color = "#CB2027", linewidth=1.2) + theme_minimal() +
+  labs(title = "Total symptom level", y = "")
+
+# ggpubr::ggarrange(p1, p2, nrow=2, heights = c(10,8))
+```
+
+## 3. Statistical network estimation
+
+```{r, message = FALSE}
+layout(t(1:2))
+chosen_var <- c("insomnia", "fatigue", "feeldown")
+res1 <- gvar(sol1[1:250,], vars = chosen_var, estimator="FIML") %>% runmodel
+# temporal network
+temporal1 <- getmatrix(res1, "PDC") # PDC = Partial Directed Correlations
+# layout 
+L <- averageLayout(cor(sol1[-1]), temporal1)
+L2 <- L
+L2[3,] <- L[2,]; L2[2,] <- L[1,]; L2[1,] <- L[3,]
+# cross-sectioanl network
+qgraph(cor(sol1[-1]), theme = "colorblind", title = "GGM", 
+               labels = chosen_var, vsize = 12, layout= L2)
+# vector-autoregression network
+qgraph(temporal1, theme = "colorblind", directed=TRUE, diag=TRUE,
+title = "GVAR", vsize = 12, mar = rep(6,4), labels = chosen_var, layout = L2, asize = 5)
+
+# pairs plot: show correlations
+ggpairs(sol1[-1], 
+        lower = list(continuous = wrap("points", alpha = 0.3, size=0.1))) +
+  theme_bw()
+```
+
+## 4. Questions to address:
+
+- 1) 
