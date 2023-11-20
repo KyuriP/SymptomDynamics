@@ -23,6 +23,9 @@ library(psychonetrics)
 library(qgraph)
 ```
 
+
+- generalize formula: edge to some sort of symbol
+- bound: 0 - 1
 ## 1. Underlying mechanism
 
 ![](mechanism.png){width="400" fig-align="center"}
