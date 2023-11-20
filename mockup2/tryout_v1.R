@@ -1,9 +1,11 @@
-# install package
+# install packages
 library(modelr)
 library(dplyr)
 library(ggplot2)
 library(RColorBrewer)
 library(patchwork)
+library(qgraph)
+library(psychonetrics)
 
 
 f <- function(x) {
@@ -21,12 +23,13 @@ sto_eq <-  c(dSA ~ .1,
              dSB ~ .1,
              dSC ~ .1)
 
-## HEALTHY STATE ##
 # define the parameters (as a named vector):
+## original params ##
 parms1 <- c(bA = -.6, bB = -.5, bC = -.6, 
            aA = .3, aB = .2, aC = .4, 
            dA = .2, dB = .5, dC = .3)
 
+## given shock ##
 parms2 <- c(bA = .6, bB = .5, bC = .7, 
             aA = .1, aB = .01, aC = .2, 
             dA = .2, dB = .5, dC = .3)
@@ -38,12 +41,17 @@ init <- c(SA = 0.3, SB = 0.5, SC= 0.8)
 deltaT <- .1 # timestep length
 n_steps <- 2300 # must be a number greater than 1
 
-# Identify the standard deviation of the stochastic noise
-D_stoeq1 <- .3
-D_stoeq2 <- .6
+# specify the standard deviation of the stochastic noise
+D_stoeq1 <- .3 # before shock
+D_stoeq2 <- .6 # after shock
 
-set.seed(45678)
-# Do one simulation of this differential equation
+set.seed(45678) # set the seed (system behavior varies much by random noise)
+# simulate :
+# > shock given at t = 300
+# > shock --> change b and noise S.D.
+# > shock duration = 40 
+# > after shock --> revert back to original parameters but noise S.D. remains larger (debating... reasonable?)
+
 sde_out <- euler_stochastic2(
   deterministic_rate = det_eq,
   stochastic_rate = sto_eq,
@@ -78,7 +86,48 @@ p2 <- sde_out |>
   theme_classic()
 
 # patchwork
-p1+p2
+p1 + p2
+
+
+## fitting network
+beforeshock <- sde_out |> filter(t < 29.9) |> select(!t)
+aftershock <- sde_out |> filter(t >=29.9) |> select(!t)
+
+layout(matrix(1:4,2,2))
+beforeGGM <- qgraph(cor_auto(beforeshock),
+       graph = 'glasso',
+       layout = 'spring',
+       theme = 'colorblind',
+       sampleSize = nrow(beforeshock),
+       title = "beforeGGM")
+
+afterGGM <- qgraph(cor_auto(aftershock),
+       graph = 'glasso',
+       layout = 'spring',
+       theme = 'colorblind',
+       sampleSize = nrow(aftershock),
+       title = "afterGGM")
+
+before <- gvar(beforeshock, estimator="FIML") %>% runmodel
+beforeGVAR <- getmatrix(before, "PDC") |> 
+  qgraph(theme = "colorblind", directed=TRUE, diag=TRUE,
+       title = "beforeGVAR")
+
+after <- gvar(aftershock, estimator="FIML") %>% runmodel
+afterGVAR <- getmatrix(after, "PDC") |>
+  qgraph(theme = "colorblind", directed=TRUE, diag=TRUE,
+       title = "afterGVAR")
+
+
+
+centralityPlot(beforeGVAR,scale="raw0")
+centralityPlot(afterGVAR,scale="raw0")
+
+## Questions:
+# - how to show the hysteresis 
+# - how to show some symptom comes down while some doesn't (differentiate behavior)
+# - the parameter value range conditions -- in order to keep bistabiliy .. ?
+
 
 
 

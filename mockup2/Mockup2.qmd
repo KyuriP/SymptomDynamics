@@ -1,3 +1,19 @@
+---
+title: "Example: Study on Dynamics of Depression"
+subtitle: "This is an illustrative example to convey the concept of the study, focusing on the dynamics of depression using mechanistic models and statistical network models."
+format: 
+  html:
+    toc: true
+    code-fold: true
+    code-summary: "Show the code"
+    embed-resources: true
+editor: visual
+theme: cosmo  
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      warning = FALSE)
 # install packages
 library(modelr)
 library(dplyr)
@@ -7,18 +23,33 @@ library(patchwork)
 library(qgraph)
 library(psychonetrics)
 
+source("euler_stochastic2.R")
+```
 
+## 1. Toy example
+
+![](toymodel_mockup2.png){fig-align="center" width="70%"}
+
+$dS_{it} = S_i(1-S_i)(\beta - \alpha S_i + S_j(1+\delta f(S_i)) dt + dW_t$
+
+## 2. Simulating mechanism
+
+```{r}
+#| fig-height: 10
+
+# function for boosting effect of other symptoms when symptom level is over 0.5
 f <- function(x) {
   if(x >= 0.5 | is.nan(x)) 1 else 0
 }
 
-# define diff equation:
+# define diff equations:
 det_eq <- c(
   dSA ~ SA*(1-SA)*(bA - aA*SA + SC*(1+ dA*f(SA))),
   dSB ~ SB*(1-SB)*(bB - aB*SB + SA*(1+ dB*f(SB))),
   dSC ~ SC*(1-SC)*(bC - aC*SC + SB*(1+ dC*f(SC)))
 )
 
+# give noise:
 sto_eq <-  c(dSA ~ .1,
              dSB ~ .1,
              dSC ~ .1)
@@ -45,7 +76,7 @@ n_steps <- 2300 # must be a number greater than 1
 D_stoeq1 <- .3 # before shock
 D_stoeq2 <- .6 # after shock
 
-set.seed(45678) # set the seed (system behavior varies much by random noise)
+set.seed(45678) # set the seed (system's behavior varies much by random noise)
 # simulate :
 # > shock given at t = 300
 # > shock --> change b and noise S.D.
@@ -67,6 +98,7 @@ sde_out <- euler_stochastic2(
   duration = 40
 )
 
+# each symptom level
 p1 <- sde_out |>
   mutate(totalsymptom = SA + SB + SC) |>
   tidyr::pivot_longer(!c(t, totalsymptom), names_to = "symptoms") |>
@@ -77,7 +109,7 @@ p1 <- sde_out |>
   theme_classic() +
   theme(legend.position="bottom")
   
-
+# total symptom level
 p2 <- sde_out |>
   mutate(totalsymptom = SA + SB + SC) |>
   ggplot(aes (x = t, y = totalsymptom)) +
@@ -86,64 +118,44 @@ p2 <- sde_out |>
   theme_classic()
 
 # patchwork
-p1 + p2
+p1 / p2
 
+```
 
-## fitting network
+## 3. Statistical network estimation
+
+```{r, message = FALSE}
+## fitting statistical networks:
 beforeshock <- sde_out |> filter(t < 29.9) |> select(!t)
 aftershock <- sde_out |> filter(t >=29.9) |> select(!t)
 
-layout(matrix(1:4,2,2))
+layout(t(1:2))
 beforeGGM <- qgraph(cor_auto(beforeshock),
        graph = 'glasso',
        layout = 'spring',
        theme = 'colorblind',
        sampleSize = nrow(beforeshock),
        title = "beforeGGM")
+# fix layout
+L <- beforeGGM$layout
 
 afterGGM <- qgraph(cor_auto(aftershock),
        graph = 'glasso',
-       layout = 'spring',
        theme = 'colorblind',
        sampleSize = nrow(aftershock),
-       title = "afterGGM")
+       title = "afterGGM",
+       layout = L)
 
+layout(t(1:2))
 before <- gvar(beforeshock, estimator="FIML") %>% runmodel
 beforeGVAR <- getmatrix(before, "PDC") |> 
   qgraph(theme = "colorblind", directed=TRUE, diag=TRUE,
-       title = "beforeGVAR")
+       title = "beforeGVAR", labels = c("SA", "SB", "SC"),
+       layout = L)
 
 after <- gvar(aftershock, estimator="FIML") %>% runmodel
 afterGVAR <- getmatrix(after, "PDC") |>
   qgraph(theme = "colorblind", directed=TRUE, diag=TRUE,
-       title = "afterGVAR")
-
-
-
-centralityPlot(beforeGVAR,scale="raw0")
-centralityPlot(afterGVAR,scale="raw0")
-
-## Questions:
-# - how to show the hysteresis 
-# - how to show some symptom comes down while some doesn't (differentiate behavior)
-# - the parameter value range conditions -- in order to keep bistabiliy .. ?
-
-
-
-
-
-## WITHOUT NOISE
-# # compute the solution via Runge-Kutta method:
-# out_solution <- rk4(system_eq = deq,
-#                     parameters = parms,
-#                     initial_condition = init,
-#                     deltaT = deltaT,
-#                     n_steps = n_steps
-# )
-# 
-# # make a plot of the solution:
-# out_solution |>
-#   tidyr::pivot_longer(!t, names_to = "symptoms") |>
-#   ggplot(aes(x = t, y = value, color = symptoms)) +
-#   geom_line() 
-
+       title = "afterGVAR", labels = c("SA", "SB", "SC"),
+       layout = L)
+```
