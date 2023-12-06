@@ -1,0 +1,6 @@
+"0","before <- gvar(beforeshock, estimator=""FIML"") %>% runmodel"
+"2","Warning: The optimizer encountered at least one non-positive definite matrix and used a pseudoinverse in parameter estimation. Results may not be accurate. You could try to check for consistency with a different optimizer using 'setoptimizer'"
+"0","beforeGVAR <- getmatrix(before, ""PDC"") |> "
+"0","  qgraph(theme = ""colorblind"", directed=TRUE, diag=TRUE,"
+"0","       title = ""beforeGVAR"", labels = c(""SA"", ""SB"", ""SC""),"
+"0","       layout = L)"
