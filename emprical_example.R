@@ -14,11 +14,11 @@ f <- function(x) x^2
 
 ## adjacency matrix
 A <- matrix(c( 1, 1.07, 0, 0, 0, 0, 0, 0, 0,
-               1.07, 1, 0.5, 0, 0, 0, 0, 0, 0,
+               1.07, 1, 1.5, 0, 0, 1.35, 0, 0, 1.13,
                0, 0, 1, 1.35, 1.28, 0, 0, 0, 0,
                1.27, 0, 0, 1, 0, 0, 0, 0, 0,
                0, 0, 0, 1.52, 1, 0, 0, 0, 0,
-               0, 1.35, 0.44, 0, 0, 1, 1.3, 1.19, 1.7,
+               0, 1.35, 1.44, 0, 0, 1, 1.3, 1.19, 1.07,
                0, 0, 0, 0, 0, 0, 1, 1.64, 0,
                0, 0, 0, 0, 0, 0, 0, 1, 0,
                0, 0, 0, 0, 0, 0, 0, 1.03, 0.5), 9, 9, byrow = T)
@@ -28,15 +28,15 @@ rownames(A) <- colnames(A) <- c("anh", "sad", "slp", "ene", "app", "glt", "con",
 # define differential equations:
 #equation <- "dS[i] ~ S[i]*(1-S[i])*(Beta[i] + A_i[i]*S[i] + A_j[i]*(1+ delta[i]*f(S[i])))"
 dif_eq <- 1:9 |> map(function(x){
-  lhs <- paste0("dS", x)
+  lhs <- paste0("dS", paste0("_",colnames(A)[x]))
   rhs <- stringr::str_replace_all(
-    "Sk*(1-Sk)*(Betak + A_ik*Sk + A_jk*(1+ deltak*f(Sk)))", "k", as.character(x))
+    "Sk*(1-Sk)*(Betak + A_ik*Sk + A_jk*(1+ deltak*f(Sk)))", "k", paste0("_",colnames(A)[x]))
   form <- as.formula(paste(lhs,"~", rhs))
 })
 
 # give noise:
 sto_eq <-  1:9 |> map(function(x){
-  lhs <- paste0("dS", x)
+  lhs <- paste0("dS", paste0("_",colnames(A)[x]))
   rhs <- 1  # change as you need
   form <- as.formula(paste(lhs,"~", rhs))
 })
@@ -46,43 +46,44 @@ sto_eq <-  1:9 |> map(function(x){
 #              dSC ~ .1)
 
 # define the parameters (as a named vector):
-A_i <- diag(A) |> set_names(paste0("A_i", 1:9)) # for now, set it all to 1
-A_j <- colSums(A) |> set_names(paste0("A_j", 1:9))
-delta <- rep(1, 9) |> set_names(paste0("delta", 1:9))
+A_i <- diag(A) |> set_names(paste0("A_i_", colnames(A))) # for now, set it all to 1
+A_j <- colSums(A) |> set_names(paste0("A_j_", colnames(A)))
+delta <- rep(1.3, 9) |> set_names(paste0("delta_", colnames(A)))
 ## Healthy: sum(A_ji)*(1 + delta(S_i^4)) + beta_i) < -A_ii
 # beta_i < -A_ii - sum(A_ji)*(1 + delta(S_i^4))
-Beta_healthy <- (- A_i - A_j*2) |> set_names(paste0("Beta", 1:9)) # as the max of delta(S_i^4) == 1
-Beta_bistable <- (- A_i - A_j*2 + 2.5) |> set_names(paste0("Beta", 1:9))
+(- A_i - A_j*2) # as the max of delta(S_i^4) == delta*1
+Beta_healthy <- c(-7.68, -7.84, -6.88, -8.74, -5.56, -5.70, -5.60, -9.72, -10.90) |> set_names(paste0("Beta_", colnames(A))) 
+Beta_bistable <- c(-5.68, -5.84, -5.88, -5.74, -5.56, -4.70, -4.60, -7.72, -8.90) |> set_names(paste0("Beta_", colnames(A)))
 # Beta_sick <- c(5.18, 5.34, 5.38, 6.24, 3.06, 8.50, -3.10, -8.22, -3.90) |> set_names(paste0("Beta", 1:9))
-Beta_sick <- c(8, 10, 10, 8, 8, 10,3,3,3) |> set_names(paste0("Beta", 1:9))
+Beta_sick <- c(-2.68, 2.84, -1.88, -2.74, -2.56, 1.70, -1.60, -3.72, -5.90) |> set_names(paste0("Beta_", colnames(A)))
 # Beta <- Beta_sick |> set_names(paste0("Beta", 1:9))
 
 ## original params
-parms1 <- c(A_i, A_j, Beta_healthy, delta)
+parms1 <- c(A_i, A_j, Beta_bistable, delta)
 ## given shock (beta: stressor increases)  
 parms2 <- c(A_i, A_j, Beta_sick, delta)
 
 # define the initial condition (as a named vector):
-init <- c(S1 = .01, 
-          S2 = .01, 
-          S3 = .01, 
-          S4 =.01, 
-          S5 =.01, 
-          S6 =.01, 
-          S7 =.01, 
-          S8 =.01, 
-          S9 =.01)
+init <- c(S_anh = .01, 
+          S_sad = .01, 
+          S_slp = .01, 
+          S_ene =.01, 
+          S_app =.01, 
+          S_glt =.01, 
+          S_con =.01, 
+          S_mot =.01, 
+          S_sui =.01)
 
 # define deltaT and the number of time steps:
 deltaT <- .1 # timestep length
-time <- 200
+timelength <- 1000
 n_steps <- as.integer(time / deltaT) # must be a number greater than 1
 
 # specify the standard deviation of the stochastic noise
 D_stoeq1 <- 0.01 # before shock
-D_stoeq2 <- 0.05 # after shock
-t_shock <- 500 
-shock_duration <- 500
+D_stoeq2 <- 0.02 # after shock
+t_shock <- 300
+shock_duration <- 100
 
 #set.seed(678) # set the seed (system's behavior varies much by random noise)
 # simulate :
@@ -97,7 +98,7 @@ sde_out <- euler_stochastic2(
   initial_condition = init,
   parameters1 = parms1,
   deltaT = deltaT,
-  n_steps = n_steps,
+  timelength = timelength,
   D1 = D_stoeq1,
   D2 = D_stoeq2,
   shock = TRUE,
@@ -106,8 +107,8 @@ sde_out <- euler_stochastic2(
   duration = shock_duration
 )
 
-shock_period <- data.frame(time = 0:n_steps*deltaT) |>
-  mutate(shock = ifelse(time >= t_shock * deltaT & time <= (t_shock+shock_duration)*deltaT, TRUE, FALSE))
+shock_period <- data.frame(time = 0:timelength) |>
+  mutate(shock = ifelse(time >= t_shock & time <= t_shock + shock_duration, TRUE, FALSE))
 
 sde_out |>
   tidyr::pivot_longer(!t, names_to = "symptoms") |>
@@ -120,7 +121,7 @@ sde_out |>
   theme(legend.position="bottom") 
 
 sde_out |>
-  mutate(totalsymptom = rowSums(pick(S1:S9))) |>
+  mutate(totalsymptom = rowSums(pick(S_anh:S_sui))) |>
   ggplot(aes (x = t, y = totalsymptom)) +
   geom_line(col = "salmon") +
   geom_area(data = shock_period, aes(x = time, y = shock*max(sde_out[,-1])*ncol(sde_out[,-1])
@@ -130,8 +131,9 @@ sde_out |>
 
 
 ## fitting statistical networks:
-beforeshock <- sde_out |> filter(t > 25 & t < 49.9) |> select(!t)
-aftershock <- sde_out |> filter(t >=49.9) |> select(!t)
+burnout <- 30
+beforeshock <- sde_out |> filter(t > burnout & t < t_shock) |> select(!t)
+aftershock <- sde_out |> filter(t >=t_shock) |> select(!t)
 
 layout(t(1:2))
 beforeGGM <- qgraph(cor_auto(beforeshock),

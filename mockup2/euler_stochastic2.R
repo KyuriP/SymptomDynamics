@@ -2,7 +2,7 @@ library(modelr)
 library(magrittr)
 
 euler_stochastic2 <- function (deterministic_rate, stochastic_rate, initial_condition, 
-                               parameters1 = NULL, t_start = 0, deltaT = 1, n_steps = 1, 
+                               parameters1 = NULL, t_start = 0, deltaT = 1, timelength = 1, 
                                D1 = 1, D2 = 1, shock = F, parameters2 = NULL, t_shock = NULL, duration = NULL) 
 {
   curr_vec <- c(initial_condition, t = t_start)
@@ -13,11 +13,12 @@ euler_stochastic2 <- function (deterministic_rate, stochastic_rate, initial_cond
   time_eq_stoc <- c(dt ~ 0)
   new_stochastic_rate <- c(stochastic_rate, time_eq_stoc) %>% 
     formula.tools::rhs()
+  n_steps = as.integer(timelength / deltaT)
   out_list <- vector("list", length = n_steps)
   out_list[[1]] <- curr_vec
   for (i in 2:n_steps) {
     if(shock){
-      if(i < t_shock | i > t_shock + duration){
+      if(i < t_shock / deltaT | i > (t_shock + duration)/deltaT){
         in_list <- c(parameters1, curr_vec) %>% as.list()
       } else {
         in_list <- c(parameters2, curr_vec) %>% as.list()
@@ -30,12 +31,12 @@ euler_stochastic2 <- function (deterministic_rate, stochastic_rate, initial_cond
     curr_stoch_rate <- sapply(new_stochastic_rate, FUN = eval, 
                               envir = in_list) %>% purrr::set_names(nm = vec_names)
     if(shock){
-      if(i < t_shock){
+      if(i < t_shock / deltaT){
         v3 <- c(curr_vec, curr_rate * deltaT, curr_stoch_rate * 
                   sqrt(2 * D1 * deltaT) * rnorm(n_vars))       
       } else {
         v3 <- c(curr_vec, curr_rate * deltaT, curr_stoch_rate * 
-                  sqrt(2 * D2 * deltaT) * rnorm(n_vars))       }
+                  sqrt(2 * D2 * deltaT) * rnorm(n_vars))}
     } else {
       v3 <- c(curr_vec, curr_rate * deltaT, curr_stoch_rate * 
                 sqrt(2 * D1 * deltaT) * rnorm(n_vars)) 
