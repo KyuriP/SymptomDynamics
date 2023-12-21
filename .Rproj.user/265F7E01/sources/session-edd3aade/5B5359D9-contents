@@ -169,16 +169,16 @@ afterGGM <- qgraph(cor_auto(aftershock),
        title = "afterGGM",
        layout = L)
 
-# layout(t(1:2))
-# before <- gvar(beforeshock, estimator="FIML") %>% runmodel
-# beforeGVAR <- getmatrix(before, "PDC") |> 
-#   qgraph(theme = "colorblind", directed=TRUE, diag=TRUE,
-#        title = "beforeGVAR", labels = c("SA", "SB", "SC"),
-#        layout = L)
-# 
-# after <- gvar(aftershock, estimator="FIML") %>% runmodel
-# afterGVAR <- getmatrix(after, "PDC") |>
-#   qgraph(theme = "colorblind", directed=TRUE, diag=TRUE,
-#        title = "afterGVAR", labels = c("SA", "SB", "SC"),
-#        layout = L)
+layout(t(1:2))
+before <- gvar(beforeshock, estimator="FIML") %>% runmodel
+beforeGVAR <- getmatrix(before, "PDC") |> 
+  qgraph(theme = "colorblind", directed=TRUE, diag=TRUE,
+       title = "beforeGVAR", labels = c("SA", "SB", "SC"),
+       layout = L)
+
+after <- gvar(aftershock, estimator="FIML") %>% runmodel
+afterGVAR <- getmatrix(after, "PDC") |>
+  qgraph(theme = "colorblind", directed=TRUE, diag=TRUE,
+       title = "afterGVAR", labels = c("SA", "SB", "SC"),
+       layout = L)
 ```

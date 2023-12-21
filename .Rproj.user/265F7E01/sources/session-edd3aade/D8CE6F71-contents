@@ -1,0 +1,59 @@
+# Define the stochastic differential equation
+sde <- function(t, x, params) {
+  mu <- params[1]
+  sigma <- params[2]
+  dx <- mu * dt + sigma * sqrt(dt) * rnorm(1)
+  return(dx)
+}
+
+
+# Set parameters
+A_i <- diag(A) # for now, set it all to 1
+A_j <- colSums(A)
+Beta <- -A_i - A_j*2 # as the max of delta(S_i^4) == 1
+delta <- rep(0.3, 9)
+params <- data.frame(A_i, A_j, Beta, delta)
+
+sde <- function(t, s, n){
+  for(i in 1:n){
+    noise = sigma * sqrt(dt) * rnorm(1)
+    ds[i] = s[i] * (1 - s[i])*(Beta[i] + A_i[i]*s[i] + A_j*(1 + delta * s[i]^4)) * dt + noise
+  }
+  
+  for i in range(n):
+    interaction_sum = np.sum(a[i, :] * s)
+    noise = sigma * np.random.normal() * np.sqrt(dt)
+    ds[i] = (-b[i] + interaction_sum) * (1 - s[i]) * s[i] * dt + noise
+    s[i] = min(max(s[i] + ds[i], 0), 1)
+}
+
+
+# Function to perform Euler-Maruyama simulation
+euler_maruyama <- function(sde, params, T, dt, x0) {
+  n <- round(T/dt)
+  t <- seq(0, T, by = dt)
+  x <- numeric(n+1)
+  x[1] <- x0
+  
+  for (i in 1:n) {
+    x[i+1] <- x[i] + sde(t[i], x[i], params)
+  }
+  
+  return(data.frame(t, x))
+}
+
+# Set parameters
+mu <- 0.1
+sigma <- 0.2
+params <- c(mu, sigma)
+
+# Set initial condition and simulation parameters
+x0 <- 0
+T <- 1
+dt <- 0.01
+
+# Perform simulation
+result <- euler_maruyama(sde, params, T, dt, x0)
+
+# Plot the results
+plot(result$t, result$x, type = "l", col = "blue", xlab = "Time", ylab = "X", main = "Euler-Maruyama Simulation")
