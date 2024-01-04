@@ -1,3 +1,0 @@
-A <- matrix(c(x1, r12theta2, r13theta3, 
-            r21theta1, x2, r23theta3, 
-            r31theta1, r32theta2, x3), 3, 3, byrow = T)
