@@ -1,0 +1,35 @@
+---
+title: "helius"
+format:
+  html:
+    grid: 
+      body-width: 3000px
+      sidebar-width: 200px
+      margin-width: 200px
+    toc: true
+editor: visual
+---
+
+```{r}
+library(haven)
+
+helius1 <- read_sav("data/231107_HELIUS data Kyuri Park.sav")
+helius2 <- read_sav("data/HELIUS_itemscores.sav")
+
+helius2$Cov1_WlbvRecent1
+library(janitor)
+All.list <- list(helius1, helius2)
+compare_df_cols(All.list)
+
+
+skimr::skim(helius2)
+
+library("labelled")
+res1 <- val_labels(helius1)
+names(res1)
+
+res2 <- val_labels(helius2)
+names(res2)
+
+
+```

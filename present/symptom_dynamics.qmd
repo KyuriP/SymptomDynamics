@@ -1,0 +1,59 @@
+---
+title: "Depressive Symptom Dynamics"
+author: "Kyuri Park"
+format: revealjs
+editor: visual
+date: today
+---
+
+## Fundamental concepts of depression
+
+-   Bistability
+-   Network connectivity
+-   Hysteresis
+-   Resilience
+
+![](img/landscape_networks.png){.absolute top="100" left="500" width="550" height="600"}
+
+## Toy model
+
+Underlying causal structure
+
+![](img/toymodel2.png){fig-align="center"}
+
+## Formalizing dynamics{.smaller}
+
+
+-   Deterministic equation:
+
+```{=tex}
+\begin{equation} \label{eq:2}
+\frac{dS_i}{dt} = S_i(1-S_i)(\beta_i + \alpha_{ii}S_i + \sum_{i \neq j}\alpha_{ij}S_j(1 + \delta_i f(S_i)))
+\end{equation}
+```
+-   Add (white) noise:
+
+```{=tex}
+\begin{equation} \label{eq:3}
+dS_{it} = S_{it}(1-S_{it})(\beta_i + \alpha_{ii} S_{it} + \sum_{i \neq j}\alpha_{ij}S_{jt}(1+\delta_i f(S_{it})) dt + S_{it}dW_t
+\end{equation}
+```
+
+## Specifying parameters{.scrollable}
+
+![](img/bistable.png){fig-align="center"}
+
+![](img/table.png){fig-align="center"}
+
+
+
+## Simulation{.scrollable}
+
+![](img/eachsymptom.png){fig-align="center"}
+
+![](img/totalsymptom.png){fig-align="center"}
+
+
+![](img/networks.png){fig-align="center"}
+
+

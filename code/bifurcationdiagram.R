@@ -11,7 +11,8 @@ d <- 4
 
 
 # S rate
-rate <- function(S, b= 1) S*(1 - S)*(b + a*S + W*(1 + d*(S^2)))  
+rate <- function(S, b = 1) S*(1 - S)*(b + a*S + W*(1 + d*(S^2)))  
+
 # Stability of a root ~ sign of eigenvalue of Jacobian
 stability<-function(b) { 
   Eq <- uniroot.all(rate, c(0,1), b = b) 

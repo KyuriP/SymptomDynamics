@@ -32,25 +32,32 @@ euler_stochastic2 <- function (deterministic_rate, stochastic_rate, initial_cond
     curr_stoch_rate <- sapply(new_stochastic_rate, FUN = eval, 
                               envir = in_list) %>% purrr::set_names(nm = vec_names)
     if(shock){
-      if(i < t_shock / deltaT){
-        v3 <- c(curr_vec, curr_rate * deltaT, curr_stoch_rate * 
-                  sqrt(2 * D1 * deltaT) * rnorm(n_vars))       
-      } else {
-        v3 <- c(curr_vec, curr_rate * deltaT, curr_stoch_rate * 
-                  sqrt(2 * D2 * deltaT) * rnorm(n_vars))}
-      # if(i < t_shock / deltaT){
+      # if(i >= t_shock / deltaT & i <= (t_shock + duration) / deltaT) {
       #   v3 <- c(curr_vec, curr_rate * deltaT, curr_stoch_rate * 
-      #             sqrt(2 * abs(curr_vec)/10 * deltaT) * rnorm(n_vars))       
+      #             sqrt(2 * abs(curr_vec)/100 * deltaT) * rnorm(n_vars))
       # } else {
-      #   v3 <- c(curr_vec, curr_rate * deltaT, curr_stoch_rate * 
-      #             sqrt(2 * abs(curr_vec)/10 * deltaT) * rnorm(n_vars))}
+      #   v3 <- c(curr_vec, curr_rate * deltaT, curr_stoch_rate *
+      #             sqrt(2 * D1 * deltaT) * rnorm(n_vars))
+      # }
+      if(i < t_shock / deltaT){
+        v3 <- c(curr_vec, curr_rate * deltaT, curr_stoch_rate *
+                  sqrt(2 * D1 * deltaT) * rnorm(n_vars))
+      } else {
+        v3 <- c(curr_vec, curr_rate * deltaT, curr_stoch_rate *
+                  sqrt(2 * D1 * deltaT) * rnorm(n_vars))}
+      # if(i < t_shock / deltaT){
+      #   v3 <- c(curr_vec, curr_rate * deltaT, curr_stoch_rate *
+      #             sqrt(2 * curr_vec/100 * deltaT) * rnorm(n_vars))
+      # } else {
+      #   v3 <- c(curr_vec, curr_rate * deltaT, curr_stoch_rate *
+      #             sqrt(2 * curr_vec/100 * deltaT) * rnorm(n_vars))}
     } else {
       v3 <- c(curr_vec, curr_rate * deltaT, curr_stoch_rate * 
                 sqrt(2 * D1 * deltaT) * rnorm(n_vars)) 
     }
     curr_vec <- tapply(v3, names(v3), sum) 
-    curr_vec[-length(curr_vec)] %<>% ifelse(. > 1, 0.99, .)
-    curr_vec[-length(curr_vec)] %<>% ifelse(. < 0, 0.01, .)
+    curr_vec[-length(curr_vec)] %<>% ifelse(. > 1, abs(. - 2), .) # this would not be over 2 ?
+    curr_vec[-length(curr_vec)] %<>% ifelse(. < 0, abs(.), .) # this would not be lower than -2 ? 
     out_list[[i]] <- curr_vec
   }
   out_results <- out_list %>% dplyr::bind_rows() %>% dplyr::relocate(t)

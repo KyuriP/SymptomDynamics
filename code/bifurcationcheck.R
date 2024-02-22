@@ -5,7 +5,7 @@ library(deBif)
 model<-function(t,state,parms)
   { with(as.list(c(state,parms)), 
          { 
-         dS <- S*(1 - S)*(b + a*S + W*(1 + d*(S^4)))   
+         dS <- S*(1 - S)*(b + a*S + W*(1 + d*(S^2)))   
          return(list(dS)) 
          })
 } 
