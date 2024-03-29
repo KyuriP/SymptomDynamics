@@ -10,7 +10,7 @@ model<-function(t,state,parms)
          })
 } 
 
-perms <- c(a = 1, b = -1, W = 1, d = 1)#pisanamedvectorofparameters 
+perms <- c(a = 1, b = -1, W = 1, d = 1) #pisanamedvectorofparameters 
 state <- c(S = 0.3) #sisthestate
 
 times <-seq(0, 100,by= 0.01)
@@ -21,3 +21,5 @@ plot(out)
 
 phaseplane(model, state, perms)
 bifurcation(model, state, perms)
+ 
+

@@ -36,6 +36,19 @@ A <- matrix(c( .30, 0, 0, 0, 0, 0, 0, 0, 0,
                0, 0, 0, 0, 0, 0, .30, .17, 0,
                0, 0, 0, 0, 0, 0, 0, .30, 0,
                0, 0, 0, 0, 0, 0, 0, .3, 0.07), 9, 9, byrow = T)
+
+# change suicidal alpha to be the same
+A <- matrix(c( .30, 0, 0, 0, 0, 0, 0, 0, 0,
+               .33, .30, .14, .15, 0, .13, 0, 0, .15,
+               .13, .14, .30, .22, .23, 0, 0, 0, 0,
+               .21, .15, .22, .30, 0, 0, .12, 0, 0,
+               0, 0, 0, .17, .30, 0, 0, 0, 0,
+               0, .13, 0, 0, .15, .30, .2, .15, .22,
+               0, 0, 0, 0, 0, 0, .30, .17, 0,
+               0, 0, 0, 0, 0, 0, 0, .30, 0,
+               0, 0, 0, 0, 0, 0, 0, .3, 0.30), 9, 9, byrow = T)
+
+
 rownames(A) <- colnames(A) <- c("anh", "sad", "slp", "ene", "app", "glt", "con", "mot", "sui")
 
 # define differential equations:
@@ -101,7 +114,7 @@ dit <- (- A_j - (- A_i - A_j*(1+delta)))
 Beta_healthy <- c(-1.94, -1.44, -1.32, -1.68, -1.36, -0.86, -1.24, -1.84, -0.74) |> set_names(paste0("Beta_", colnames(A))) 
 
 ## bistable: ...< beta_i < - A_j
-- A_j
+- A_j*(1+2)
 # Beta_bistable <- c(-5.58, -5.34, -5.78, -5.64, -5.46, -4.60, -4.50, -7.62, -6.81) |> set_names(paste0("Beta_", colnames(A)))
 # Beta_bistable <- c(-1.07, -0.82, -0.76, -0.94, -0.78, -0.53, -0.72, -1.02, -0.62) |> set_names(paste0("Beta_", colnames (A)))
 # Beta_bistable <- c(-1.24, -0.83, -0.73, -1.03, -0.77, -0.35, -0.67, -1.16, -1.01) |> set_names(paste0("Beta_", colnames(A)))
@@ -109,7 +122,8 @@ Beta_bistable <- c(-1.355, -0.995, -0.905, -1.165, -0.935, -0.575, -0.845, -1.28
 # Beta_bistable <- c(-1.246,-0.921, -0.843, -1.077, -0.869, -0.544, -0.791, -1.181, -1.00) |> set_names(paste0("Beta_", colnames(A))) 
 rownames(A) <- colnames(A) <- c("anh", "sad", "slp", "ene", "app", "glt", "con", "mot", "sui")
 
-- A_j + dist*0.1
+- A_j + dist*20
+Beta_bistable*(1 - 0.325)
 ## sick: beta_i > - A_j
 # Beta_sick <- c(1.68, 2.04, 1.88, -2.74, -2.56, 1.95, -1.60, -3.72, -5.90) |> set_names(paste0("Beta_", colnames(A))
 # Beta_sick <- c(-0.72, -0.47, -0.41, -0.59, -0.53, -0.18, -0.37, -0.67, -0.41) |> set_names(paste0("Beta_", colnames(A)))
@@ -203,7 +217,7 @@ eachsym <- sde_out |>
   labeller = labeller(symptoms = labelllername) 
   )
 
-# ggsave("eachsym_v2.pdf", plot = eachsym, width = 25, height =10, units = "cm", dpi = 300)
+# ggsave("eachsym_v2.pdf", plot = eachsym, width = 30, height =15, units = "cm", dpi = 300)
 
 
 ## aggregate symptom level
@@ -348,6 +362,7 @@ abline(v = -1.3, lty=3, col = "lightgray")
 # dev.off()
 
 
+
 ## High resilience person
 
 ## adjacency matrix
@@ -370,6 +385,16 @@ Ahigh <- matrix(c( .10, 0, 0, 0, 0, 0, 0, 0, 0,
                    0, 0, 0, 0, 0, 0, .10, .17, 0,
                    0, 0, 0, 0, 0, 0, 0, .10, 0,
                    0, 0, 0, 0, 0, 0, 0, .3, 0.02), 9, 9, byrow = T)
+
+Ahigh <- matrix(c( .10, 0, 0, 0, 0, 0, 0, 0, 0,
+                   .33, .10, .14, .15, 0, .13, 0, 0, .15,
+                   .13, .14, .10, .22, .23, 0, 0, 0, 0,
+                   .21, .15, .22, .10, 0, 0, .12, 0, 0,
+                   0, 0, 0, .17, .10, 0, 0, 0, 0,
+                   0, .13, 0, 0, .15, .10, .2, .15, .22,
+                   0, 0, 0, 0, 0, 0, .10, .17, 0,
+                   0, 0, 0, 0, 0, 0, 0, .10, 0,
+                   0, 0, 0, 0, 0, 0, 0, .3, 0.10), 9, 9, byrow = T)
 
 rownames(Ahigh) <- colnames(Ahigh) <- c("anh", "sad", "slp", "ene", "app", "glt", "con", "mot", "sui")
 
@@ -471,7 +496,7 @@ eachsym_res <- sde_out_res |>
   facet_wrap(~symptoms, labeller = labeller(symptoms = labelllername) 
   )
 
-# ggsave("eachsym_resv2.pdf", plot = eachsym_res, width = 25, height =10, units = "cm", dpi = 300)
+# ggsave("eachsym_resv2.pdf", plot = eachsym_res, width = 30, height =15, units = "cm", dpi = 300)
 
 
 ## aggregate symptom level
@@ -625,6 +650,16 @@ Alow <- matrix(c( .50, 0, 0, 0, 0, 0, 0, 0, 0,
                   0, 0, 0, 0, 0, 0, 0, .50, 0,
                   0, 0, 0, 0, 0, 0, 0, .30, 0.15), 9, 9, byrow = T)
 
+Alow <- matrix(c( .50, 0, 0, 0, 0, 0, 0, 0, 0,
+                  .33, .50, .14, .15, 0, .13, 0, 0, .15,
+                  .13, .14, .50, .22, .23, 0, 0, 0, 0,
+                  .21, .15, .22, .50, 0, 0, .12, 0, 0,
+                  0, 0, 0, .17, .50, 0, 0, 0, 0,
+                  0, .13, 0, 0, .15, .50, .2, .15, .22,
+                  0, 0, 0, 0, 0, 0, .50, .17, 0,
+                  0, 0, 0, 0, 0, 0, 0, .50, 0,
+                  0, 0, 0, 0, 0, 0, 0, .30, 0.50), 9, 9, byrow = T)
+
 rownames(Alow) <- colnames(Alow) <- c("anh", "sad", "slp", "ene", "app", "glt", "con", "mot", "sui")
 
 
@@ -725,7 +760,7 @@ eachsym_low <- sde_out_low |>
              labeller = labeller(symptoms = labelllername) 
   )
 
-# ggsave("eachsym_lowv2.pdf", plot = eachsym_low, width = 25, height =10, units = "cm", dpi = 300)
+# ggsave("eachsym_lowv2.pdf", plot = eachsym_low, width = 30, height =15, units = "cm", dpi = 300)
 
 
 ## aggregate symptom level
@@ -855,19 +890,27 @@ aggregated <- readRDS("aggregated.rds")
 aggregated_res <- readRDS("aggregated_res.rds")
 aggregated_low <- readRDS("aggregated_low.rds")
 
-avgnet <- aggregated |> select(S_anh:S_sui) 
+avgnet <- aggregated |> dplyr::select(S_anh:S_sui) 
 colnames(avgnet) <- colnames(A)
-avgnet_res <- aggregated_res |> select(S_anh:S_sui)
+avgnet_res <- aggregated_res |> dplyr::select(S_anh:S_sui)
 colnames(avgnet_res) <- colnames(A)
-avgnet_low <- aggregated_low |> select(S_anh:S_sui)
+avgnet_low <- aggregated_low |> dplyr::select(S_anh:S_sui)
 colnames(avgnet_low) <- colnames(A)
 
 #total average net 
 totavgnet <- avgnet |> bind_rows(avgnet_res, avgnet_res) #|> slice_sample(prop = 0.8)
-totavgnetwork <- estimateNetwork(totavgnet, default = "EBICglasso", tuning = 0.1)
+totavgnetwork <- estimateNetwork(totavgnet, default = "EBICglasso")
 totavgnetwork2 <- plot(totavgnetwork,  labels = colnames(A))
-#totavgnetwork2$
 
+#swap their locations (con & glt)
+conloc <- totavgnetwork2$layout[7,]
+gltloc <- totavgnetwork2$layout[6,]
+totavgnetwork2$layout[6,] <- conloc
+totavgnetwork2$layout[7,] <- gltloc
+
+plot(totavgnetwork2)
+
+# centrality
 res_totavg <- centrality_auto(totavgnetwork)
 
 cent_totavg <- res_totavg$node.centrality$Strength |>as_data_frame() |>  mutate(node = factor(rownames(res_totavg$node.centrality), levels= c(rownames(res_totavg$node.centrality)))
@@ -885,9 +928,9 @@ cent_totavg_plot <- cent_totavg |>
 
 library(patchwork)
 
-cent_totavg_plot + ~plot(totavgnetwork,  labels = colnames(A), node.width=2, main = "population network") 
+figpatches <- cent_totavg_plot + ~plot(totavgnetwork,  labels = colnames(A), node.width=2, main = "population network") 
 
-pdf(file = "totalnetwork.pdf", width = 14, height = 9)
+pdf(file = "totalnetwork.pdf", width = 12, height = 8)
 old_par <- par(mar = c(0, 2, 0, 0), bg = NA)
 wrap_elements(panel = ~plot(totavgnetwork2,  labels = colnames(A), edge.color = "deepskyblue4"), clip = FALSE) + cent_totavg_plot + plot_layout(widths = c(1.7, 1))
 par(old_par)

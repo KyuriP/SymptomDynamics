@@ -4,7 +4,7 @@ library(dplyr)
 library(stringr)
 
 helius2 <- read_sav("data/HELIUS_itemscores.sav")
-helius2$H2_WlbvRecent10
+helius2$H2_WlbvRecent9
 
 dep_scores <- helius2 |> 
   select(contains("WlbvRecent") & !ends_with("Ingevuld"), ID) |>
@@ -36,7 +36,8 @@ net_list <- dep_list |>
         plot(.x)
       )
 
-plot(net_list$Cov1)
+
+plot(net_list$H1)
 
 # H1net <- estimateNetwork(H1, default = "EBICglasso")
 # plot(H1net)
