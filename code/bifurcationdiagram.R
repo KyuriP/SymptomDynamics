@@ -17,19 +17,10 @@ b <- -8; a <- 1; W <- 1; d <- 3
 
 
 # S rate
-#rate <- function(S, b = 1) S*(1 - S)*(b + a*S + W*(1 + d*(S^2)))  
-
 rate <- function(S, W = 3) S*(1 - S)*(b + a*S + W*(1 + d*(S^2)))  
 
 
 # Stability of a root ~ sign of eigenvalue of Jacobian
-
-# stability<-function(b) { 
-#   Eq <- uniroot.all(rate, c(0,1), b = b) 
-#   eig <-vector() 
-#   for(i in 1:length(Eq)) 
-#     eig[i]<-sign(gradient(rate,Eq[i],b = b)) 
-#   return(list(Eq=Eq,Eigen=eig)) } 
 
 stability<-function(W) { 
   Eq <- uniroot.all(rate, c(0,1), W = W) 
@@ -40,15 +31,10 @@ stability<-function(W) {
 
 
 # bifurcation diagram 
-# bseq <- seq(-8, 2, by=0.01) 
-
 wseq <-  seq(0, 10, by=0.01) 
 
 # plot bifurcation
-# lst <- bseq |> 
-#   map_df(~ stability(.x), .id = "id") |>
-#   mutate(beta = as.factor(bseq[as.numeric(id)]),
-#          Eigen = ifelse(Eigen == 1, "unstable", "stable"))
+
 lst1 <- wseq |> 
   map_df(~ stability(.x), .id = "id") |>
   mutate(omega = as.factor(wseq[as.numeric(id)]),
@@ -115,6 +101,25 @@ ggsave("bifurcation_W.pdf", plot = bif_W, units="in", width=25, height=12, bg = 
 
 
 
+b <- 1; a <- 1; W <- 1; d <- 3
+rate <- function(S, b = 1) S*(1 - S)*(b + a*S + W*(1 + d*(S^2)))
+
+stability<-function(b) {
+  Eq <- uniroot.all(rate, c(0,1), b = b)
+  eig <-vector()
+  for(i in 1:length(Eq))
+    eig[i]<-sign(gradient(rate,Eq[i],b = b))
+  return(list(Eq=Eq,Eigen=eig)) }
+
+bseq <- seq(-8, 2, by=0.01)
+
+lst <- bseq |>
+  map_df(~ stability(.x), .id = "id") |>
+  mutate(beta = as.factor(bseq[as.numeric(id)]),
+         Eigen = ifelse(Eigen == 1, "unstable", "stable"))
+stable <- lst |> filter(Eigen =="stable")
+unstable <- lst |> filter(Eigen =="unstable")
+
 
 bif <- lst |> ggplot(aes(x = beta, y = Eq, color = Eigen)) +
   geom_point(size = 0.3) +
@@ -127,7 +132,7 @@ bif <- lst |> ggplot(aes(x = beta, y = Eq, color = Eigen)) +
   annotate('rect', xmin = 300, xmax = 700, ymin =0, ymax= 1, alpha=0.1, fill="orange")+
   labs(x = expression(beta[i]), y = expression("S"[i]^"*"))+
   scale_y_continuous(breaks=c(0,1))+
-  scale_x_discrete(breaks = c("-5", "-1"), labels = c(expression(-omega[i] *(delta[i]+1) - alpha[ii]), expression(-omega[i]))) + 
+  scale_x_discrete(breaks = c("-5", "-1"), labels = c(expression(-omega[i] *(1+delta[i]) - alpha[ii]), expression(-omega[i]))) + 
   #scale_x_discrete(breaks = c(205, 700), labels = c(expression(-omega *(delta+1) - alpha), expression(-omega))) + 
   theme(axis.text.x=element_text(size = 40), 
         axis.text.y=element_text(size = 40),

@@ -11,10 +11,10 @@ library(purrr)
 library(tidyr)
 library(bootnet)
 
-set.seed(100)
-
+# source the function
 source("code/euler_stochastic2.R")
 
+# define "f"
 f <- function(x) x^2
 
 ## adjacency matrix
@@ -402,7 +402,7 @@ rownames(Ahigh) <- colnames(Ahigh) <- c("anh", "sad", "slp", "ene", "app", "glt"
 # define the parameters (as a named vector):
 Ahigh_i <- diag(Ahigh) |> set_names(paste0("A_i_", colnames(Ahigh))) # for now, set it all to 1
 Ahigh_j <- colSums(Ahigh) |> set_names(paste0("A_j_", colnames(Ahigh)))
-delta_high <- rep(8, 9) |> set_names(paste0("delta_", colnames(Ahigh)))
+delta_high <- rep(6, 9) |> set_names(paste0("delta_", colnames(Ahigh)))
 
 ## Healthy: sum(A_ji)*(1 + delta(S_i^4)) + beta_i) < -A_ii
 # beta_i < -A_ii - sum(A_ji)*(1 + delta(S_i^4))
@@ -520,6 +520,9 @@ aggregated_res <- map(1:n_sims, ~ euler_stochastic2(
 ) |> list_rbind(names_to = "sim")
 
 # saveRDS(aggregated_res, "aggregated_res.rds")
+# aggregated_res <- readRDS("data/aggregated_res.rds")
+
+
 
 quantile_df <- function(x, probs = c(0.025, 0.5, 0.975)) {
   tibble(
@@ -569,7 +572,7 @@ totalsym_res <- ggplot(data = summarized_res) +
   geom_hline(yintercept = 10/3, linetype = 2, color = "azure4", lwd = 0.1) +
   theme_classic(base_size = 15)
 
-# ggsave("totalsym_resv2.pdf", plot = totalsym_res, width = 20, height =10, units = "cm", dpi = 300)
+# ggsave("totalsym_resv2.pdf", plot = totalsym_res, width = 25, height =10, units = "cm", dpi = 300)
 
 
 
@@ -754,7 +757,7 @@ eachsym_low <- sde_out_low |>
   scale_color_discrete(name = "Symptoms", labels = c("anhedonia", "sad", "sleep", "energy", "appetite", "guilty", "concentration", "motor", "suicidal"))+
   #labs(x="time", y = "", title ="Trajectory of each symptom") +
   labs(x="time", y = "") +
-  theme_classic() +
+  theme_classic(base_size = 15) +
   theme(legend.position="none") +
   facet_wrap(~symptoms,
              labeller = labeller(symptoms = labelllername) 
@@ -886,9 +889,9 @@ abline(v = -3.9, lty=3, col = "lightgray")
 abline(v = -1.3, lty=3, col = "lightgray")
 
 # dev.off()
-aggregated <- readRDS("aggregated.rds")
-aggregated_res <- readRDS("aggregated_res.rds")
-aggregated_low <- readRDS("aggregated_low.rds")
+aggregated <- readRDS("data/aggregated.rds")
+aggregated_res <- readRDS("data/aggregated_res.rds")
+aggregated_low <- readRDS("data/aggregated_low.rds")
 
 avgnet <- aggregated |> dplyr::select(S_anh:S_sui) 
 colnames(avgnet) <- colnames(A)
@@ -900,7 +903,12 @@ colnames(avgnet_low) <- colnames(A)
 #total average net 
 totavgnet <- avgnet |> bind_rows(avgnet_res, avgnet_res) #|> slice_sample(prop = 0.8)
 totavgnetwork <- estimateNetwork(totavgnet, default = "EBICglasso")
+
+grp <- list(`cycle` = 2:6, `no cycle` = c(1,7:9))
+
+
 totavgnetwork2 <- plot(totavgnetwork,  labels = colnames(A))
+# totavgnetwork2 <- plot(totavgnetwork,  labels = colnames(A), groups = grp, color = c("#F5651C", "#58B5BC"), legend=F, border.color = "white",border.width = 2, label.color = "white")
 
 #swap their locations (con & glt)
 conloc <- totavgnetwork2$layout[7,]
@@ -908,10 +916,15 @@ gltloc <- totavgnetwork2$layout[6,]
 totavgnetwork2$layout[6,] <- conloc
 totavgnetwork2$layout[7,] <- gltloc
 
+
+# png(file = "net_comp.png", width=2000, height=1000, bg = 'transparent')
+# dev.off()
 plot(totavgnetwork2)
+
 
 # centrality
 res_totavg <- centrality_auto(totavgnetwork)
+rownames(res_totavg$node.centrality) <- colnames(A)
 
 cent_totavg <- res_totavg$node.centrality$Strength |>as_data_frame() |>  mutate(node = factor(rownames(res_totavg$node.centrality), levels= c(rownames(res_totavg$node.centrality)))
 )
@@ -923,8 +936,10 @@ cent_totavg_plot <- cent_totavg |>
   geom_path(color = "deepskyblue4") + 
   theme_bw() +
   labs(x = "", y = "", color = "") +
-  theme(text=element_text(size=20))+
+  theme(text=element_text(size=15))+
   facet_grid(. ~ dummyB)
+
+ggsave("cent_sim.png", plot = cent_totavg_plot, width = 3.5, height =5.5, dpi = 300)
 
 library(patchwork)
 

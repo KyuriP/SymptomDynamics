@@ -46,11 +46,11 @@ class(out)
 ################################################
 layout(1)
 ## fake networks for Fig1
-fakeA <- matrix(c(0,0,0,0,0,
-                  0,0,0,0.1,0,
+fakeA <- matrix(c(0,0.1,0,0,0.1,
+                  0.1,0,0,0.1,0,
                   0,0,0,0,0,
-                  0,0.3,0,0,0,
-                  0.3,0,0,0,0), 5, 5, byrow = T)
+                  0,0.1,0,0,0,
+                  0.1,0,0,0.1,0), 5, 5, byrow = T)
 
 fakeA[lower.tri(fakeA)] = t(fakeA)[lower.tri(fakeA)]
 rownames(fakeA) <- colnames(fakeA) <- nl
@@ -99,6 +99,12 @@ pdf(file = "toymodel2.pdf", width=16, height=12, bg = 'transparent')
 
 ho <- qgraph(A, theme = 'colorblind', legend = TRUE, groups = grp, color = c("#F5651C", "#58B5BC"), nodeNames = Names, border.color = "white",border.width = 2, edge.color = "darkgray", edge.width = 0.8, curve = 0.3, curveAll = T, label.color = "white", legend.cex = 1.2, asize= 4, layout = manual_layout)
 
+dev.off()
+
+
+# diag(A) <- 0.1
+png(file = "toymodelnet.png", width=1000, height=1000, bg = 'transparent')
+qgraph(A, theme = 'colorblind', legend = F, groups = grp, color = c("#F5651C", "#58B5BC"), border.color = "white",border.width = 2, edge.color = "darkgray", edge.width = 0.8, curve = 0.3, curveAll = T, label.color = "white", legend.cex = 1.2, asize= 4, layout = manual_layout, diag = T)
 dev.off()
 
 
@@ -194,7 +200,6 @@ centralityA <- tibble(InStrength = cent$node.centrality$InStrength, OutStrength 
   mutate(node = factor(rownames(cent$node.centrality), levels= c(rownames(cent$node.centrality)))
   )
 
-
 centralityA %<>%  pivot_longer(!node, names_to = "centrality", values_to = "value")
 
 cent_A <- centralityA |>
@@ -212,6 +217,19 @@ ggsave("centrality_A.pdf", plot = cent_A, width = 25, height =20, units = "cm", 
 centralityA$dummyA <- "In/Out Strength"
 centralityA$dummyB <- "Average Strength"
 
+# plotA <- centralityA |> filter(centrality == "InStrength" | centrality == "OutStrength") |>
+#   ggplot(aes(x=value, y = node, group=centrality, color = centrality)) + 
+#   geom_point() + 
+#   geom_path() + 
+#   theme_bw() +
+#   labs(x = "", y = "", color = "") +
+#   scale_color_brewer(palette = "Set2") + 
+#   theme(text=element_text(size=20),
+#         legend.position = "none") +
+#   facet_grid(. ~ dummyA)
+# ggsave("toy_centrality.png", plot = plotA, width = 8, height = 10, unit = "cm", dpi = 300)
++theme(axis.text=element_text(size=20), legend.text = element_text(size=10))
+
 plotA <- centralityA |> filter(centrality == "InStrength" | centrality == "OutStrength") |>
   ggplot(aes(x=value, y = node, group=centrality, color = centrality)) + 
   geom_point() + 
@@ -220,8 +238,26 @@ plotA <- centralityA |> filter(centrality == "InStrength" | centrality == "OutSt
   labs(x = "", y = "", color = "") +
   scale_color_brewer(palette = "Set2") + 
   theme(text=element_text(size=20),
-        legend.position = "none") +
+        legend.position = "bottom",
+        legend.text = element_text(size=15)) +
   facet_grid(. ~ dummyA)
+ggsave("cent_toy.png", plot = plotA, width = 4.5, height = 8, dpi = 300)
+
+plotA <- centralityA |> filter(centrality == "InStrength" ) |>
+  ggplot(aes(x=value, y = node, group=centrality, color = centrality)) + 
+  geom_point() + 
+  geom_path() + 
+  theme_bw() +
+  labs(x = "", y = "", color = "") +
+  lims(x = c(0,0.9)) +
+  scale_color_brewer(palette = "Set2") + 
+  theme(text=element_text(size=20),
+        legend.position = "bottom",
+        legend.text = element_text(size=15)) +
+  facet_grid(. ~ dummyA)
+ggsave("cent_toy_instrength.png", plot = plotA, width = 4.5, height = 8, dpi = 300)
+
+
 
 plotB <- centralityA |> filter(centrality == "Strength") |>
   ggplot(aes(x=value, y = node, group=1)) + 
