@@ -1,6 +1,6 @@
 ---
-title: "Modelling Dynamics of Depressive Symptoms"
-subtitle: "Taking Computational Modeling Approach"
+title: "Modeling Depression Dynamics at the Symptom Level"
+subtitle: "Taking a Computational Modeling Approach"
 institute: "Apr 2, 2024"  #change for defense May 22, 2023
 author: "Kyuri Park"
 format: 
@@ -109,13 +109,10 @@ Accordingly, the two stable states are presumed to be distinguishable by a weakl
 
 ## Fundamental features of depression dynamics {.scrollable}
 
-<div>
-
+::: {#citeborsboom}
 [@borsboom2017network; @cramer_major_2016]
+:::
 
-</div>
-
-<div>
 
 1.  Bistability
 
@@ -125,7 +122,6 @@ Accordingly, the two stable states are presumed to be distinguishable by a weakl
 
 4.  Resilience
 
-</div>
 
 ::: r-stack
 ![](img/hysteresis0.png){.absolute top="380" left="20"} ![](img/hysteresis1.png){.absolute .fragment .fade-in top="380" left="20" fragment-index="1" width="2600"} ![](img/hysteresis2.png){.absolute .fragment .fade-in top="380" left="20" fragment-index="2" width="2600"} ![](img/hysteresis3.png){.absolute .fragment .fade-in top="380" left="20" fragment-index="3" width="2600"} ![](img/hysteresis4.png){.absolute .fragment .fade-in top="380" left="20" fragment-index="4" width="2600"} ![](img/hysteresis5.png){.absolute .fragment .fade-in top="380" left="20" fragment-index="5" width="2600"} ![](img/hysteresis6.png){.absolute .fragment .fade-in top="380" left="20" fragment-index="6" width="2600"} ![](img/hysteresis7.png){.absolute .fragment .fade-in top="380" left="20" fragment-index="7" width="2600"} ![](img/hysteresis8.png){.absolute .fragment .fade-in top="380" left="20" fragment-index="8" width="2600"} ![](img/resilience1.png){.absolute .fragment .fade-in top="380" left="20" fragment-index="9" width="2600"}
@@ -149,13 +145,10 @@ Although here I did not indicate the causal directions but I assume these three 
 
 ## Fundamental features of depression dynamics {.scrollable}
 
-<div>
-
+::: {#citeborsboom}
 [@borsboom2017network; @cramer_major_2016]
+:::
 
-</div>
-
-<div>
 
 1.  Bistability
 
@@ -165,7 +158,6 @@ Although here I did not indicate the causal directions but I assume these three 
 
 4.  [Resilience]{style="color:#FF0000"}
 
-</div>
 
 ::: r-stack
 ![](img/resilience1.png){.absolute .fragment .fade-out top="380" left="20" width="2600" fragment-index="1"} <!-- ![](img/resilience2.png){.absolute .fragment .fade-up top="380" left="20" fragment-index="1" width="2600"} --> ![](img/resilience3.png){.absolute .fragment .fade-up top="380" left="20" width="920" fragment-index="1"}
@@ -184,9 +176,9 @@ For example, for resilience, we will specify different levels of resilience with
 So this is sort of top-down approach, evaluating whether the proposed features of depression dynamics are supported within our modeling framework.
 :::
 
-## Toy model {.scrollable}
+## Toy model {.smaller}
 
-Use the average of three empirical weight matrices with causal directions primarily guided by empirical evidence [@ramos-vera_network_2021; @lee_measurement_2023; @jing_comparing_2023].
+Adjacency matrix (for the weighted directed graph) determined based on insights from some empirical studies [@ramos-vera_network_2021; @lee_measurement_2023; @jing_comparing_2023] and practical judgment.
 
 ::: r-stack
 ![](img/netA.png){.absolute .fragment .semi-fade-out left="0" top="200" width="450" fragment-index="1"} ![](img/toymodel.png){.absolute .fragment .fade-in right="0" top="200" width="600" fragment-index="1"}
@@ -220,7 +212,7 @@ I have done this, in case if the nodes that are part of cycles show any differen
 
 ```{=tex}
 \begin{equation} \label{eq:3}
-dS_{i} = S_{i}(1-S_{i})(\beta_i + \alpha_{ii} S_{i} + \sum_{i \neq j}\alpha_{ji}S_{j}(1+\delta_i f(S_{i}))) dt + \sigma_i dW
+dS_{i} = S_{i}(1-S_{i})(\beta_i + \alpha_{ii} S_{i} + \sum_{i \neq j}\alpha_{ji}S_{j}(1+\delta_i f(S_{i}))) dt + \sigma_i dW_i
 \end{equation}
 ```
 <br>
@@ -255,13 +247,13 @@ In this context, approaching 0 means a low symptom level, indicating symptom dea
 The third term is a sum of three elements that collectively determine the symptom level.
 Here, $\beta_i$ represents the sensitivity level of $S_i$.
 A lower $\beta_i$ indicates reduced sensitivity to external triggering factors, making the symptom less prone to activation.
-It is an important parameter, which heavily influences the system's tipping point, so I will talk about this in more detail in the following slide
+It is an important parameter, which heavily influences the system's tipping point, so I will talk about this in more detail in the following slide.
 
 $\alpha$ denotes the weight of edges in the network, basically the elements of matrix $\mathbf{A}$.
 $\alpha_{ji}$ represents the impact of $S_j$ on $S_i$, and $\delta_i$ acts as a booster, making the influence of other symptoms on $S_i$ stronger, depending on the current level of $S_i$.
 We define $f$ to be a quadratic function, so in the end what it says is that, as the $S_i$ level increases, the effects of other symptoms are amplified by $\delta_i \cdot S_i^2$.
 So here we used quadratic function because it seems one of the simplest function I could think of for a monotonic non-linear increasing function, but it was my arbitrary choice; eventually any monotnoic increasing function would've been fine.
-So this term actually adds nonlinearity into our mode as this is the interaction term between $S_i$ and $S_j$ and also as we use the quadratic function for f, it enables our model to capture the nonliear responses.
+So this term actually adds nonlinearity into our model as this is the interaction term between $S_i$ and $S_j$ and also as we use the quadratic function for f, it enables our model to capture the nonliear responses.
 
 Any questions?...
 It would be insane if everything clicks now, just let it sink for now, and it will become hopefully clearer when I show you the plots on how the model behaves.
@@ -278,12 +270,12 @@ Are these okay-ish clear?
 Then I will show you a bit more in detail how does the dynamics look given this model.
 :::
 
-## Specifying parameters
+## Simulation setup
+
+Apply a shock (external trigger) to the system and observe its behavior.
 
 ::: r-stack
-![](img/bifurcation_beta1.png){.absolute top="200" left="180" width="660"} ![](img/bifurcation_beta2.png){.absolute .fragment .fade-in top="170" left="163" width="678"} ![](img/bifurcation_beta3.png){.absolute .fragment .fade-in top="119" left="162" width="677"} ![](img/bifurcation_beta4.png){.absolute .fragment .fade-in top="109" left="163" width="677"}
-
-![](img/bifurcation_beta22.png){.absolute .fragment .fade-in top="109" left="163" width="678"}
+![](img/bifurcation_beta1.png){.absolute top="240" left="180.1" width="661"} ![](img/bifurcation_beta2.png){.absolute .fragment .fade-in top="210" left="163" width="678"} ![](img/bifurcation_beta3.png){.absolute .fragment .fade-in top="159" left="162" width="677"} ![](img/bifurcation_beta4.png){.absolute .fragment .fade-in top="149" left="162" width="678"} ![](img/bifurcation_beta5.png){.absolute .fragment .fade-in top="150" left="163" width="677"} ![](img/bifurcation_beta6.png){.absolute .fragment .fade-in top="149" left="163" width="676"}
 :::
 
 ::: notes
@@ -304,28 +296,26 @@ Presuming inherent bistability in our model as we discussed, we constrain $\beta
 Across all symptoms, we set beta to fall within this range, but slightly leaning towards the stable depressed regime like this (CLICK).
 
 Except for the $suicidal$ symptom.
-I made one exception for the symptom suicidal, and made the beta to be smaller so it becomes more challenging to become activated. About this, I will show you in more detail in the following slide.
+I made one exception for the symptom suicidal, and made the beta to be smaller so it becomes more challenging to get activated.
+About this, I will show you in more detail in the following slide.
 :::
 
+## Simulation setup (cont.) {.scrollable}
 
-## Simulation setup {.scrollable}
-
-Apply a shock (external trigger) to the system and observe its behavior.
+Simulate across three different resilience level scenarios.
 
 ::: panel-tabset
-### Shock
-
-![](img/tab1.png){width="80%" fig-align="center"}
-
-<br> <br>
-
-![](img/symptoms_bif.png){width="80%" fig-align="center"}
-
 ### Resilience
 
 ![](img/tab2.png){width="80%" fig-align="center"}
 
 ![](img/anh_resilience.png){width="70%" fig-align="center"}
+
+### Shock
+
+![](img/tab1.png){width="80%" fig-align="center"}
+
+![](img/symptoms_bif.png){width="80%" fig-align="center"}
 :::
 
 ::: notes
@@ -343,19 +333,18 @@ And after that, the beta was put back to the original value.
 In the plot below, I wanted to show you that how the bistable range differs per symptom given that they have different omega, the aggregated incoming effects from the other symptom.
 The plot here shows bifurcation for four different symptoms, along with their energy landscapes before and after the shock, so the orange one is before, and the red one is after.
 Symptom anhedonia exhibits the widest bistable range as you can see, because it has the largest aggregated effects from other symptoms.
-These wider bistable range implies sort of greater buffer to perturbations, resulting in less transitions between the two stable states.
+These wider bistable range implies sort of greater buffer to perturbations, resulting in less transitions between the states by random perturbations.
 In contrast, symptom guilty shows the shortest bistable range, as $\omega_{glt}$ is the smallest among the symptoms.
 This limited range indicates more frequent transitions between the states upon perturbations, as also shown by the relatively flatter energy landscape.
-The orange dotted line in the diagram is the original $\beta_i$ values specified, while the red dotted line is the increased $\beta_i$ value representing the shock.
+The orange dotted line in the diagram is the original $\beta_i$ values specified, and the red dotted line is the increased $\beta_i$ value used as a shock.
 
 As I mentioned earlier, an exception was made for the symptom suicidal, where $\beta_i$ is much smaller than the other symptoms; so it positioned farther from the stable depressed regime.
 This ensures that even with the increase of stress caused by the shock, the chance that suicidal symptom gets activated is much lower, as can also be seen in its energy landscape.
 I made this exception so that it can align with those empirical observations where the suicidal symptom exhibits much lower activation compared to the other symptoms, presumably due to its extreme nature.
 
-
 (CLICK TAB) And we did this for three different resilience scenarios, each scenario was repeated for 500 times.
-Resilience levels are adjusted by modifying the self-reinforcing parameter ($\alpha_{ii}$) and boosting factor ($\delta_i$).
-So in the high-resilience scenario, both parameters are reduced to enhance resilience, and in the low-resilience scenario, the parameters are increased to diminish resilience against activation.
+Resilience levels are adjusted by modifying the self-reinforcing factor ($\alpha_{ii}$) and boosting factor ($\delta_i$).
+So in the high-resilience scenario, both parameters are reduced to enhance resilience, and in the low-resilience scenario, they are increased to lower resilience against activation.
 Here, you see the example landscape of symptom anhedonia, so you see the valley for depressed state becomes deeper as the resilience level goes down.
 :::
 
@@ -403,7 +392,8 @@ The horizontal dotted gray lines represents the diagnostic cutoff points accordi
 
 (SCROLL DOWN) Then, I estimated Gaussian graphical model for each of the phases: before the shock, during, and after the shock.
 As you can see, we have some clear differences in terms of network density.
-Before the shock when the system was near the healthy state, it shows rather a sparse network, and when the system is approaching the depressed state, the network becomes denser. And even after the shock, the network somewhat maintains a decent level of density.
+Before the shock when the system was near the healthy state, it shows rather a sparse network, and when the system is approaching the depressed state, the network becomes denser.
+And even after the shock, the network somewhat maintains a decent level of density.
 
 (TAB) Moving on to the high resilience scenario, now we observe less prolonged activation after the shock, with most symptoms quickly returning to a healthy state ($S = 0$) following its removal.
 You still see much more fluctuations with the symptom guilty and concentration, although it is not as obvious as before.
@@ -446,13 +436,20 @@ And of course, during and after the shock, overall connectivity gets strengthene
 
 ::: notes
 Here again, I just put the network estimated before the shock from each of the scenario side-by-side, so that you can easily compare.
-So we did find some clear distinctive network structures in different level of resilience. That is one of the points I'd like to highlight.
+So we did find some clear distinctive network structures in different level of resilience.
+That is one of the points I'd like to highlight.
 :::
 
 ## Results (cont.)
 
+Network estimated from aggregated simulated data across time and resilience levels.
+
 ::: r-stack
-![](img/totalnetwork.png){.absolute top="100" left="0" width="500"} ![](img/toymodelnet.png){.fragment .absolute top="100" right="27" width="490"} ![](img/totalnetwork_v2.png){.fragment .absolute top="100" left="0" width="500"}
+![](img/totalnetwork.png){.absolute top="120" left="0" width="500"} [simulated network]{.absolute bottom="40" left="150" style="font-size: 0.7em;"}
+
+![](img/toymodelnet.png){.fragment .absolute top="120" right="27" width="490" fragment-index="1"} [original network]{.absolute .fragment bottom="40" right="150" fragment-index="1" style="font-size: 0.7em;"}
+
+![](img/totalnetwork_v2.png){.fragment .absolute top="120" left="0" width="500" fragment-index="2"}
 :::
 
 ::: notes
@@ -463,28 +460,31 @@ This is the resulting estimated network model.
 It retrieves all the edges except for the one between sad and suicidal, which is likely dropped because of our manipulation over the suicidal symptom.
 
 Also, the network shows a clear clustering structure: most nodes on the left side of the simulated network (POINT) are not part of any cycles, while the ones on the right (POINT) are involved in cycles.
-(CLICK). If I apply the same coloring scheme, it is easier to see this.
-And also, the guilty symptom sort of acts as a bridge between these two clusters, which can be also seen in the original network structure. That I found pretty intriguing.
+(CLICK).
+If I apply the same coloring scheme, it is easier to see this.
+And also, the guilty symptom sort of acts as a bridge between these two clusters, which can be also seen in the original network structure.
+That I found pretty intriguing.
 :::
 
 ## Results (cont.) {.scrollable .smaller}
 
-<center>Simulated network vs. Original network</center>
+<center>Simulated network   vs.   Original network</center>
 
 ::: {r-stack}
-![](img/cent_sim.png){.absolute top="130" left="80" width="390"}
+![](img/cent_sim.png){.absolute top="130" left="180" width="300"}
 
-![](img/cent_toy2.png){.absolute top="130" right="70" width="390" height="650"}
+![](img/cent_toy2.png){.absolute top="132" right="160" width="300" height="503"}
 
-![](img/cent_toy_instrength.png){.absolute .fragment top="130" right="70" width="390" height="650"}
+![](img/cent_toy_instrength.png){.absolute .fragment top="132" right="160" width="300" height="503"}
 :::
 
 ::: notes
 Then, I looked at the centrality of these networks.
 As you know, the simulated one is undirected network, so I computed the strength centrality and for the original model, I computed the in-strength, which is the green line and the out-strength which is the orange line here, as this original network has directions.
 So analyzing the strength centrality of the simulated network, I found that they actually quite closely follow the in-strength pattern of the original network.
-(CLICK) See, the patterns aligns quite well, with a deviation in motor symptom. 
-This deviation is again, because we manipulated the suicidal symptom to rarely get activated. So the motor symptom, which is heavily affected by suicidal now shows a lower strength centrality in our simulated network.
+(CLICK) See, the patterns aligns quite well, with a deviation in motor symptom.
+This deviation is again, because we manipulated the suicidal symptom to rarely get activated.
+So the motor symptom, which is heavily affected by suicidal now shows a lower strength centrality in our simulated network.
 
 So I found this very interesting... The implication for this is up to discussion, but given this I wanted to emphasize that to some extent we can gather some information about the dynamics based on statistical networks, however, inferring causal relationships, such as talking about intervention targets or key driving nodes, solely based on statistical networks could go very wrong.
 :::
@@ -492,12 +492,11 @@ So I found this very interesting... The implication for this is up to discussion
 ## Discussion {background-image="img/bg_sl.png"}
 
 ::: {.fragment .semi-fade-out fragment-index="1"}
--   Top-down approach aimed at testing the theorized features of depression dynamics.
+-   Top-down approach to test the theorized features of depression dynamics.
 :::
 
 ::: {.fragment .fade-in-then-semi-out fragment-index="1"}
 -   The model stands out from the others:
-    -   non-probabilistic nature
     -   continuity
     -   non-linearity
 :::
@@ -505,7 +504,7 @@ So I found this very interesting... The implication for this is up to discussion
 ::: {.fragment .fade-in-then-semi-out fragment-index="3"}
 -   Future efforts:
     -   specifying the non-linearity
-    -   identifying feedback loops
+    -   identifying feedback loops / casual directions
     -   calibrating parameters
 :::
 
@@ -524,15 +523,15 @@ And that also enables us to keep the continuos nature and we can simulate the co
 Also, we've incorporated the non-linarity term that can be controlled by the delta parameter.
 This makes our model more flexible by capturing the nonlinear responses in the dynamics.
 
-And of course, this is just very start.
+And of course, this is just a very start.
 There are much more could be done in the future.
 For instance, we would like to investigate further on this non-linearity aspect in the dynamics, as we for now just used a very simple expression, but it probably is not as simple as how we defined in reality.
 Also, about the feedback loops and causal directions of the model, I believe we can work on that more in order to find out what is the reasonable directions, ideally substantiated by data; I've been looking into some of the causal algorithms currently.
 And with the presence of feedback loops, it is pretty challenging, but I hope in some years there would be some progress on studying the causal structure of symptom network.
-Lastly, more of practical aspect; in the follow up of this work, one of the first thing should be to calibrate the parameters and do some sensitivity aaalyses.
+Lastly, more of practical aspect; for the follow up of this work, one of the first thing should be done is to calibrate the parameters and do some sensitivity analyses.
 
-And I was hoping that I could hear what you guys think about this.
-And if you have any idea on what you can do with this type of model and idea on some interesting extension for this work, I would love to hear it.
+And I was really hoping that I could hear what you guys think about this.
+And if you have any idea on what you can do with this type of model or any idea on some interesting extension for this work, I would love to hear it.
 :::
 
 ## Thank You {background-image="img/bg_sl5.png"}
@@ -541,7 +540,7 @@ And if you have any idea on what you can do with this type of model and idea on 
 -   Contact: k.park\@uva.nl
 
 ::: {#supervisors}
-![Vítor Vasconcelos](img/Vitor.png){.absolute top="10" right="300" width="200" height="214"} [Vítor Vasconcelos]{.absolute top="250" right="330"} ![Mike Lees](img/mike.png){.absolute top="10" right="50" width="201"} [Mike Lees]{.absolute top="250" right="110"}
+![Vítor Vasconcelos](img/Vitor.png){.absolute top="10" right="300" width="200" height="214"} [Vítor V. Vasconcelos]{.absolute top="250" right="330"} ![Mike Lees](img/mike.png){.absolute top="10" right="50" width="201"} [Mike Lees]{.absolute top="250" right="110"}
 :::
 
 <br> <br> <br> <br> <br> <br>

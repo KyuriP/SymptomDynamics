@@ -832,7 +832,7 @@ totalsym_low <- ggplot(data = summarized_low) +
   labs(x = "time", y= "") +
   geom_hline(yintercept = 5/3, linetype =2, color = "azure4", lwd = 0.1) +
   geom_hline(yintercept = 10/3, linetype = 2, color = "azure4", lwd = 0.1) +
-  theme_classic()
+  theme_classic(base_size = 15)
 
 # ggsave("totalsym_lowv2.pdf", plot = totalsym_low, width = 25, height =10, units = "cm", dpi = 300)
 
