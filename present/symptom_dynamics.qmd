@@ -39,9 +39,13 @@ library(kableExtra)
 
 ::: notes
 Hello, I am Kyuri, I am a PhD student working at the Computational Science Lab at the university of amsterdam.
-The main project I am working for is about modelling depression dynamics with regard to precariousness factors mainly in the context of Amsterdam city.
-I think the main question we have is what kind of precariousness factors are mainly involved and we want to learn about the dynamical relationships so that ultimately we can understand where to intervene in the system to prevent fully-blown depression and minimize the mental health problems in the city.
+I also used to study here for my undergraduate, majoring in psychological methods. 
+Then, I went to Utrecht for my master's, then back to Amsterdam. 
+
+So the main project I am currently working on is about modelling depression dynamics with regard to precariousness factors, which are basically all sorts of risk factors such as low income, bad neighbordhood and so on.
+So ultimately we want to understand where to intervene in the system to prevent fully-blown depression and hopefully minimize the mental health problems.
 That's the grand scheme, but as a first baby step, I've started working on modeling depression symptoms, which is the work that I am planning to present today.
+But this is still an on-going work and the goal for me today to share this with you guys is to  pick some of your brains to get some interesting implications and of course improvements for future. But i am already aware of a lot of limitations so I encourage you to approach this with an open mind and full of positivity. And just a heads up, i am not a good public speaker, so if you are confused, you are probably rightfully being so. Feel free to ask for clarification; I will give it another go, as long as the time allows.
 :::
 
 ## Network theory of psychopathology
@@ -70,7 +74,7 @@ Mental disorder is produced by direct causal interactions between symptoms that 
 :::
 
 ::: notes
-The main foundation for me when I start looking into modelling the depression symptom dynamics is the network theory of psychopathology of Denny, which says mental disorder is produced by direct causal interactions between the symptoms.
+The main foundation for me when I start looking into modelling depression symptom dynamics is the network theory of psychopathology of Denny, which says mental disorder is produced by direct causal interactions between the symptoms.
 And the crucial point here is that, these causal interactions often form feedback loops and they reinforce each other.
 As you can see here, feeling down makes you sleep poorly and lack of sleep makes you feel tired and it sort of forms this vicious cycle.
 Like that symptom activation spreads throughout the network, and when those cyclic relationships become strong enough and symptom activation sustains itself, that manifests as a depression.
@@ -103,7 +107,7 @@ The first one is bistability, which suggests that depression, as a dynamic syste
 This notion is often illustrated using an energy landscape analogy with hills and valleys like this.
 
 And second one is network connectivity.
-With the introduction of the network theory, there has been increasing evidence that various patient groups have stronger network connections compared to healthy controls.
+With the introduction of the network theory, there has been increasing evidence that clinically depressed groups have stronger network connections compared to healthy controls.
 Accordingly, the two stable states are presumed to be distinguishable by a weakly connected network in the healthy population and a strongly connected network in the depressed population.
 :::
 
@@ -125,21 +129,23 @@ Accordingly, the two stable states are presumed to be distinguishable by a weakl
 
 ::: r-stack
 ![](img/hysteresis0.png){.absolute top="380" left="20"} ![](img/hysteresis1.png){.absolute .fragment .fade-in top="380" left="20" fragment-index="1" width="2600"} ![](img/hysteresis2.png){.absolute .fragment .fade-in top="380" left="20" fragment-index="2" width="2600"} ![](img/hysteresis3.png){.absolute .fragment .fade-in top="380" left="20" fragment-index="3" width="2600"} ![](img/hysteresis4.png){.absolute .fragment .fade-in top="380" left="20" fragment-index="4" width="2600"} ![](img/hysteresis5.png){.absolute .fragment .fade-in top="380" left="20" fragment-index="5" width="2600"} ![](img/hysteresis6.png){.absolute .fragment .fade-in top="380" left="20" fragment-index="6" width="2600"} ![](img/hysteresis7.png){.absolute .fragment .fade-in top="380" left="20" fragment-index="7" width="2600"} ![](img/hysteresis8.png){.absolute .fragment .fade-in top="380" left="20" fragment-index="8" width="2600"} ![](img/resilience1.png){.absolute .fragment .fade-in top="380" left="20" fragment-index="9" width="2600"}
+
 :::
+<br>
+<br>
 
 ::: notes
 Third one is hysteresis.
 In psychopathology, hysteresis refers to, quoting Denny, the phenomenon that symptoms continue to activate each other, even after the triggering factor has disappeared.
 
 In this figure, the shaded area represents the period when the system experiences stress or shock.
-Even after this trigger has been removed, the system does not return to a healthy state immediately but remains lingering near the depressed state.
-This persistence in symptom activation, irrespective of the absence of external triggers, illustrates hysteresis within the system.
+And here you see, after this trigger is removed, the system does not return to a healthy state immediately but remains lingering near the depressed state.
 
-As you see here with the symptom network representation, the symptom gets activated with the external trigger, but even with the absence of trigger, the symptoms remain activated.
-So this property right here is called hysteresis.
+As you see here with the symptom network representation, the symptom gets activated with the external trigger, the "e" node, but even when the trigger is gone, the symptoms remain activated.
+So this property right here is called hysteresis, that we are going to focus on.
 (CLICK)
 
-And this network that has relatively strong connection with feedback loops, which enables hysteresis effect to show, we call it a vulnerable network or low resilient network.
+And this network that has relatively strong connection with feedback loops, which enables hysteresis to show, we call it a vulnerable network or low resilient network.
 Although here I did not indicate the causal directions but I assume these three nodes form a cycle.
 :::
 
@@ -160,20 +166,25 @@ Although here I did not indicate the causal directions but I assume these three 
 
 
 ::: r-stack
-![](img/resilience1.png){.absolute .fragment .fade-out top="380" left="20" width="2600" fragment-index="1"} <!-- ![](img/resilience2.png){.absolute .fragment .fade-up top="380" left="20" fragment-index="1" width="2600"} --> ![](img/resilience3.png){.absolute .fragment .fade-up top="380" left="20" width="920" fragment-index="1"}
-![](img/resilience4.png){.absolute .fragment .fade-in top="380" left="20" fragment-index="2" width="1500"} ![](img/resilience5.png){.absolute .fragment .fade-in top="380" left="20" fragment-index="3" width="1500"}
+![](img/resilience1.png){.absolute .fragment .fade-out top="380" left="20" width="2600" fragment-index="1"} <!-- ![](img/resilience2.png){.absolute .fragment .fade-up top="380" left="20" fragment-index="1" width="2600"} --> 
+![](img/resilience3.png){.absolute .fragment .fade-up top="380" left="20" width="920" fragment-index="1"}
+![](img/resilience4.png){.absolute .fragment .fade-in top="380" left="20" fragment-index="2" width="1500"}
+![](img/resilience5.png){.absolute .fragment .fade-in top="380" left="20" fragment-index="3" width="1500"}
 :::
 
 ::: notes
-This resilience concept is the last point.
-Contrary to this low resilient network, when the network relatively has weak connections, we call it highly resilient network.
-Because in this case, the symptom activation does not easily propagate through the network and hysteresis can therefore be hardly observed.
+This resilience concept is the last point that I want to talk about.
+Opposite to this low resilient network, when the network has relatively weak connections, we call it a highly resilient network.
+Because in this case, the symptom activation does not easily propagate through the network so hysteresis therefore can also be hardly observed.
 
-In this study, with our model, we assess whether we can replicate these features of depression dynamics, except for bistability.
-We would more or less presume that our system has bistability and we formalize our model such that it satisfies this condition.
-For the rest, we will see whether our model can retrieve such features.
-For example, for resilience, we will specify different levels of resilience within our model and examine whether the resulting statistical network models exhibit different structures.
+So in this study, what we are gonna do with our model is that we are going to assess whether we can replicate these features of depression dynamics.
+For example, for resilience, we will specify different levels of resilience within our model and see whether the resulting network models exhibit different structures.
 So this is sort of top-down approach, evaluating whether the proposed features of depression dynamics are supported within our modeling framework.
+<!-- So in this study, with our model that I am going to show, we are going to assess whether we can replicate these features of depression dynamics, except for bistability. -->
+<!-- For bistability, we would more or less presume that our system has bistability and we formalize our model such that it satisfies this condition. -->
+<!-- For the rest, we will see if our model can retrieve such features through our simulation. -->
+<!-- For example, for resilience, we will specify different levels of resilience within our model and examine whether the resulting statistical network models exhibit different structures. -->
+<!-- So this is sort of top-down approach, evaluating whether the proposed features of depression dynamics are supported within our modeling framework. -->
 :::
 
 ## Toy model {.smaller}
@@ -186,13 +197,12 @@ Adjacency matrix (for the weighted directed graph) determined based on insights 
 
 ::: notes
 So this is the toy model we used.
-I didn't really have any data back then, so what I did was basically that I found three empirical studies which estimated statistical networks and I average their weight matrices.
-And then, given some empirical evidence but mainly more of common sense, I assigned the causal directions, which results in this A matrix.
+I didn't really have any data back then, so I relied on insights from some empirical studies and mainly common sense to determine the weights and causal directions, which results in this adjacency matrix, A. So it is literally a toy model.
+
 When visualized in a network, we get this.
 Note that the self-loops are included in our model even though empirical networks did not have those.
 And also all these causal links are positive, meaning that every feedback loops are reinforcing.
-Lastly, here, i colored the nodes that are part of cycles in orange, and the ones that are not part of any cycles in blue.
-I have done this, in case if the nodes that are part of cycles show any differences from the ones that are not later in our simulation.
+Lastly, here, I colored the nodes that are part of cycles in orange, and the ones that are not part of any cycles in blue.
 :::
 
 ## Formalizing dynamics {.smaller .scrollable}
@@ -240,7 +250,8 @@ $f(x) = x^2$.
 So this is the model we used for symptom dynamics.
 The first top expression shows the ODE, the ordinary differential equation, defining the interaction between the symptoms.
 So the $S_i$ here corresponds to a symptom i.
-The first two terms $S_i(1-S_i)$ are typical logistic differential equations, which we put to constrain the symptom level between 0 and 1.
+Let me go through this equation term by term with you, so you know how we came up with this.
+The first two terms $S_i(1-S_i)$ are typical logistic differential equation, which we put to constrain the symptom level between 0 and 1.
 We imposed this constraint to align with the common practice of measuring symptoms on bounded scales in questionnaires.
 In this context, approaching 0 means a low symptom level, indicating symptom deactivation, and approaching 1 indicates symptom activation.
 
@@ -249,21 +260,21 @@ Here, $\beta_i$ represents the sensitivity level of $S_i$.
 A lower $\beta_i$ indicates reduced sensitivity to external triggering factors, making the symptom less prone to activation.
 It is an important parameter, which heavily influences the system's tipping point, so I will talk about this in more detail in the following slide.
 
-$\alpha$ denotes the weight of edges in the network, basically the elements of matrix $\mathbf{A}$.
-$\alpha_{ji}$ represents the impact of $S_j$ on $S_i$, and $\delta_i$ acts as a booster, making the influence of other symptoms on $S_i$ stronger, depending on the current level of $S_i$.
-We define $f$ to be a quadratic function, so in the end what it says is that, as the $S_i$ level increases, the effects of other symptoms are amplified by $\delta_i \cdot S_i^2$.
-So here we used quadratic function because it seems one of the simplest function I could think of for a monotonic non-linear increasing function, but it was my arbitrary choice; eventually any monotnoic increasing function would've been fine.
-So this term actually adds nonlinearity into our model as this is the interaction term between $S_i$ and $S_j$ and also as we use the quadratic function for f, it enables our model to capture the nonliear responses.
+$\alpha$ denotes the weight of edges in the network, basically the elements of matrix $\mathbf{A}$. $\alpha_{ii}$ is the diagonal of the matrix A, the self-reinforcing loop.
+And $\alpha_{ji}$ represents the impact of $S_j$ on $S_i$, and $\delta_i$ acts as a booster, making the influence of other symptoms on $S_i$ stronger, depending on the current level of $S_i$.
+And here we define $f$ to be a quadratic function, because it seems to be one of the simplest functions I could think of for a monotonic non-linear increasing function, but it was my arbitrary choice. So in the end what it says is that, as the $S_i$ level increases, the effects of other symptoms are amplified by $\delta_i \cdot S_i^2$.
+
+And this term is important because this actually adds the nonlinearity into our model because this is the interaction term between $S_i$ and $S_j$, which can be turned on and off by this delta.
 
 Any questions?...
-It would be insane if everything clicks now, just let it sink for now, and it will become hopefully clearer when I show you the plots on how the model behaves.
+It would be insane if everything clicks straight away, just let it sink for now, and hopefully it becomes clearer when I show you the plots on how the model behaves.
 
 And this second equation, is just to show that we introduced the noise to our model to capture the inherent randomness observed in symptom dynamics.
-The noise is usually seen as blurring trajectories in deterministic systems, but the noise can actually facilitate transitions between different states, so the strength of this noise is therefore very important in modeling the dynamics.
+The noise is usually seen as blurring trajectories in deterministic systems, but the noise can actually facilitate transitions between different states, so the strength of this noise is therefore very important.
 Here we control the noise strength with $\sigma_i$.
 And the underlying nature of the noise in our model is Gaussian white noise, which is a common choice for capturing random fluctuations.
-Adding this noise term, we can describe the dynamics of symptoms with a SDE, the stochastic differential equation which is shown right here.
-So that is all the equation I have.
+Adding this noise term, we can describe the dynamics of symptoms with this SDE, the stochastic differential equation.
+So that is all the equations I have.
 
 So, this is a quick summary of what are the different parameters doing in our model.
 Are these okay-ish clear?
@@ -279,25 +290,34 @@ Apply a shock (external trigger) to the system and observe its behavior.
 :::
 
 ::: notes
-So how did we specify the parameters in our model.
-Well, one of the most important parameters is $\beta_i$ as it plays a crucial role in inducing regime changes in dynamics.
-And that can be shown with this bifurcation diagram for $\beta$.
-Here, the solid lines represent the stable equilibrium, while dashed lines represent unstable equilibrium.
-And the red asterisks highlight critical points or also they are called bifurcation points, where the system transitions from one type of behavior to another.
+So to observe how this model behaves, we design a simulation where we apply a shock to the system, which can be seen as an external trigger. 
+
+So the way we operationalize the shock was basically adding a stress to each of the symptom which is essentially the same as increasing beta.
+
+But the question is then, how we defined the beta. And that can be shown with this bifurcation diagram for $\beta$. Let's look at this together.
+So here, the solid lines represent the stable equilibrium, while dashed lines represent unstable equilibrium.
+And the red asterisks highlight critical points or they are also called bifurcation points, where the system transitions from one type of behavior to another.
 
 The yellow-shaded area indicates the range of bistability; there are two stable states at 0 and 1 with an unstable state in between.
-This area is determined by the relative strength of $\beta$ compared to the other parameters: $\omega_i$, $\delta_i$, and $\alpha_{ii}$.
+This area is determined by the relative strength of $\beta$ compared to the other parameters here, which are $\omega_i$, $\delta_i$, and $\alpha_{ii}$.
 For simplicity, here I defined the aggregated effects of other symptoms on $S_i$ as $\omega_i$.
-So when $\beta$ is smaller than $-\omega_i(\delta_i + 1) - \alpha_{ii}$ (the first critical point), only 0 stands as a stable equilibrium, (CLICK) which can be represented as such energy landscape.
-And as $\beta$ surpasses this first critical point, both 0 and 1 become stable states, together with an unstable point in between, (CLICK) which then can be represented by this smooth W shape landscape.
-And as $\beta_i$ exceeding $\omega_i$, the second critical point, 0 transitions to an unstable state, leaving 1 as the only stable equilibrium (CLICK).
+So when $\beta$ is smaller than the first critical point, only 0 stands as a stable equilibrium, (CLICK) which can be represented as such energy landscape like this.
+And as $\beta$ surpasses this first critical point, both 0 and 1 become stable states, together with an unstable state in between, (CLICK) which then can be represented by this smooth W shape bi-stable landscape.
+And as $\beta_i$ exceeding $\omega_i$, the second critical point, 0 transitions to an unstable state, leaving 1 as the only stable equilibrium (CLICK), as you can see.
+
 
 Presuming inherent bistability in our model as we discussed, we constrain $\beta$ to be within this yellow-shaded bistable region.
-Across all symptoms, we set beta to fall within this range, but slightly leaning towards the stable depressed regime like this (CLICK).
+So across all symptoms, we set the beta to fall within this range, but slightly leaning towards the stable depressed regime like this (CLICK).
 
-Except for the $suicidal$ symptom.
-I made one exception for the symptom suicidal, and made the beta to be smaller so it becomes more challenging to get activated.
-About this, I will show you in more detail in the following slide.
+Then, when we give the shock to system, we raise $\beta_i$ like this, closer to the second critical point, where depressed state is the only stable equilibrium. So the symptoms will likely go towards the depressed regime. 
+<!-- So across all the symptoms, we increase beta proportionally equal amount, making sure that each symptom experiences a comparable push towards the depressed state.  -->
+
+But there is one exception made, for the $suicidal$ symptom.
+For the suicidal symptom, we set the beta to be smaller to begin with, so it is more challenging to get activated.
+And the reason why we did this is, to make it align with those empirical observations where the suicidal symptom exhibits much lower activation compared to the other symptoms, probably because of its extreme nature. okay?
+
+
+
 :::
 
 ## Simulation setup (cont.) {.scrollable}
@@ -319,12 +339,11 @@ Simulate across three different resilience level scenarios.
 :::
 
 ::: notes
-To evaluate if the model can reproduce the fundamental aspects of depression dynamics that I talked about, we simulated the scenarios where a shock was introduced to the system.
-This simulated shock is designed to mimic a random sudden stressor such as losing a significant other.
+Then, we did this for three different resilience scenarios.
+Resilience levels are adjusted by modifying the self-reinforcing factor ($\alpha_{ii}$) and boosting factor ($\delta_i$).
+So in the high-resilience scenario, both parameters are reduced to enhance resilience, and in the low-resilience scenario, they are increased to lower resilience against activation.
+Here, you see the example landscape of symptom anhedonia, so you see that the valley for depressed state becomes deeper and deeper as the resilience level goes down.
 
-So the way we operationalize the shock was basically adding a stress to each of the symptom which is essentially the same as increasing beta.
-So we raised $\beta_i$ proportionally equally across all symptoms, ensuring each symptom experiences a comparable push towards the depressed state.
-In this simulation, we increased $\beta_i$ by approximately 33%.
 
 Here the table shows the exact value I used for the simulation.
 We simulated over 4000 timepoints, and the shock was given at where t = 1000 and the shock lasted for 500 time points.
@@ -332,7 +351,7 @@ And after that, the beta was put back to the original value.
 
 In the plot below, I wanted to show you that how the bistable range differs per symptom given that they have different omega, the aggregated incoming effects from the other symptom.
 The plot here shows bifurcation for four different symptoms, along with their energy landscapes before and after the shock, so the orange one is before, and the red one is after.
-Symptom anhedonia exhibits the widest bistable range as you can see, because it has the largest aggregated effects from other symptoms.
+Symptom anhedonia exhibits the widest bistable range as you can see, because it has the largest aggregated effects from other symptoms. 
 These wider bistable range implies sort of greater buffer to perturbations, resulting in less transitions between the states by random perturbations.
 In contrast, symptom guilty shows the shortest bistable range, as $\omega_{glt}$ is the smallest among the symptoms.
 This limited range indicates more frequent transitions between the states upon perturbations, as also shown by the relatively flatter energy landscape.
@@ -341,11 +360,6 @@ The orange dotted line in the diagram is the original $\beta_i$ values specified
 As I mentioned earlier, an exception was made for the symptom suicidal, where $\beta_i$ is much smaller than the other symptoms; so it positioned farther from the stable depressed regime.
 This ensures that even with the increase of stress caused by the shock, the chance that suicidal symptom gets activated is much lower, as can also be seen in its energy landscape.
 I made this exception so that it can align with those empirical observations where the suicidal symptom exhibits much lower activation compared to the other symptoms, presumably due to its extreme nature.
-
-(CLICK TAB) And we did this for three different resilience scenarios, each scenario was repeated for 500 times.
-Resilience levels are adjusted by modifying the self-reinforcing factor ($\alpha_{ii}$) and boosting factor ($\delta_i$).
-So in the high-resilience scenario, both parameters are reduced to enhance resilience, and in the low-resilience scenario, they are increased to lower resilience against activation.
-Here, you see the example landscape of symptom anhedonia, so you see the valley for depressed state becomes deeper as the resilience level goes down.
 :::
 
 ## Results {.scrollable}
@@ -371,22 +385,25 @@ Here, you see the example landscape of symptom anhedonia, so you see the valley 
 :::
 
 ::: notes
-So with that set up, we have these results.
-This is for the baseline resilience scenario.
+So the results. Quickly about the set up, so for each iteration, we simulated over 4000 timepoints, and the shock was given at where t = 1000 and the shock lasted for 500 time points.
+And for each scenario, we repeated the simulation for 500 times. Alright?
+
+So this is for the baseline resilience scenario.
 So here this plot shows the one example trajectory for each symptom.
 The gray shaded area indicates the period when the shock was given to the system.
 The first thing you can see is that, upon receiving the shock, all symptoms except for suicidal became activated.
 Then, some of the symptoms persist in the activated state even after the shock stops, indicating hysteresis.
-Those symptoms with clear hysteresis are turned out to be the ones that are part of the cycles with relatively high in-degree centrality, except for anhedonia.
-Also, there is noticeable fluctuation occurring in the guilty symptom, which is due to its narrow bistable range that makes it prone to flipping with small perturbations, as I just showed you in the previous slide.
-This fluctuation also affects concentration, because concentration is mainly influenced by guilty.
-Lastly, motor does not show much of hysteresis, and the reason is that motor is mainly affected by suicidal, which does barely gets activated in this case.
+Those symptoms with clear hysteresis are turned out to be mostly the nodes that are part of the cycles with relatively high in-degree centrality.
+<!-- Also, there is noticeable fluctuation occurring in the guilty symptom, which is due to its narrow bistable range that makes it prone to flipping with small perturbations. -->
+<!-- This fluctuation also affects concentration, because concentration is mainly influenced by guilty. -->
+<!-- Lastly, motor does not show much of hysteresis, and the reason is that motor is mainly affected by suicidal, which does barely gets activated in this case. -->
 
 (SCROLL DOWN) Here you see, this one is the median trajectory over 500 simulations.
 And the shaded area represents the interquantile range.
-Again, you see some clear fluctuation happening with symptom guilty and its main descendant, the concentration.
+Again, you see some clear hysteresis effect for some of the symptoms.
 
-(SCROLL DOWN) And if we look at the sum of all symptoms, this is how it looks.
+(SCROLL DOWN) And if we look at the sum of all symptoms, this is how it looks. 
+Again, the red line is median, and shaded area is interquantile range.
 So with the shock the system gets activated and it eventually comes down near the healthy state at the time about 3500.
 The horizontal dotted gray lines represents the diagnostic cutoff points according to the PHQ-9 questionnaire, with the lower line indicating mild depression and the higher one is indicating moderate depression.
 
@@ -395,10 +412,10 @@ As you can see, we have some clear differences in terms of network density.
 Before the shock when the system was near the healthy state, it shows rather a sparse network, and when the system is approaching the depressed state, the network becomes denser.
 And even after the shock, the network somewhat maintains a decent level of density.
 
-(TAB) Moving on to the high resilience scenario, now we observe less prolonged activation after the shock, with most symptoms quickly returning to a healthy state ($S = 0$) following its removal.
-You still see much more fluctuations with the symptom guilty and concentration, although it is not as obvious as before.
+(TAB) Moving on to the high resilience scenario, now we observe less prolonged activation after the shock, with most symptoms quickly returning to a healthy state, as the shock is removed.
+<!-- You still see much more fluctuations with the symptom guilty and concentration, although it is not as obvious as before. -->
 
-(SCROLL DOWN) And again, this is average trajectories, showing much less hysteresis in general.
+(SCROLL DOWN) And again, this is median trajectories, showing much less hysteresis in general.
 
 (SCROLL DOWN) And the aggregated symptom level also exhibits reduced hysteresis, as the system recovers before where $t = 2000$, shortly after the shock is removed.
 Also, we observe a smoother upward curve during the shock, indicating a slower increasing activation compared to the baseline scenario.
@@ -409,17 +426,17 @@ And during the shock, the network appears relatively dense, although not as dens
 
 (TAB) Lastly, for the low resilience level.
 As expected, all symptoms exhibit more activation compared to the other scenarios.
-In this case, even the symptom suicidal is activated upon the introduction of the shock.
-Most symptoms remain activated after the shock, with guilty and concentration again showing significant fluctuations.
+You see in this case, even the symptom suicidal is activated upon the introduction of the shock.
 
-(SCROLL DOWN) Again, these are average trajectories; most symptoms seem pretty stuck at the activation state.
+(SCROLL DOWN) Again, these are median trajectories; most symptoms seem pretty stuck at the activation state.
 
-(SCROLL DOWN) As a result, the average aggregated symptom level remains elevated for a longer time.
+(SCROLL DOWN) As a result, the aggregated symptom level remains elevated for a longer time.
 It reaches the full activation quickly upon the shock and maintains a moderate depression level thereafter, failing to recover till the end of our simulation.
 
 (SCROLL DOWN) And for the networks, as expected, they are denser than the others.
 Especially, the network density before the shock is obviously the highest among all three scenarios.
-And of course, during and after the shock, overall connectivity gets strengthened.
+
+So in summary, we did find some clear hysteresis effects in our model, and also variations in network connectivity across different time phases as well as different resilience level.
 :::
 
 ## Results (cont.)
@@ -436,8 +453,7 @@ And of course, during and after the shock, overall connectivity gets strengthene
 
 ::: notes
 Here again, I just put the network estimated before the shock from each of the scenario side-by-side, so that you can easily compare.
-So we did find some clear distinctive network structures in different level of resilience.
-That is one of the points I'd like to highlight.
+So again this shows distinctive network structures in different level of resilience. 
 :::
 
 ## Results (cont.)
@@ -453,16 +469,16 @@ Network estimated from aggregated simulated data across time and resilience leve
 :::
 
 ::: notes
-Lastly, to assess how well our model in general can reconstruct the original toy model, I estimated a Gaussian graphical model based on all the simulated data across different resilience levels (1500 iterations over 4000 time points).
+Finally, to assess how well our model in general can reconstruct the original toy model, I estimated a Gaussian graphical model based on all the simulated data aggregated across time and resilience levels.
 This is the resulting estimated network model.
 
-(CLICK) Looking at the network structure, we can see that the overall network resembles the skeleton of the original network.
+(CLICK) Looking at the network structure, we can see that the overall network resembles the skeleton of the original network. Let me remind you the toy model again.
 It retrieves all the edges except for the one between sad and suicidal, which is likely dropped because of our manipulation over the suicidal symptom.
 
-Also, the network shows a clear clustering structure: most nodes on the left side of the simulated network (POINT) are not part of any cycles, while the ones on the right (POINT) are involved in cycles.
+Also, the network shows a clear clustering structure: most nodes on the left side of the simulated network are not part of any cycles, while the ones on the right side are part of cycles.
 (CLICK).
 If I apply the same coloring scheme, it is easier to see this.
-And also, the guilty symptom sort of acts as a bridge between these two clusters, which can be also seen in the original network structure.
+And also, the guilty symptom sort of acts like a bridge between these two clusters, which can be also seen in the original network structure.
 That I found pretty intriguing.
 :::
 
@@ -480,9 +496,9 @@ That I found pretty intriguing.
 
 ::: notes
 Then, I looked at the centrality of these networks.
-As you know, the simulated one is undirected network, so I computed the strength centrality and for the original model, I computed the in-strength, which is the green line and the out-strength which is the orange line here, as this original network has directions.
+As you know, the simulated one is undirected network, so I computed the strength centrality and for the original model, I computed the in-strength, which is the green line and the out-strength which is the orange line here.
 So analyzing the strength centrality of the simulated network, I found that they actually quite closely follow the in-strength pattern of the original network.
-(CLICK) See, the patterns aligns quite well, with a deviation in motor symptom.
+(CLICK) See, the patterns aligns quite well, with a deviation in the motor and suicidal symptom.
 This deviation is again, because we manipulated the suicidal symptom to rarely get activated.
 So the motor symptom, which is heavily affected by suicidal now shows a lower strength centrality in our simulated network.
 
@@ -517,21 +533,18 @@ Alright, so finally discussion.
 This study in my opinion was meaningful in a sense it was one of the first attempts to test the theorized features of depression symptom dynamics using a computational model.
 So instead of fitting a network from data, here we gave you a more of top-down approach.
 
-And how does our model differs or what does this model adds to the existing ones?
-I would say first, this is not a probablistic model, it does not have the component of being active or not active given certain probablity like in an Ising model.
-And that also enables us to keep the continuos nature and we can simulate the continuous symptom trajectory instead of being binary.
-Also, we've incorporated the non-linarity term that can be controlled by the delta parameter.
-This makes our model more flexible by capturing the nonlinear responses in the dynamics.
+And how does our model differs or what does this model actually adds to the existing ones?
+I would say first, our model differs in its continuous nature, which allows us to simulate symptom trajectories continuously rather than getting binary responses, such as in the Ising model. Also, we've incorporated the non-linearity term that can be controlled by the delta parameter, which makes our model more flexible by being able to capture the nonlinear responses in the dynamics.
 
-And of course, this is just a very start.
+But of course, this is just a very start.
 There are much more could be done in the future.
-For instance, we would like to investigate further on this non-linearity aspect in the dynamics, as we for now just used a very simple expression, but it probably is not as simple as how we defined in reality.
-Also, about the feedback loops and causal directions of the model, I believe we can work on that more in order to find out what is the reasonable directions, ideally substantiated by data; I've been looking into some of the causal algorithms currently.
-And with the presence of feedback loops, it is pretty challenging, but I hope in some years there would be some progress on studying the causal structure of symptom network.
+For instance, we would actually like to investigate further on this non-linearity aspect in the dynamics, as we for now just used a very simple expression, but it probably is not as simple as how we defined in reality.
+Also, about the feedback loops and causal directions of the model. It is one of the hot topics, causality and causal discovery. I am also very much interested in this and I've bothered Lourens a lot in the past, trying to understand this more.
+The thing is there are some promising causal algorithms that could learmn the causal structure even with the feedback loops present in the model. So hopefully with the data I have now, I would like to delve deeper into this. If anyone working on causal discovery / causal inference, I would like to hear about what you think about this as well.
 Lastly, more of practical aspect; for the follow up of this work, one of the first thing should be done is to calibrate the parameters and do some sensitivity analyses.
 
-And I was really hoping that I could hear what you guys think about this.
-And if you have any idea on what you can do with this type of model or any idea on some interesting extension for this work, I would love to hear it.
+And I was really hoping that I could hear what you guys think about this model.
+And if you have any idea on what you can do with this type of models or any interesting extensions for this work, I would love to hear it.
 :::
 
 ## Thank You {background-image="img/bg_sl5.png"}
@@ -548,4 +561,8 @@ And if you have any idea on what you can do with this type of model or any idea 
 ##### References
 
 ::: {#refs}
+:::
+
+::: notes
+Thank you very much. I'd like to thank to my supervisors, Vitor Vasconcelos and Mike Lees, who have been guiding me through this work. Also if you have any comments or questions, please feel free to reach out to me via email. I'm always open to discussion and feedback. Alright, thanks a lot again for your attention.
 :::
