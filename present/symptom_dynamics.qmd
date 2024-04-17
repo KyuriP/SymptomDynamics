@@ -175,7 +175,7 @@ Although here I did not indicate the causal directions but I assume these three 
 ::: notes
 This resilience concept is the last point that I want to talk about.
 Opposite to this low resilient network, when the network has relatively weak connections, we call it a highly resilient network.
-Because in this case, the symptom activation does not easily propagate through the network so hysteresis therefore can also be hardly observed.
+Because in this case, the symptom activation does not easily propagate through the network.
 
 So in this study, what we are gonna do with our model is that we are going to assess whether we can replicate these features of depression dynamics.
 For example, for resilience, we will specify different levels of resilience within our model and see whether the resulting network models exhibit different structures.
@@ -255,7 +255,7 @@ The first two terms $S_i(1-S_i)$ are typical logistic differential equation, whi
 We imposed this constraint to align with the common practice of measuring symptoms on bounded scales in questionnaires.
 In this context, approaching 0 means a low symptom level, indicating symptom deactivation, and approaching 1 indicates symptom activation.
 
-The third term is a sum of three elements that collectively determine the symptom level.
+The third term is a sum of three different elements that collectively determine the symptom level.
 Here, $\beta_i$ represents the sensitivity level of $S_i$.
 A lower $\beta_i$ indicates reduced sensitivity to external triggering factors, making the symptom less prone to activation.
 It is an important parameter, which heavily influences the system's tipping point, so I will talk about this in more detail in the following slide.
@@ -302,8 +302,8 @@ The yellow-shaded area indicates the range of bistability; there are two stable 
 This area is determined by the relative strength of $\beta$ compared to the other parameters here, which are $\omega_i$, $\delta_i$, and $\alpha_{ii}$.
 For simplicity, here I defined the aggregated effects of other symptoms on $S_i$ as $\omega_i$.
 So when $\beta$ is smaller than the first critical point, only 0 stands as a stable equilibrium, (CLICK) which can be represented as such energy landscape like this.
-And as $\beta$ surpasses this first critical point, both 0 and 1 become stable states, together with an unstable state in between, (CLICK) which then can be represented by this smooth W shape bi-stable landscape.
-And as $\beta_i$ exceeding $\omega_i$, the second critical point, 0 transitions to an unstable state, leaving 1 as the only stable equilibrium (CLICK), as you can see.
+And as $\beta$ surpasses this first critical point, both 0 and 1 become stable states (CLICK) which then can be represented by this smooth W shape bi-stable landscape.
+And as $\beta_i$ exceeding $\omega_i$, the second critical point, 0 transitions to an unstable state, leaving 1 as the only stable equilibrium (CLICK), as you can see in this landscape.
 
 
 Presuming inherent bistability in our model as we discussed, we constrain $\beta$ to be within this yellow-shaded bistable region.
@@ -436,7 +436,7 @@ It reaches the full activation quickly upon the shock and maintains a moderate d
 (SCROLL DOWN) And for the networks, as expected, they are denser than the others.
 Especially, the network density before the shock is obviously the highest among all three scenarios.
 
-So in summary, we did find some clear hysteresis effects in our model, and also variations in network connectivity across different time phases as well as different resilience level.
+So in summary, we did find some clear hysteresis effects in our model, and also variations in network connectivity across different time phases as well as different resilience level. And just to point out, these various networks are generated based on the same mechanistic model.
 :::
 
 ## Results (cont.)
@@ -453,7 +453,7 @@ So in summary, we did find some clear hysteresis effects in our model, and also 
 
 ::: notes
 Here again, I just put the network estimated before the shock from each of the scenario side-by-side, so that you can easily compare.
-So again this shows distinctive network structures in different level of resilience. 
+So this shows distinctive network structures in different level of resilience and just want to emphasize once again that they are based on the same underlying model, and in this case they only slightly differ with a couple of parameter values.
 :::
 
 ## Results (cont.)
@@ -517,6 +517,7 @@ So I found this very interesting... The implication for this is up to discussion
     -   non-linearity
 :::
 
+
 ::: {.fragment .fade-in-then-semi-out fragment-index="3"}
 -   Future efforts:
     -   specifying the non-linearity
@@ -538,9 +539,9 @@ I would say first, our model differs in its continuous nature, which allows us t
 
 But of course, this is just a very start.
 There are much more could be done in the future.
-For instance, we would actually like to investigate further on this non-linearity aspect in the dynamics, as we for now just used a very simple expression, but it probably is not as simple as how we defined in reality.
+For example, we would actually like to investigate further on this non-linearity aspect in the dynamics, as we for now just used a very simple expression, but it probably is not as simple as how we defined in reality.
 Also, about the feedback loops and causal directions of the model. It is one of the hot topics, causality and causal discovery. I am also very much interested in this and I've bothered Lourens a lot in the past, trying to understand this more.
-The thing is there are some promising causal algorithms that could learmn the causal structure even with the feedback loops present in the model. So hopefully with the data I have now, I would like to delve deeper into this. If anyone working on causal discovery / causal inference, I would like to hear about what you think about this as well.
+The thing is there are some promising causal algorithms that could learn the causal structure even with the feedback loops present in the model. So hopefully with the data I have now, I would like to delve deeper into this. If anyone working on causal discovery / causal inference, I would like to hear about what you think about this as well.
 Lastly, more of practical aspect; for the follow up of this work, one of the first thing should be done is to calibrate the parameters and do some sensitivity analyses.
 
 And I was really hoping that I could hear what you guys think about this model.
