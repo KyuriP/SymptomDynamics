@@ -2,13 +2,13 @@
 # install packages
 library(modelr)
 library(dplyr)
+library(purrr)
+library(tidyr)
 library(ggplot2)
 library(RColorBrewer)
 library(patchwork)
 library(qgraph)
-library(psychonetrics)
-library(purrr)
-library(tidyr)
+#library(psychonetrics)
 library(bootnet)
 
 # source the function
@@ -18,15 +18,6 @@ source("code/euler_stochastic2.R")
 f <- function(x) x^2
 
 ## adjacency matrix
-# A <- matrix(c( 1, 1.07, 0, 0, 0, 0, 0, 0, 0,
-#                1.07, 1, 1.5, 0, 0, 1.5, 0, 0, 1.13,
-#                0, 0, 1, 1.35, 1.38, 0, 0, 0, 0,
-#                1.27, 0, 0, 1, 0, 0, 0, 0, 0,
-#                0, 0, 0, 1.52, 1, 0, 0, 0, 0,
-#                0, 1.35, 1.44, 0, 0, 1, 1.3, 1.19, 1.07,
-#                0, 0, 0, 0, 0, 0, 1, 1.64, 0,
-#                0, 0, 0, 0, 0, 0, 0, 1, 0,
-#                0, 0, 0, 0, 0, 0, 0, 1.03, 0.5), 9, 9, byrow = T)
 A <- matrix(c( .30, 0, 0, 0, 0, 0, 0, 0, 0,
                .33, .30, .14, .15, 0, .13, 0, 0, .15,
                .13, .14, .30, .22, .23, 0, 0, 0, 0,
@@ -100,9 +91,7 @@ delta <- rep(9.5, 9) |> set_names(paste0("delta_", colnames(A)))
 
 ## Healthy: sum(A_ji)*(1 + delta(S_i^4)) + beta_i) < -A_ii
 # beta_i < -A_ii - sum(A_ji)*(1 + delta(S_i^2))
-(- A_i - A_j*2) # as the max of delta(S_i^4) == delta*1
-(- A_i - A_j*2.5) # as the max of delta(S_i^4) == delta*1
-(- A_i - A_j*3.5)
+
 
 mid <- ((- A_i - A_j*(1+delta)) - A_j)/2
 dist <- (- A_j - (- A_i - A_j*(1+delta))) / 100

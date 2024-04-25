@@ -1,7 +1,7 @@
 ---
 title: "Modeling Depression Dynamics at the Symptom Level"
 subtitle: "Taking a Computational Modeling Approach"
-institute: "Apr 2, 2024"  #change for defense May 22, 2023
+institute: "Apr 19, 2024"  #change date
 author: "Kyuri Park"
 format: 
   revealjs:
@@ -37,19 +37,18 @@ library(knitr)
 library(kableExtra)
 ```
 
-::: notes
-Hello, I am Kyuri, I am a PhD student working at the Computational Science Lab at the university of amsterdam.
-I also used to study here for my undergraduate, majoring in psychological methods. 
-Then, I went to Utrecht for my master's, then back to Amsterdam. 
-
-So the main project I am currently working on is about modelling depression dynamics with regard to precariousness factors, which are basically all sorts of risk factors such as low income, bad neighbordhood and so on.
-So ultimately we want to understand where to intervene in the system to prevent fully-blown depression and hopefully minimize the mental health problems.
-That's the grand scheme, but as a first baby step, I've started working on modeling depression symptoms, which is the work that I am planning to present today.
-But this is still an on-going work and the goal for me today to share this with you guys is to  pick some of your brains to get some interesting implications and of course improvements for future. But i am already aware of a lot of limitations so I encourage you to approach this with an open mind and full of positivity. And just a heads up, i am not a good public speaker, so if you are confused, you are probably rightfully being so. Feel free to ask for clarification; I will give it another go, as long as the time allows.
-:::
 
 ## Network theory of psychopathology
+<!-- ::: notes -->
+<!-- Hello, I am Kyuri, I am a PhD student working at the Computational Science Lab at the university of amsterdam. -->
+<!-- I also used to study here for my undergraduate, majoring in psychological methods.  -->
+<!-- Then, I went to Utrecht for my master's, then back to Amsterdam.  -->
 
+<!-- So the main project I am currently working on is about modelling depression dynamics with regard to precariousness factors, which are basically all sorts of risk factors such as low income, bad neighbordhood and so on. -->
+<!-- So ultimately we want to understand where to intervene in the system to prevent fully-blown depression and hopefully minimize the mental health problems. -->
+<!-- That's the grand scheme, but as a first baby step, I've started working on modeling depression symptoms, which is the work that I am planning to present today. -->
+<!-- But this is still an on-going work and the goal for me today to share this with you guys is to  pick some of your brains to get some interesting implications and of course improvements for future. But i am already aware of a lot of limitations so I encourage you to approach this with an open mind and full of positivity. And just a heads up, i am not a good public speaker, so if you are confused, you are probably rightfully being so. Feel free to ask for clarification; I will give it another go, as long as the time allows. -->
+<!-- ::: -->
 Mental disorder is produced by direct causal interactions between symptoms that reinforce each other via feedback loops.
 [@BorsboomCramer2013].
 
@@ -306,7 +305,7 @@ And as $\beta$ surpasses this first critical point, both 0 and 1 become stable s
 And as $\beta_i$ exceeding $\omega_i$, the second critical point, 0 transitions to an unstable state, leaving 1 as the only stable equilibrium (CLICK), as you can see in this landscape.
 
 
-Presuming inherent bistability in our model as we discussed, we constrain $\beta$ to be within this yellow-shaded bistable region.
+Presuming inherent bistability in our model as we discussed, we constrain $\beta$ to be within this bistable region.
 So across all symptoms, we set the beta to fall within this range, but slightly leaning towards the stable depressed regime like this (CLICK).
 
 Then, when we give the shock to system, we raise $\beta_i$ like this, closer to the second critical point, where depressed state is the only stable equilibrium. So the symptoms will likely go towards the depressed regime. 
@@ -513,10 +512,13 @@ So I found this very interesting... The implication for this is up to discussion
 
 ::: {.fragment .fade-in-then-semi-out fragment-index="1"}
 -   The model stands out from the others:
-    -   continuity
     -   non-linearity
+    -   continuity 
+
 :::
 
+![](img/palmer_prediction.png){.absolute top="150" right="50" width="400" .fragment  .fade-in-then-semi-out fragment-index="2"}
+[@palmer2000predicting]{style="font-size:0.7em;" .absolute top="450" right="70" .fragment .fade-in-then-semi-out fragment-index="2"}
 
 ::: {.fragment .fade-in-then-semi-out fragment-index="3"}
 -   Future efforts:
@@ -529,13 +531,27 @@ So I found this very interesting... The implication for this is up to discussion
 -   Other implications?
 :::
 
+
+
 ::: notes
 Alright, so finally discussion.
 This study in my opinion was meaningful in a sense it was one of the first attempts to test the theorized features of depression symptom dynamics using a computational model.
 So instead of fitting a network from data, here we gave you a more of top-down approach.
 
-And how does our model differs or what does this model actually adds to the existing ones?
-I would say first, our model differs in its continuous nature, which allows us to simulate symptom trajectories continuously rather than getting binary responses, such as in the Ising model. Also, we've incorporated the non-linearity term that can be controlled by the delta parameter, which makes our model more flexible by being able to capture the nonlinear responses in the dynamics.
+And how does our model differs or what does this model actually adds to the existing ones? (Han actually asked me this before).
+
+I would say first, we've incorporated the non-linearity term that can be controlled by the delta parameter, which makes our model more flexible by being able to capture the nonlinear responses in the dynamics.
+
+And secondly, our model differs in its continuous nature, which allows us to simulate symptom trajectories continuously rather than getting binary responses, such as in the Ising model. 
+
+And this continuity can actually provide a significant advantage. Lourens, who unfortunately couldn't join us today, introduced me to this work from Palmer, who mainly works in climate and weather prediction. The core concept of Palmer's work revolves around the idea that with sufficient information about the initial state, we can potentially predict the continuous trajectory of a dynamical system.
+
+In this case, they were predicting temperature using what they call an ensemble prediction model. This model essentially adds perturbations to the initial conditions and generate trajectories based on stochastic differential equations. In the graph, you see the dashed line, that is the actual temperature, and the gray lines represent trajectories from the model. And here, their predictions were quite okay, as the real temperature fell within the predicted bounds.
+
+So this shows one of the possibilities that such continuous model could also be utilized in psychological research, to make a short-term prediction like this, so for example it could be used to make a short-term prognosis or so. 
+
+
+
 
 But of course, this is just a very start.
 There are much more could be done in the future.
@@ -557,7 +573,7 @@ And if you have any idea on what you can do with this type of models or any inte
 ![Vítor Vasconcelos](img/Vitor.png){.absolute top="10" right="300" width="200" height="214"} [Vítor V. Vasconcelos]{.absolute top="250" right="330"} ![Mike Lees](img/mike.png){.absolute top="10" right="50" width="201"} [Mike Lees]{.absolute top="250" right="110"}
 :::
 
-<br> <br> <br> <br> <br> <br>
+<br> <br> <br> <br> <br> 
 
 ##### References
 
