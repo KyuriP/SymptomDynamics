@@ -1,6 +1,13 @@
+## =========================================================
+## Bifurcation diagrams
+##
+## creating Figure 4 and Figure 5 
+## =========================================================
 ## install packages
 source("code/libraries.R")
 
+
+## Create Figure 5 : Bifurcation w.r.t. omega W
 
 # setting 1: 1 1
 b <- -8; a <- 1; W <- 1; d <- 1
@@ -11,10 +18,8 @@ b <- -8; a <- 3; W <- 1; d <- 0
 # setting 4: 1 3
 b <- -8; a <- 1; W <- 1; d <- 3
 
-
 # S rate
 rate <- function(S, W = 3) S*(1 - S)*(b + a*S + W*(1 + d*(S^2)))  
-
 
 # stability of a root ~ sign of eigenvalue of Jacobian
 stability<-function(W) { 
@@ -25,10 +30,10 @@ stability<-function(W) {
   return(list(Eq=Eq,Eigen=eig)) } 
 
 
-# bifurcation diagram 
+# omega range
 wseq <-  seq(0, 10, by=0.01) 
 
-# plot bifurcation
+# get the list of stability for each condition
 lst1 <- wseq |> 
   map_df(~ stability(.x), .id = "id") |>
   mutate(omega = as.factor(wseq[as.numeric(id)]),
@@ -67,7 +72,7 @@ big_lst <- bind_rows(lst2, lst3, lst4, .id = "sets") |>
 big_lst_stable <- big_lst |> filter(Eigen == "stable")
 big_lst_unstable <- big_lst |> filter(Eigen == "unstable")
 
-## bifurcation diagram w.r.t. omega W
+# plot bifurcation diagram w.r.t. omega W
 bif_W <- big_lst_stable |> ggplot(aes(x = omega, y = Eq)) + 
   geom_point(aes(color = sets)) +
   theme_classic() +
@@ -95,8 +100,9 @@ bif_W <- big_lst_stable |> ggplot(aes(x = omega, y = Eq)) +
 # ggsave("bifurcation_W.pdf", plot = bif_W, units="in", width=25, height=12, bg = 'transparent')
 
 
-## bifurcation diagram w.r.t. beta
+## Create Figure 4: Bifurcation diagram w.r.t. beta 
 b <- 1; a <- 1; W <- 1; d <- 3
+
 rate <- function(S, b = 1) S*(1 - S)*(b + a*S + W*(1 + d*(S^2)))
 
 stability<-function(b) {
@@ -142,8 +148,6 @@ bif <- lst |> ggplot(aes(x = beta, y = Eq, color = Eigen)) +
         #   colour = "white")
         ) 
   #guides(color = guide_legend(override.aes = list(shape = NA, linetype  = c(1,2), size = 5, color = "royalblue")))
-
-
 
 png(file="bifurcation.png", units="in", width=20, height=10, res=300, bg = 'transparent')
 bif
@@ -204,7 +208,6 @@ for(i in 1:length(possibleS)){
 }
 
 
-
 cc <- scales::seq_gradient_pal("lightskyblue1", "navy")(seq(0,1,length.out=11))
 points <- data.frame(possibleS) |> mutate(time = 0, S = possibleS) 
 
@@ -233,7 +236,7 @@ dev.off()
 
 
 
-# landscape plots
+## landscape plots
 
 # converging to 0
 perms <- c(a = 1, b = -2, W = 0.5, d = 0.5)
@@ -293,8 +296,6 @@ ball0 <- ggplot(dat) +
 #   theme_void() +
 #   #geom_point(aes(x=1.105, y=0.0795),color = "lightblue", alpha = .5, size = 5) +
 #   #coord_cartesian(xlim =c(0.5,4))
-
-
 
 png(file="ball0.png", units="in", width=6, height=4, res=300, bg = 'transparent')
 ball0

@@ -1,3 +1,9 @@
+## =========================================================
+## Euler–Maruyama method 
+##
+## approximate numerical solution of SDEs
+## (boundary correction has been made)
+## =========================================================
 ## install packages
 source("code/libraries.R")
 

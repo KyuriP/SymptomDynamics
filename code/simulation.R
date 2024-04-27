@@ -1,3 +1,9 @@
+## =========================================================
+## Main simulation 
+##
+## run simulation 500 times for each of the different 
+## resilience scenarios (low / baseline / high)
+## =========================================================
 ## install packages
 source("code/libraries.R")
 

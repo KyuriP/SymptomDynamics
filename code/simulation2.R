@@ -1,8 +1,14 @@
+## =========================================================
+## Main simulation 
+##
+## run simulation 500 times for each of the different 
+## resilience scenarios (low / baseline / high)
+## =========================================================
+## install packages
+source("code/libraries.R")
 
 rm(list=ls())
 
-## install packages
-source("code/libraries.R")
 ## source necessary functions
 source("code/euler_stochastic2.R")
 source("code/mod_specification.R")

@@ -1,12 +1,12 @@
+## =========================================================
+## Creating 3d-plots 
+##
+## make Figure 4 (bifurcation diagram with landscapes) in 3D
+## =========================================================
 ## install packages
 source("code/libraries.R")
 
-open3d()
-x <-  seq(0, 30, by = 0.0001)
-y <-  seq(0, 30, by = 0.0001)
-z <- -dgamma(x, shape = 2, scale = 0.1)
-
-
+# open 3d workspace
 open3d()
 x <-  seq(0, 1, by = 0.0001)
 # bistability
@@ -48,7 +48,7 @@ aspect3d(1.5, 2, 1)
 par3d(windowRect = c(20, 30, 800, 800))
 #par3d(pp)
 
-rgl.snapshot("bistab1.png", fmt="png", top=TRUE )
+rgl.snapshot("bistab1.png", fmt="png", top=TRUE)
 
 
 ## Save RGL parameters to a list object

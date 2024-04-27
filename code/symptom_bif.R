@@ -1,8 +1,12 @@
+## =========================================================
+## Bifurcation diagrams with landscapes
+##
+## creating Figure 6 (bifurcation diagram for four symptoms)
+## =========================================================
 ## install packages
 source("code/libraries.R")
 
 ## bifurcation plot per symptom
-
 
 # anhedonia
 b <- -8; a <- 0.3; W <- 0.97; d <- 9
@@ -16,8 +20,7 @@ b <- -8; a <- 0.3; W <- 0.44; d <- 9
 # S rate
 rate <- function(S, b = 1) S*(1 - S)*(b + a*S + W*(1 + d*(S^2)))
 
-# Stability of a root ~ sign of eigenvalue of Jacobian
-
+# stability of a root ~ sign of eigenvalue of Jacobian
 stability<-function(b) {
   Eq <- uniroot.all(rate, c(0,1), b = b)
   eig <-vector()
@@ -64,58 +67,6 @@ sui_unstable <- sui_lst |> filter(Eigen =="unstable")
 # find x-intercept
 # lst |> filter(beta == -0.6)
 
-
-# bif_anh <- anh_lst |> ggplot(aes(x = beta, y = Eq, color = Eigen)) +
-#   geom_point(size = 0.1) +
-#   theme_classic() +
-#   scale_color_manual(values=c("royalblue", "white"), labels = c("stable", "unstable")) +
-#   geom_line(data= anh_unstable, aes(x = beta, y = Eq), group=1, linetype=2,linewidth=1, color = "royalblue") +
-#   annotate('rect', xmin = 301, xmax = 1204, ymin =0, ymax= 1, alpha=0.1, fill="gold1")+
-#   geom_vline(xintercept = 1106, linetype="dotted", color = "orange", linewidth=1.5) +
-#   geom_vline(xintercept = 1210, linetype="dotted", color = "coral3", linewidth=1.5) +
-#   scale_y_continuous(breaks=c(0,1))+
-#   labs(title = "(a) anhedonia", y = "", x="")+
-#   guides(color="none") +
-#   theme(axis.text.x=element_blank(), 
-#         axis.ticks.x=element_blank(),
-#         plot.title=element_text(size = 20), 
-#         axis.text.y=element_text(size = 20))
-# #plot.margin = margin(0.5, 0.1, 0.5, 0.1, "cm"))
-# 
-# bif_slp <- slp_lst |> ggplot(aes(x = beta, y = Eq, color = Eigen)) +
-#   geom_point(size = 0.1) +
-#   theme_classic() +
-#   scale_color_manual(values=c("royalblue", "white"), labels = c("stable", "unstable")) +
-#   geom_line(data= slp_unstable, aes(x = beta, y = Eq), group=1, linetype=2,linewidth=1, color = "royalblue") +
-#   annotate('rect', xmin = 611, xmax = 1235, ymin =0, ymax= 1, alpha=0.1, fill="gold1")+
-#   geom_vline(xintercept = 1166, linetype="dotted", color = "orange", linewidth=1.5) +
-#   geom_vline(xintercept = 1241, linetype="dotted", color = "coral3", linewidth=1.5) +
-#   scale_y_continuous(breaks=c(0,1))+
-#   labs(title = "(c) sleep", y = "", x= "")+
-#   guides(color="none") +
-#   theme(axis.text.x=element_blank(), 
-#         axis.ticks.x=element_blank(),
-#         plot.title=element_text(size = 20), 
-#         axis.text.y=element_text(size = 20))
-#         #plot.margin = margin(0.5, 0.1, 0.5, 0.1, "cm"))
-
-
-# bif_glt <- glt_lst |> ggplot(aes(x = beta, y = Eq, color = Eigen)) +
-#   geom_point(size = 0.1) +
-#   theme_classic() +
-#   scale_color_manual(values=c("royalblue", "white"), labels = c("stable", "unstable")) +
-#   geom_line(data= glt_unstable, aes(x = beta, y = Eq), group=1, linetype=2,linewidth=1, color = "royalblue") +
-#   annotate('rect', xmin = 841, xmax = 1258, ymin =0, ymax= 1, alpha=0.1, fill="gold1")+
-#   geom_vline(xintercept = 1215, linetype="dotted", color = "orange", linewidth=1.5) +
-#   geom_vline(xintercept = 1265, linetype="dotted", color = "coral3", linewidth=1.5) +
-#   scale_y_continuous(breaks=c(0,1))+
-#   labs(title = "(b) guilty", y = "", x="")+
-#   guides(color="none") +
-#   theme(axis.text.x=element_blank(), 
-#         axis.ticks.x=element_blank(),
-#         plot.title=element_text(size = 20), 
-#         axis.text.y=element_text(size = 20))
-#         #plot.margin = margin(0.5, 0.1, 0.5, 0.1, "cm"))
 
 bif_anh <- anh_lst |> ggplot(aes(x = beta, y = Eq)) +
   geom_point(aes(color = Eigen), size = 0.1) +
@@ -222,6 +173,7 @@ bif_sui <- sui_lst |> ggplot(aes(x = beta, y = Eq)) +
         legend.position = "bottom")
 
 
+# plot the energy landscapes (by manually solving the equations)
 x <- seq(-2, 2, by = 0.01)
 anh_bi = x^2*(582*x^3 - 615*x^2- 440*x + 455) / 300
 anh_sh = x^2*(194*x^3 - 205*x^2- 40*x -15) / 100
@@ -261,7 +213,6 @@ anh_ls <- df_landscape |>filter(grepl("anh", symptom)) |>
         legend.title = element_text(size = 18, face ="bold"),
         legend.key.width = unit(4, "line"),
         legend.position='bottom')
-
 
 # slp landscape
 pointdat_slp <- data.frame(x = 1, y = -0.122)

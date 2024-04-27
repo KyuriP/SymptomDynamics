@@ -1,13 +1,18 @@
+## =========================================================
+## HELIUS data
+##
+## 
+## =========================================================
 ## install packages
 source("code/libraries.R")
 
-# import helius data
+# import HELIUS data
 helius2 <- read_sav("data/HELIUS_itemscores.sav")
-helius2$H1_WlbvRecent8
-helius2$H1_WlbvRecent9
-helius2$H1_WlbvRecent_89
+# helius2$H1_WlbvRecent8
+# helius2$H1_WlbvRecent9
+# helius2$H1_WlbvRecent_89
 
-# clean up data
+# clean up depression item scores
 dep_scores <- helius2 |> 
   select(contains("WlbvRecent") & !ends_with("Ingevuld"), ID) |>
   pivot_longer(-ID, names_to = "wave1", values_to = "value") |>
@@ -31,12 +36,13 @@ dep_list <- dep_scores %>%
   {setNames(group_split(.), group_keys(.)[[1]])}  %>% 
   map(~.x |>pivot_wider(id_cols = ID, names_from = item_num, values_from = value))
   
-# each wave separately
+# separate each wave 
 net_list <- dep_list |>
   map(~.x |>select(-ID) |> relocate(sui, .after = mot) |>
       estimateNetwork(.x, default = "EBICglasso") |>
         plot(.x)
       )
+
 
 Layout_simnet <- totavgnetwork2$layout
 
@@ -61,7 +67,7 @@ cent_netH1_helius |>
   facet_grid(. ~ dummyB)
 
 
-# each wave separately
+# all waves together
 average_net_allwaves <- dep_list |>
   map(~.x |>select(-ID) |> relocate(sui, .after = mot)
   ) |> list_rbind() |>

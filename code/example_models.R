@@ -1,53 +1,24 @@
+## =========================================================
+## Example network models
+##
+## creating Figure 1 (example bistable landscape with networks),
+## Figure 2 (example directed network model) and
+## Figure 3 (centrality of the example network model)
+## =========================================================
 ## install packages
 source("code/libraries.R")
 
-# bistable landscape
 
+## Creating Figure 1: example bistable landscape with networks
+
+# bistable landscape for Fig1
 x = seq(-5, 5, 0.01)
 y = 1/5 * x^4 - 4*x^2 + 10
 
 plot(x, y, type = "l")
 
-# Bifurcation plot
-model<-function(t,state,parms)
-{ with(as.list(c(state,parms)), 
-       { 
-         dS <- S*(1 - S)*(b + a*S + W*(1 + d*(S^4)))   
-         return(list(dS)) 
-       })
-} 
 
-beta <- seq(-3, 3, by = 0.01)
-states <- seq(0, 1, by = 0.01)
-
-conver <- list()
-for (i in 1:length(beta)){
-  perms <- c(a = 1, b = beta[i], W = 1, d = 0.5) # pisanamedvectorofparameters 
-  times <-seq(0, 100,by= 0.01)
-  convergence <- list()
-  for(j in 1:length(state)){
-  state <- c(S = states[j]) # sisthestate
-  out <- ode(y= state, times = times, func= model, parms = perms)
-  convergence[[j]] <- unique(round(tail(out[,2], 100),1))
-  }
-  conver[[i]] <- convergence[j]
-}
-
-data.frame(beta, convergence) |>
-  ggplot(aes(x = beta, y = convergence)) +
-  geom_point()
-
-unique(round(tail(out[,2], 100),1))
-class(out)
-
-
-
-
-
-
-################################################
-layout(1)
-## fake networks for Fig1
+# example networks for Fig1
 fakeA <- matrix(c(0,0.1,0,0,0.1,
                   0.1,0,0,0.1,0,
                   0,0,0,0,0,
@@ -78,9 +49,8 @@ png(file="sicknetwork.png", units="in", width=5, height=5, res=300, bg = 'transp
 qgraph(fakeB, theme = 'colorblind')
 dev.off()
 
-################################################
 
-## Directed network example
+## Creating Figure 2: example directed network 
 Names <- c("anhedonia", "sadness", "sleep", "energy", "appetite", "guilty", "concentration", "motor", "suicidal")
 
 grp <- list(`cycle` = 2:6, `no cycle` = c(1,7:9))
@@ -110,8 +80,7 @@ qgraph(A, theme = 'colorblind', legend = F, groups = grp, color = c("#F5651C", "
 dev.off()
 
 
-################################################
-# empirical networks
+## specifying weight matrix based on empirical networks
 # lee et al.(2023) partial correlations
 net1 <- matrix(c(0, 0, 0, 0, 0, 0, 0, 0, 0,
                  0.32, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -171,7 +140,6 @@ net5 <- matrix(c(0.00,	2.14,	0.32,	1.27,	0.64,	0.50,	0.66,	0.31,	0.30,
 
 
 
-
 # get the average weight matrices
 ggmlist <- list(net1, net2, net3)
 isinglist <- list(net4, net5)
@@ -186,7 +154,7 @@ round(averageIsing, 2)
 colnames(averageGGM) <- rownames(averageGGM) <- Names
 colnames(averageIsing) <- rownames(averageIsing) <- Names
 
-## Directed network example
+# example directed network 
 Names <- c("anhedonia", "sadness", "sleep", "energy", "appetite", "guilt", "concentration", "motor", "suicidal")
 layout(1)
 qgraph(averageGGM, theme = 'colorblind',legend = TRUE,  nodeNames = Names, layout="spring")
@@ -194,7 +162,18 @@ qgraph(averageGGM, theme = 'colorblind',legend = TRUE,  nodeNames = Names, layou
 qgraph(averageIsing, layout="spring")
 
 
-## centrality
+## Creating Figure 3: centrality of example network model
+
+A <- matrix(c( .30, 0, 0, 0, 0, 0, 0, 0, 0,
+               .33, .30, .14, .15, 0, .13, 0, 0, .15,
+               .13, .14, .30, .22, .23, 0, 0, 0, 0,
+               .21, .15, .22, .30, 0, 0, .12, 0, 0,
+               0, 0, 0, .17, .30, 0, 0, 0, 0,
+               0, .13, 0, 0, .15, .30, .2, .15, .22,
+               0, 0, 0, 0, 0, 0, .30, .17, 0,
+               0, 0, 0, 0, 0, 0, 0, .30, 0,
+               0, 0, 0, 0, 0, 0, 0, .3, 0.30), 9, 9, byrow = T)
+
 cent <- centrality_auto(A)
 stn <- (cent$node.centrality$InStrength + cent$node.centrality$OutStrength)/2 
 
@@ -219,18 +198,6 @@ ggsave("centrality_A.pdf", plot = cent_A, width = 25, height =20, units = "cm", 
 centralityA$dummyA <- "In/Out Strength"
 centralityA$dummyB <- "Average Strength"
 
-# plotA <- centralityA |> filter(centrality == "InStrength" | centrality == "OutStrength") |>
-#   ggplot(aes(x=value, y = node, group=centrality, color = centrality)) + 
-#   geom_point() + 
-#   geom_path() + 
-#   theme_bw() +
-#   labs(x = "", y = "", color = "") +
-#   scale_color_brewer(palette = "Set2") + 
-#   theme(text=element_text(size=20),
-#         legend.position = "none") +
-#   facet_grid(. ~ dummyA)
-# ggsave("toy_centrality.png", plot = plotA, width = 8, height = 10, unit = "cm", dpi = 300)
-+theme(axis.text=element_text(size=20), legend.text = element_text(size=10))
 
 plotA <- centralityA |> filter(centrality == "InStrength" | centrality == "OutStrength") |>
   ggplot(aes(x=value, y = node, group=centrality, color = centrality)) + 
@@ -244,6 +211,7 @@ plotA <- centralityA |> filter(centrality == "InStrength" | centrality == "OutSt
         legend.text = element_text(size=15)) +
   facet_grid(. ~ dummyA)
 ggsave("cent_toy.png", plot = plotA, width = 4.5, height = 8, dpi = 300)
+
 
 plotA <- centralityA |> filter(centrality == "InStrength" ) |>
   ggplot(aes(x=value, y = node, group=centrality, color = centrality)) + 
