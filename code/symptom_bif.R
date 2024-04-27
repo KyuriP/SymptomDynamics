@@ -1,10 +1,5 @@
-library(rootSolve)
-library(ggplot2)
-library(dplyr)
-library(purrr)
-library(tidyr)
-library(deSolve)
-library(ggpubr)
+## install packages
+source("code/libraries.R")
 
 ## bifurcation plot per symptom
 

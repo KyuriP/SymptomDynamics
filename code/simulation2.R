@@ -1,27 +1,19 @@
 
-## install packages
-library(modelr)
-library(dplyr)
-library(purrr)
-library(tidyr)
-library(ggplot2)
-library(RColorBrewer)
-library(patchwork)
-library(qgraph)
-library(tidyverse)
-library(bootnet)
-
 rm(list=ls())
+
+## install packages
+source("code/libraries.R")
 ## source necessary functions
 source("code/euler_stochastic2.R")
 source("code/mod_specification.R")
 
+## set the seed
 set.seed(123)
 
 ## define model specifics: choose the scenario and initial value for symptoms
-choice <- "base"
-choice <- "high"
-choice <- "low"
+# choice <- "base"
+# choice <- "high"
+# choice <- "low"
 
 mod <- mod_spec(scenario = choice, init_val = 0.01)
 
@@ -91,7 +83,7 @@ eachsym <- sde_out |>
 ## aggregate symptom level
 n_sims <- 10
 
-# run sims n_sims times
+# run simulation n_sims times
 aggregated <- map(1:n_sims, ~ euler_stochastic2(
   Amat = mod$A, 
   deterministic_rate = mod$dif_eq,
@@ -108,13 +100,15 @@ aggregated <- map(1:n_sims, ~ euler_stochastic2(
   mutate(totalsymptom = rowSums(pick(S_anh:S_sui)))
 ) |> list_rbind(names_to = "sim")
 
+## save datasets
 # saveRDS(aggregated, "aggregated2.rds") # delta = 8.5
 # saveRDS(aggregated, "aggregated3.rds") # delta = 9
 # saveRDS(aggregated, "aggregated_4.rds") # delta = 9 with old beta
 
+## read datasets
 # aggregated <- readRDS("aggregated2.rds")
 
-
+## IQR function
 inter_quantile <- function(x, probs = c(0.25, 0.5, 0.75)) {
   tibble(
     val = quantile(x, probs, na.rm = TRUE),
@@ -122,6 +116,7 @@ inter_quantile <- function(x, probs = c(0.25, 0.5, 0.75)) {
   )
 }
 
+## Each symptom plot
 each_summ <- aggregated |> 
   select(-c(totalsymptom, sim)) |>
   tidyr::pivot_longer(!t, names_to = "symptoms") |>
@@ -143,6 +138,8 @@ eachsym_quant <- ggplot(data = each_summ) +
   
 # ggsave("eachsym_quant.pdf", plot = eachsym_quant, width = 30, height = 15, units = "cm", dpi = 300)
 
+
+## Total symptom level plot
 summarized <- aggregated |>
   reframe(inter_quantile(totalsymptom), .by = t) |>
   pivot_wider(names_from = "quant", values_from = "val", names_glue = "q{quant}")
@@ -152,7 +149,6 @@ totalsym <- ggplot(data = summarized) +
   ), inherit.aes = FALSE, fill = "darkgray", alpha = 0.2) +
   geom_line(aes(x = t, y = q0.5), col = "red4", lwd = 0.2) +
   geom_ribbon(aes(x=t,ymin=q0.25,ymax=q0.75),fill = "tomato1", alpha=0.3) +
-  #ggtitle("Average level of the aggregated symptoms") +
   labs(x = "time", y= "") +
   geom_hline(yintercept = 5/3, linetype = 2, color = "azure4", lwd = 0.1) +
   geom_hline(yintercept = 10/3, linetype = 2, color = "azure4", lwd = 0.1) +
@@ -172,34 +168,40 @@ totalsym <- ggplot(data = summarized) +
 
 
 
-## fitting statistical networks:
-burnout <- 100
-beforeshock <- aggregated |> filter(t > burnout & t < t_shock) |> select(S_anh:S_sui)
-# beforeshock <- aggregated |> filter(t < t_shock) |> select(S_anh:S_sui)
-duringshock <- aggregated |> filter(t >= t_shock & t <= t_shock + shock_duration) |> select(S_anh:S_sui)
-aftershock <- aggregated |> filter(t >= 3000) |> select(S_anh:S_sui)
-# aftershock <- aggregated |> filter(t >= t_shock + shock_duration) |> select(S_anh:S_sui)
+
+## fitting statistical networks
+burnin <- 100
+# before shock
+beforeshock <- aggregated |> 
+  filter(t > burnin & t < t_shock) |> 
+  select(S_anh:S_sui) |> 
+  estimateNetwork(default = "EBICglasso")
+# during shock
+duringshock <- aggregated |> 
+  filter(t >= t_shock & t <= t_shock + shock_duration) |> 
+  select(S_anh:S_sui) |>
+  estimateNetwork(default = "EBICglasso")
+# after shock
+aftershock <- aggregated |> 
+  filter(t >= 3000) |> 
+  select(S_anh:S_sui) |>
+  estimateNetwork(default = "EBICglasso")
 
 
-beforeshock <- estimateNetwork(beforeshock, default = "EBICglasso")
-duringshock <- estimateNetwork(duringshock, default = "EBICglasso")
-aftershock <- estimateNetwork(aftershock, default = "EBICglasso")
-
-
-#' Creating hyperparameter *max_value*
+# hyperparameter *max_value*
 max_value <- max(
   max(abs(beforeshock$graph)), 
   max(abs(duringshock$graph)),
   max(abs(aftershock$graph))
 )
 
-#' Creating hyperparameter *net_layout*
+# hyperparameter *net_layout*
 net_layout <- averageLayout(beforeshock,
                             duringshock,
                             aftershock)
 
 
-# Creating node names
+# create node names
 nodenames <- c("anhedonia", "sad", "sleep", "energy", "appetite", "guilty", "concentration", "motor", "suicidal")
 
 # pdf(file = "triplenetworks2_v2.pdf", width = 16, height = 9)
@@ -220,6 +222,7 @@ abline(v = -1.3, lty=3, col = "lightgray")
 
 
 ## fitting aggregated network
+# read all datasets
 aggregated <- readRDS("data/aggregated.rds")
 aggregated_res <- readRDS("data/aggregated_res.rds")
 aggregated_low <- readRDS("data/aggregated_low.rds")
@@ -231,10 +234,10 @@ colnames(avgnet_res) <- colnames(A)
 avgnet_low <- aggregated_low |> dplyr::select(S_anh:S_sui)
 colnames(avgnet_low) <- colnames(A)
 
-#total average net 
-totavgnet <- avgnet |> bind_rows(avgnet_res, avgnet_res) #|> slice_sample(prop = 0.8)
+# total average net 
+totavgnet <- avgnet |> bind_rows(avgnet_res, avgnet_low) #|> slice_sample(prop = 0.8)
 totavgnetwork <- estimateNetwork(totavgnet, default = "EBICglasso")
-
+# grouping nodes by cycle/nocycle
 grp <- list(`cycle` = 2:6, `no cycle` = c(1,7:9))
 
 
@@ -253,12 +256,15 @@ totavgnetwork2$layout[7,] <- gltloc
 plot(totavgnetwork2)
 
 
-# centrality
+# compute centrality
 res_totavg <- centrality_auto(totavgnetwork)
 rownames(res_totavg$node.centrality) <- colnames(A)
 
-cent_totavg <- res_totavg$node.centrality$Strength |>as_data_frame() |>  mutate(node = factor(rownames(res_totavg$node.centrality), levels= c(rownames(res_totavg$node.centrality)))
-)
+cent_totavg <- res_totavg$node.centrality$Strength |>
+  as_data_frame() |>  
+  mutate(node = factor(rownames(res_totavg$node.centrality), 
+                       levels= c(rownames(res_totavg$node.centrality)))
+  )
 
 cent_totavg$dummyB <- "Strength"
 cent_totavg_plot <- cent_totavg |>
@@ -270,41 +276,44 @@ cent_totavg_plot <- cent_totavg |>
   theme(text=element_text(size=15))+
   facet_grid(. ~ dummyB)
 
-ggsave("cent_sim.png", plot = cent_totavg_plot, width = 3.5, height =5.5, dpi = 300)
+# ggsave("cent_sim.png", plot = cent_totavg_plot, width = 3.5, height =5.5, dpi = 300)
 
+## create Fig16 (overall net)
 library(patchwork)
 
 figpatches <- cent_totavg_plot + ~plot(totavgnetwork,  labels = colnames(A), node.width=2, main = "population network") 
 
-pdf(file = "totalnetwork.pdf", width = 12, height = 8)
+# pdf(file = "totalnetwork.pdf", width = 12, height = 8)
 old_par <- par(mar = c(0, 2, 0, 0), bg = NA)
 wrap_elements(panel = ~plot(totavgnetwork2,  labels = colnames(A), edge.color = "deepskyblue4"), clip = FALSE) + cent_totavg_plot + plot_layout(widths = c(1.7, 1))
 par(old_par)
 dev.off()
 
-# per resilience level
-avgnet <- estimateNetwork(avgnet, default = "EBICglasso", tuning = 0.1)
-avgnet_res <- estimateNetwork(avgnet_res, default = "EBICglasso", tuning = 0.1)
-avgnet_low <- estimateNetwork(avgnet_low, default = "EBICglasso", tuning = 0.1)
 
+## overall network per resilience level
+avgnet <- estimateNetwork(avgnet, default = "EBICglasso")
+avgnet_res <- estimateNetwork(avgnet_res, default = "EBICglasso")
+avgnet_low <- estimateNetwork(avgnet_low, default = "EBICglasso")
+
+# hyperparameter *max_value*
 max_value_avg <- max(
   max(abs(avgnet$graph)),
   max(abs(avgnet_res$graph)),
   max(abs(avgnet_low$graph))
 )
 
-#' Creating hyperparameter *net_layout*
+# hyperparameter *net_layout*
 net_layout_avg <- averageLayout(avgnet,
                                 avgnet_res,
                                 avgnet_low)
 
 
-plot(avgnet_low, layout = net_layout_avg, maximum = max_value_avg,  labels = colnames(A), node.width=2)
+plot(avgnet_low, layout = net_layout_avg, maximum = max_value_avg, labels = colnames(A), node.width=2)
 plot(avgnet, layout = net_layout_avg, maximum = max_value_avg,  labels = colnames(A), node.width=2)
 plot(avgnet_res, layout = net_layout_avg, maximum = max_value_avg,  labels = colnames(A), node.width=2)
 
 
-## centrality
+## overall network centrality per resilience level
 reslow <- centrality_auto(avgnet_low)
 resmid <- centrality_auto(avgnet)
 reshigh <- centrality_auto(avgnet_res)
@@ -326,39 +335,46 @@ cent_sim <- centrality_sim |>
 
 
 
+## overall network centrality per phase
+agg_before <- rbind(aggregated, aggregated_res, aggregated_low) |>
+  filter(t < 1000) |>
+  dplyr::select(S_anh:S_sui) |>
+  rename_with(~gsub("S_", "", .x, fixed =TRUE)) |>
+  estimateNetwork(default = "EBICglasso")
 
-reslow2 <- centrality_auto(duringshock_low)
-resmid2 <- centrality_auto(duringshock)
-reshigh2 <- centrality_auto(duringshock_res)
+agg_during <- rbind(aggregated, aggregated_res, aggregated_low) |>
+  filter(t >= 1000, t < 1500) |>
+  dplyr::select(S_anh:S_sui) |>
+  rename_with(~gsub("S_", "", .x, fixed =TRUE)) |>
+  estimateNetwork(default = "EBICglasso")
 
-centrality_sim2 <- tibble(reslow3 = reslow2$node.centrality$Strength, resmid3 = resmid2$node.centrality$Strength, reshigh3 = reshigh2$node.centrality$Strength) |> 
-  mutate(node = factor(rownames(reslow$node.centrality), levels= c(rownames(reslow$node.centrality)))
+agg_after <- rbind(aggregated, aggregated_res, aggregated_low) |>
+  filter(t > 1500) |>
+  dplyr::select(S_anh:S_sui) |>
+  rename_with(~gsub("S_", "", .x, fixed =TRUE)) |>
+  estimateNetwork(default = "EBICglasso")
+
+  
+avgcent_before <- centrality_auto(agg_before)
+avgcent_during <- centrality_auto(agg_during)
+avgcent_after <- centrality_auto(agg_after)
+
+centrality_phase <- tibble(res_before = avgcent_before$node.centrality$Strength, res_during = avgcent_during$node.centrality$Strength, res_after = avgcent_after$node.centrality$Strength) |> 
+  mutate(node = factor(rownames(avgcent_before$node.centrality), levels= c(rownames(avgcent_before$node.centrality)))
   )
 
-centrality_sim2 %<>%  pivot_longer(!node, names_to = "resilience", values_to = "value")
+centrality_phase %<>%  pivot_longer(!node, names_to = "phase", values_to = "value")
+  
+cent_phase_plot <- centrality_phase |>
+    mutate(resilience = factor(phase, levels = c("res_before", "res_during", "res_after"))) |>
+    ggplot(aes(x=value, y = node, group=1)) + 
+    geom_point(color = "deepskyblue4") + 
+    geom_path(color = "deepskyblue4") + 
+    theme_bw() +
+    labs(x = "", y = "") +
+    theme(text=element_text(size=20))+
+    facet_wrap(~resilience, labeller = as_labeller(c("res_before" = "before shock", "res_during" = "during shock", "res_after" = "after shock"))) 
 
-cent_sim2 <- centrality_sim2 |>
-  mutate(resilience = factor(resilience, levels = c("reslow3", "resmid3", "reshigh3"))) |>
-  ggplot(aes(x=value, y = node, group=1)) + 
-  geom_point(color = "deepskyblue4") + 
-  geom_path(color = "deepskyblue4") + 
-  theme_bw() +
-  labs(x = "", y = "") +
-  theme(text=element_text(size=20))+
-  facet_wrap(~resilience, labeller = as_labeller(c("reslow3" = "low resilience", "resmid3" = "mid resilience", "reshigh3" = "high resilience"))) 
-
-# centrality_sim2 |>
-#   mutate(resilience = factor(resilience, levels = c("reslow3", "resmid3", "reshigh3"))) |>
-#   ggplot(aes(x=value, y = node, group=resilience, color = resilience)) + 
-#   geom_point() + 
-#   geom_path() + 
-#   theme_bw() +
-#   labs(x = "", y = "") +
-#   theme(text=element_text(size=20),
-#         legend.position = "bottom") + 
-#   coord_flip() 
-
-ggsave("centrality_sim.pdf", plot = cent_sim2, width = 25, height = 16, units = "cm", dpi = 300)
 
 
 # beforeGGM <- qgraph(cor_auto(beforeshock),

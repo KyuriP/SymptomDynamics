@@ -6,21 +6,12 @@
 ## 
 ## return: list of relevant parameters and equations
 ## =========================================================
+## install packages
+source("code/libraries.R")
 
 mod_spec <- function(scenario = "base", init_val = 0, ...){
   
-  ## Adjacency matrices
-  # A <- matrix(c( .30, 0, 0, 0, 0, 0, 0, 0, 0,
-  #                .33, .30, .14, .15, 0, .13, 0, 0, .15,
-  #                .13, .14, .30, .22, .23, 0, 0, 0, 0,
-  #                .21, .15, .22, .30, 0, 0, .12, 0, 0,
-  #                0, 0, 0, .17, .30, 0, 0, 0, 0,
-  #                0, .13, 0, 0, .15, .30, .2, .15, .22,
-  #                0, 0, 0, 0, 0, 0, .30, .17, 0,
-  #                0, 0, 0, 0, 0, 0, 0, .30, 0,
-  #                0, 0, 0, 0, 0, 0, 0, .3, 0.07), 9, 9, byrow = T)
-  
-  # change suicidal alpha to be the same
+  ## weigthed adjacency matrix
   A <- matrix(c( .30, 0, 0, 0, 0, 0, 0, 0, 0,
                  .33, .30, .14, .15, 0, .13, 0, 0, .15,
                  .13, .14, .30, .22, .23, 0, 0, 0, 0,
@@ -30,7 +21,6 @@ mod_spec <- function(scenario = "base", init_val = 0, ...){
                  0, 0, 0, 0, 0, 0, .30, .17, 0,
                  0, 0, 0, 0, 0, 0, 0, .30, 0,
                  0, 0, 0, 0, 0, 0, 0, .3, 0.30), 9, 9, byrow = T)
-  
   rownames(A) <- colnames(A) <- c("anh", "sad", "slp", "ene", "app", "glt", "con", "mot", "sui")
 
     ## beta
@@ -87,5 +77,4 @@ mod_spec <- function(scenario = "base", init_val = 0, ...){
   return(model = list(delta = delta, Beta_bistable = Beta_bistable, Beta_sick = Beta_sick, A = A, initial_values = init, dif_eq = dif_eq, sto_eq = sto_eq))
 }
 
-res <- mod_spec(scenario = "low")
 

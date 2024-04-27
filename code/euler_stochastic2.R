@@ -1,5 +1,6 @@
-library(modelr)
-library(magrittr)
+## install packages
+source("code/libraries.R")
+
 
 euler_stochastic2 <- function (deterministic_rate, stochastic_rate, initial_condition, 
                                Amat, parameters1 = NULL, t_start = 0, deltaT = 1, timelength = 1, 

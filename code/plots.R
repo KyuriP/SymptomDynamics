@@ -1,3 +1,5 @@
+## install packages
+source("code/libraries.R")
 
 # bistable landscape
 

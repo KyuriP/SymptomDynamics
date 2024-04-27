@@ -1,15 +1,5 @@
-
-# install packages
-library(modelr)
-library(dplyr)
-library(purrr)
-library(tidyr)
-library(ggplot2)
-library(RColorBrewer)
-library(patchwork)
-library(qgraph)
-#library(psychonetrics)
-library(bootnet)
+## install packages
+source("code/libraries.R")
 
 rm(list=ls())
 

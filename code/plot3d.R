@@ -1,5 +1,5 @@
-library(plot3D)
-library(rgl)
+## install packages
+source("code/libraries.R")
 
 open3d()
 x <-  seq(0, 30, by = 0.0001)

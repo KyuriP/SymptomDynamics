@@ -1,14 +1,13 @@
-library(haven)
-library(purrr)
-library(dplyr)
-library(stringr)
+## install packages
+source("code/libraries.R")
 
+# import helius data
 helius2 <- read_sav("data/HELIUS_itemscores.sav")
 helius2$H1_WlbvRecent8
 helius2$H1_WlbvRecent9
 helius2$H1_WlbvRecent_89
 
-
+# clean up data
 dep_scores <- helius2 |> 
   select(contains("WlbvRecent") & !ends_with("Ingevuld"), ID) |>
   pivot_longer(-ID, names_to = "wave1", values_to = "value") |>
@@ -43,7 +42,7 @@ Layout_simnet <- totavgnetwork2$layout
 
 net_list$H1$layout <- Layout_simnet
 
- plot(net_list$H1)
+plot(net_list$H1)
 
 res_netH1_helius <- centrality_auto(net_list$H1)
 rownames(res_netH1_helius$node.centrality) <- colnames(A)

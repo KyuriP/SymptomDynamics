@@ -1,9 +1,5 @@
-library(rootSolve)
-library(ggplot2)
-library(dplyr)
-library(purrr)
-library(tidyr)
-library(deSolve)
+## install packages
+source("code/libraries.R")
 
 
 # setting 1: 1 1
@@ -20,8 +16,7 @@ b <- -8; a <- 1; W <- 1; d <- 3
 rate <- function(S, W = 3) S*(1 - S)*(b + a*S + W*(1 + d*(S^2)))  
 
 
-# Stability of a root ~ sign of eigenvalue of Jacobian
-
+# stability of a root ~ sign of eigenvalue of Jacobian
 stability<-function(W) { 
   Eq <- uniroot.all(rate, c(0,1), W = W) 
   eig <-vector() 
@@ -34,7 +29,6 @@ stability<-function(W) {
 wseq <-  seq(0, 10, by=0.01) 
 
 # plot bifurcation
-
 lst1 <- wseq |> 
   map_df(~ stability(.x), .id = "id") |>
   mutate(omega = as.factor(wseq[as.numeric(id)]),
@@ -73,6 +67,7 @@ big_lst <- bind_rows(lst2, lst3, lst4, .id = "sets") |>
 big_lst_stable <- big_lst |> filter(Eigen == "stable")
 big_lst_unstable <- big_lst |> filter(Eigen == "unstable")
 
+## bifurcation diagram w.r.t. omega W
 bif_W <- big_lst_stable |> ggplot(aes(x = omega, y = Eq)) + 
   geom_point(aes(color = sets)) +
   theme_classic() +
@@ -97,10 +92,10 @@ bif_W <- big_lst_stable |> ggplot(aes(x = omega, y = Eq)) +
         plot.margin = margin(4, 4, 4, 5, "cm"),
         axis.ticks.length=unit(1, "cm"))
 
-ggsave("bifurcation_W.pdf", plot = bif_W, units="in", width=25, height=12, bg = 'transparent')
+# ggsave("bifurcation_W.pdf", plot = bif_W, units="in", width=25, height=12, bg = 'transparent')
 
 
-
+## bifurcation diagram w.r.t. beta
 b <- 1; a <- 1; W <- 1; d <- 3
 rate <- function(S, b = 1) S*(1 - S)*(b + a*S + W*(1 + d*(S^2)))
 
@@ -157,7 +152,6 @@ dev.off()
 
 
 ## phase plots
-
 model<-function(t,state,parms)
 { with(as.list(c(state,parms)), 
        { 
@@ -208,8 +202,6 @@ plot(x = rep(0,length(possibleS)), possibleS, col = cc, xlim = c(0, 100), pch = 
 for(i in 1:length(possibleS)){
   lines(result1[result1$S == possibleS[i],]$time, result1[result1$S == possibleS[i],]$value, type="l", col = cc[i])
 }
-
-
 
 
 
