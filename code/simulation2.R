@@ -19,9 +19,12 @@ source("code/mod_specification.R")
 set.seed(123)
 
 ## define model specifics: choose the scenario and initial value for symptoms
-mod <- mod_spec(scenario = "base", init_val = 0.01)
-mod_high <- mod_spec(scenario = "high", init_val = 0.01)
-mod_low <- mod_spec(scenario = "low", init_val = 0.01)
+choice <- "base"
+choice <- "high"
+choice <- "low"
+
+mod <- mod_spec(scenario = choice, init_val = 0.01)
+
 
 ## define "f"
 f <- function(x) x^2
@@ -54,8 +57,8 @@ sde_out <- euler_stochastic2(
   D1 = D_stoeq1,
   shock = TRUE,
   t_shock = t_shock, 
-  duration = shock_duration
-  #seed = 123  # set seed
+  duration = shock_duration,
+  seed = 123  # set seed
 )
 
 # shock period 
@@ -86,7 +89,7 @@ eachsym <- sde_out |>
 
 
 ## aggregate symptom level
-n_sims <- 500
+n_sims <- 10
 
 # run sims n_sims times
 aggregated <- map(1:n_sims, ~ euler_stochastic2(
@@ -106,7 +109,10 @@ aggregated <- map(1:n_sims, ~ euler_stochastic2(
 ) |> list_rbind(names_to = "sim")
 
 # saveRDS(aggregated, "aggregated2.rds") # delta = 8.5
-saveRDS(aggregated, "aggregated3.rds") # delta = 9
+# saveRDS(aggregated, "aggregated3.rds") # delta = 9
+# saveRDS(aggregated, "aggregated_4.rds") # delta = 9 with old beta
+
+# aggregated <- readRDS("aggregated2.rds")
 
 
 inter_quantile <- function(x, probs = c(0.25, 0.5, 0.75)) {
