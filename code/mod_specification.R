@@ -24,9 +24,11 @@ mod_spec <- function(scenario = "base", init_val = 0, ...){
   rownames(A) <- colnames(A) <- c("anh", "sad", "slp", "ene", "app", "glt", "con", "mot", "sui")
 
     ## beta
-  # Beta_bistable <- c(-1.358, -1.008, -0.924, -1.176, -0.952, -0.602, -0.868, -1.288, -2.30) |> set_names(paste0("Beta_", colnames(A))) # -omega * (1 + 0.4)
+  Beta_bistable <- c(-1.373, -1.019, -0.934, -1.189, -0.962, -0.608, -0.877, -1.302, -2.30) |> set_names(paste0("Beta_", colnames(A))) # -omega * (1 + 0.41)
+  # Beta_bistable <- c(-1.4067, -1.0440, -0.9570, -1.2180, -0.9860, -0.6235, -0.8990, -1.334, -2.30) |> set_names(paste0("Beta_", colnames(A))) # -omega * (1 + 0.45)
   # Beta_bistable <- c(-1.355, -0.95, -0.905, -1.165, -0.935, -0.575, -0.845, -1.285, -2.30) |> set_names(paste0("Beta_", colnames(A))) # -omega * (1 + appx 0.375)
-  Beta_bistable <- c(-1.309, -0.972, -0.891, -1.134, -0.918, -0.580, -0.837, -1.242, -2.30) |> set_names(paste0("Beta_", colnames(A))) # -omega * (1 + 0.35)
+  # Beta_bistable <- c(-1.309, -0.972, -0.891, -1.134, -0.918, -0.580, -0.837, -1.242, -2.30) |> set_names(paste0("Beta_", colnames(A))) # -omega * (1 + 0.35)
+
   Beta_sick <- c(-0.91, -0.66, -0.60, -0.78, -0.62, -0.37, -0.56, -0.86, -1.30) |> set_names(paste0("Beta_", colnames(A))) #- A_j + dist*5
   
   ## delta 

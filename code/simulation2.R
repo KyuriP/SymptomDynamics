@@ -14,12 +14,12 @@ source("code/euler_stochastic2.R")
 source("code/mod_specification.R")
 
 ## set the seed
-set.seed(123)
+#set.seed(123)
 
 ## define model specifics: choose the scenario and initial value for symptoms
-# choice <- "base"
-# choice <- "high"
-# choice <- "low"
+choice <- "base"
+choice <- "high"
+choice <- "low"
 
 mod <- mod_spec(scenario = choice, init_val = 0.01)
 
