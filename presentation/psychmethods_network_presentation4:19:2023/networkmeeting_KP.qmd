@@ -1,0 +1,314 @@
+---
+title: "Modeling Depression Dynamics at the Symptom Level"
+subtitle: "Taking a Computational Modeling Approach"
+institute: "Apr 19, 2024"  #change date
+author: "Kyuri Park"
+format: 
+  revealjs:
+    embed-resources: true
+    logo: img/csl_logo.png
+    footer: "Computational Science Lab - University of Amsterdam"
+    theme: [default, custom.scss]
+    slide-number: c/t
+    transition: fade
+    transition-speed: slow
+    background-transition: fade
+    preview-links: auto
+    html-math-method: mathjax
+    auto-stretch: false
+    # chalkboard:
+    #   boardmarker-width: 5
+from: markdown+emoji
+title-slide-attributes:
+    data-background-image: img/bg_bwcsl.png
+    data-background-size: "cover"
+    data-background-opacity: "1"
+execute:
+  echo: false
+bibliography: main_ref.bib
+csl: "apa.csl"
+editor: 
+  markdown: 
+    wrap: sentence
+---
+
+```{r, include=F}
+library(knitr)
+library(kableExtra)
+```
+
+
+## Network theory of psychopathology
+
+Mental disorder is produced by direct causal interactions between symptoms that reinforce each other via feedback loops.
+[@BorsboomCramer2013].
+
+::: r-stack
+![](img/cycle1.png){.fragment fig-align="center" width="450"}
+
+![](img/cycle2.png){.fragment fig-align="center" width="450"}
+
+![](img/cycle3.png){.fragment fig-align="center" width="450"}
+
+![](img/cycle4.png){.fragment fig-align="center" width="450"}
+
+![](img/cycle5.png){.fragment fig-align="center" width="450"}
+
+:::
+
+
+## Fundamental features of depression dynamics
+
+::: {#citeborsboom}
+[@borsboom2017network; @cramer_major_2016]
+:::
+
+1.  [Bistability]{.fragment .highlight-current-red fragment-index="1"}
+
+2.  [Network connectivity]{.fragment .highlight-current-red fragment-index="2"}
+
+3.  Hysteresis
+
+4.  Resilience
+
+::: r-stack
+![](img/landscape.png){.absolute .fragment .fade-in-then-out top="90" left="545" width="403.5" height="317" fragment-index="1"}
+
+![](img/landscape_networks.png){.absolute .fragment .fade-in top="90" left="500" width="540" height="600" fragment-index="2"}
+:::
+
+
+## Fundamental features of depression dynamics {.scrollable}
+
+::: {#citeborsboom}
+[@borsboom2017network; @cramer_major_2016]
+:::
+
+
+1.  Bistability
+
+2.  Network connectivity
+
+3.  [Hysteresis]{style="color:#FF0000"}
+
+4.  Resilience
+
+
+::: r-stack
+![](img/hysteresis0.png){.absolute top="380" left="20"} ![](img/hysteresis1.png){.absolute .fragment .fade-in top="380" left="20" fragment-index="1" width="2600"} ![](img/hysteresis2.png){.absolute .fragment .fade-in top="380" left="20" fragment-index="2" width="2600"} ![](img/hysteresis3.png){.absolute .fragment .fade-in top="380" left="20" fragment-index="3" width="2600"} ![](img/hysteresis4.png){.absolute .fragment .fade-in top="380" left="20" fragment-index="4" width="2600"} ![](img/hysteresis5.png){.absolute .fragment .fade-in top="380" left="20" fragment-index="5" width="2600"} ![](img/hysteresis6.png){.absolute .fragment .fade-in top="380" left="20" fragment-index="6" width="2600"} ![](img/hysteresis7.png){.absolute .fragment .fade-in top="380" left="20" fragment-index="7" width="2600"} ![](img/hysteresis8.png){.absolute .fragment .fade-in top="380" left="20" fragment-index="8" width="2600"} ![](img/resilience1.png){.absolute .fragment .fade-in top="380" left="20" fragment-index="9" width="2600"}
+
+:::
+<br>
+<br>
+
+
+## Fundamental features of depression dynamics {.scrollable}
+
+::: {#citeborsboom}
+[@borsboom2017network; @cramer_major_2016]
+:::
+
+
+1.  Bistability
+
+2.  Network connectivity
+
+3.  Hysteresis
+
+4.  [Resilience]{style="color:#FF0000"}
+
+
+::: r-stack
+![](img/resilience1.png){.absolute .fragment .fade-out top="380" left="20" width="2600" fragment-index="1"} <!-- ![](img/resilience2.png){.absolute .fragment .fade-up top="380" left="20" fragment-index="1" width="2600"} --> 
+![](img/resilience3.png){.absolute .fragment .fade-up top="380" left="20" width="920" fragment-index="1"}
+![](img/resilience4.png){.absolute .fragment .fade-in top="380" left="20" fragment-index="2" width="1500"}
+![](img/resilience5.png){.absolute .fragment .fade-in top="380" left="20" fragment-index="3" width="1500"}
+:::
+
+
+## Toy model {.smaller}
+
+Adjacency matrix (for the weighted directed graph) determined based on insights from some empirical studies [@ramos-vera_network_2021; @lee_measurement_2023; @jing_comparing_2023] and practical judgment.
+
+::: r-stack
+![](img/netA.png){.absolute .fragment .semi-fade-out left="0" top="200" width="450" fragment-index="1"} ![](img/toymodel.png){.absolute .fragment .fade-in right="0" top="200" width="600" fragment-index="1"}
+:::
+
+
+## Formalizing dynamics {.smaller .scrollable}
+
+-   Deterministic differential equation (`ODE`^1^):
+
+<br> <br>
+
+```{=tex}
+\begin{equation} \label{eq:2}
+\frac{dS_i}{dt} = S_i(1-S_i)(\beta_i + \alpha_{ii}S_i + \sum_{i \neq j}\alpha_{ji}S_j(1 + \delta_i f(S_i)))
+\end{equation}
+```
+<br> <br>
+
+-   Add (white) noise (`SDE`^2^):
+
+```{=tex}
+\begin{equation} \label{eq:3}
+dS_{i} = S_{i}(1-S_{i})(\beta_i + \alpha_{ii} S_{i} + \sum_{i \neq j}\alpha_{ji}S_{j}(1+\delta_i f(S_{i}))) dt + \sigma_i dW_i
+\end{equation}
+```
+<br>
+
+::: {#footnotes_eq}
+^1^: Ordinary Differential Equation.\
+^2^: Stochastic Differential Equation.\
+$f(x) = x^2$.
+:::
+
+<br> <br> <br> <br> <br> <br> <br>
+
+#### Description of parameters
+
+| Parameter  | Description                                                                                                                                                                                             |
+|--------------------------|:---------------------------------------------|
+| $\beta_i$  | The sensitivity level of $S_i$ to external triggering factors.                                                                                                                                          |
+| $\alpha$   | The elements of the weight matrix $\mathbf{A}$. <BR> $\alpha_{ij}$ refers to the weight of the edge $S_i \rightarrow S_j$ and $\alpha_{ii}$ refers to the weight of the self-reinforcing loop of $S_i$. |
+| $\delta_i$ | The boosting factor that amplifies the effect of other $S_j$'s on $S_i$.                                                                                                                                |
+| $\sigma_i$ | The scaling factor that controls the strength of the stochastic term.                                                                                                                                   |
+
+![](img/bifurcation_W.png){fig-align="center"}
+
+
+## Simulation setup
+
+Apply a shock (external trigger) to the system and observe its behavior.
+
+::: r-stack
+![](img/bifurcation_beta1.png){.absolute top="240" left="180.1" width="661"} ![](img/bifurcation_beta2.png){.absolute .fragment .fade-in top="210" left="163" width="678"} ![](img/bifurcation_beta3.png){.absolute .fragment .fade-in top="159" left="162" width="677"} ![](img/bifurcation_beta4.png){.absolute .fragment .fade-in top="149" left="162" width="678"} ![](img/bifurcation_beta5.png){.absolute .fragment .fade-in top="150" left="163" width="677"} ![](img/bifurcation_beta6.png){.absolute .fragment .fade-in top="149" left="163" width="676"}
+:::
+
+
+## Simulation setup (cont.) {.scrollable}
+
+Simulate across three different resilience level scenarios.
+
+::: panel-tabset
+### Resilience
+
+![](img/tab2.png){width="80%" fig-align="center"}
+
+![](img/anh_resilience.png){width="70%" fig-align="center"}
+
+### Shock
+
+![](img/tab1.png){width="80%" fig-align="center"}
+
+![](img/symptoms_bif.png){width="80%" fig-align="center"}
+:::
+
+
+## Results {.scrollable}
+
+::: panel-tabset
+### Baseline
+
+![](img/eachsym.png) ![](img/eachsym_quant.png) ![](img/totalsym.png)
+
+![](img/triplenetworks.png)
+
+### High resilience
+
+![](img/eachsym_res.png) ![](img/eachsym_quant_res.png) ![](img/totalsym_res.png)
+
+![](img/triplenetworks_res.png)
+
+### Low resilience
+
+![](img/eachsym_low.png) ![](img/eachsym_quant_low.png) ![](img/totalsym_low.png)
+
+![](img/triplenetworks_low.png)
+:::
+
+
+## Results (cont.)
+
+*Before the shock* phase comparison
+
+::: {layout="[26,-11, 26, -11, 26]"}
+![high resilience](img/blnet_high.png)
+
+![base resilience](img/blnet_base.png)
+
+![low resilience](img/blnet_low.png)
+:::
+
+
+## Results (cont.)
+
+Network estimated from aggregated simulated data across time and resilience levels.
+
+::: r-stack
+![](img/totalnetwork.png){.absolute top="120" left="0" width="500"} [simulated network]{.absolute bottom="40" left="150" style="font-size: 0.7em;"}
+
+![](img/toymodelnet.png){.fragment .absolute top="120" right="27" width="490" fragment-index="1"} [original network]{.absolute .fragment bottom="40" right="150" fragment-index="1" style="font-size: 0.7em;"}
+
+![](img/totalnetwork_v2.png){.fragment .absolute top="120" left="0" width="500" fragment-index="2"}
+:::
+
+
+## Results (cont.) {.scrollable .smaller}
+
+<center>Simulated network   vs.   Original network</center>
+
+::: {r-stack}
+![](img/cent_sim.png){.absolute top="130" left="180" width="300"}
+
+![](img/cent_toy2.png){.absolute top="132" right="160" width="300" height="503"}
+
+![](img/cent_toy_instrength.png){.absolute .fragment top="132" right="160" width="300" height="503"}
+:::
+
+
+
+## Discussion {background-image="img/bg_sl.png"}
+
+::: {.fragment .semi-fade-out fragment-index="1"}
+-   Top-down approach to test the theorized features of depression dynamics.
+:::
+
+::: {.fragment .fade-in-then-semi-out fragment-index="1"}
+-   The model stands out from the others:
+    -   non-linearity
+    -   continuity 
+
+:::
+
+![](img/palmer_prediction.png){.absolute top="150" right="50" width="400" .fragment  .fade-in-then-semi-out fragment-index="2"}
+[@palmer2000predicting]{style="font-size:0.7em;" .absolute top="450" right="70" .fragment .fade-in-then-semi-out fragment-index="2"}
+
+::: {.fragment .fade-in-then-semi-out fragment-index="3"}
+-   Future efforts:
+    -   specifying the non-linearity
+    -   identifying feedback loops / casual directions
+    -   calibrating parameters
+:::
+
+::: {.fragment .fade-in fragment-index="4"}
+-   Other implications?
+:::
+
+
+
+## Thank You {background-image="img/bg_sl5.png"}
+
+-   Comments / Questions?
+-   Contact: k.park\@uva.nl
+
+::: {#supervisors}
+![Vítor Vasconcelos](img/Vitor.png){.absolute top="10" right="300" width="200" height="214"} [Vítor V. Vasconcelos]{.absolute top="250" right="330"} ![Mike Lees](img/mike.png){.absolute top="10" right="50" width="201"} [Mike Lees]{.absolute top="250" right="110"}
+:::
+
+<br> <br> <br> <br> <br> 
+
+##### References
+
+::: {#refs}
+:::
