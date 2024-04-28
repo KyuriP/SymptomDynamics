@@ -36,13 +36,13 @@ mod_spec <- function(scenario = "base", init_val = 0, ...){
   
   ## high resilience case
   if (scenario == "high") {
-    diag(A) <- 0.2
+    diag(A) <- 0.25
     delta <- rep(8, 9) |> set_names(paste0("delta_", colnames(A)))
   } 
   
   ## low resilience case
   if (scenario == "low") {
-    diag(A) <- 0.4
+    diag(A) <- 0.35
     delta <- rep(10, 9) |> set_names(paste0("delta_", colnames(A)))
   } 
   
