@@ -4,7 +4,7 @@ source("code/libraries.R")
 
 
 # compute density before shock
-sum(weightMatrix_lowresil) - sum(weightMatrix_highresil)
+# sum(weightMatrix_lowresil) - sum(weightMatrix_highresil)
 
 # 1st critical pt: -colSums(A)*(1+delta)-a_ii; given baseline scenario, -colSums(A)*(1+9)-0.3 
 # 2nd critical pt: -colSums(A)
@@ -137,8 +137,44 @@ compute_density <- function(choice = "base", Beta = NULL, Sigma, n_sim = 10){
 
 ## results
 
-res_highs <- map(1:nrow(betas), function(x) map(1:length(sigmas), function(y) compute_density(choice = "high", Beta = betas[x,], Sigma = sigmas[y])))
-res_lows <- map(1:nrow(betas), function(x) map(1:length(sigmas), function(y) compute_density(choice = "low", Beta = betas[x,], Sigma = sigmas[y])))
+res_highs <- map(1:nrow(betas), function(x) map_dfr(1:length(sigmas), function(y) compute_density(choice = "high", Beta = betas[x,], Sigma = sigmas[y]),.id = "id") |> mutate(sigma = sigmas[as.numeric(id)]))
+res_lows <- map(1:nrow(betas), function(x) map_dfr(1:length(sigmas), function(y) compute_density(choice = "low", Beta = betas[x,], Sigma = sigmas[y]),.id = "id") |> mutate(sigma = sigmas[as.numeric(id)]))
 
 
+## over 10 beta and 10 sigma
+high_resil <- readRDS("data/res_highs.rds")
+low_resil <- readRDS("data/res_lows.rds")
 
+high_resil %<>%  map(~as.data.frame(.x) |>
+                    tidyr::pivot_longer(everything())|>
+                                          mutate(sigma = rep(sigmas, each=3))
+                  )
+low_resil %<>%  map(~as.data.frame(.x) |>
+                    tidyr::pivot_longer(everything())|>
+                    mutate(sigma = rep(sigmas, each=3))
+)
+
+diff_result <- map2_dfc(low_resil, high_resil, \(x,y) x$value - y$value) |> 
+  rename_with(~paste0("beta", 1:nrow(betas))) |>
+  mutate(sigma = rep(sigmas, each=3),
+         phase = rep(c("before", "during", "after"), 10)) 
+
+## plot diff results
+
+# given sigma value
+p_sigma <- diff_result |>
+  tidyr::pivot_longer(!c(sigma, phase), names_to = "beta", values_to = "value") |>
+  ggplot(aes(x = as.factor(round(sigma,3)), y = value, color = factor(phase, levels=c("before", "during", "after")), fill = factor(phase, levels=c("before", "during", "after")))) +
+  geom_boxplot(alpha =0.3,   outlier.size = 1) +
+  labs(color = "", fill = "", x = "sigma", title = "network density difference", subtitle = "high vs. low resilience", y = "") +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) +
+  theme_pubr()
+
+# given beta value
+p_beta <- diff_result |>
+  tidyr::pivot_longer(!c(sigma, phase), names_to = "beta", values_to = "value") |>
+  ggplot(aes(x = factor(beta, levels =c(paste0("beta", 1:10))), y = value, color = factor(phase, levels=c("before", "during", "after")), fill = factor(phase, levels=c("before", "during", "after")))) +
+  geom_boxplot(alpha =0.3,   outlier.size = 1) +
+  labs(color = "", fill = "", x = "beta", title = "network density difference", subtitle = "high vs. low resilience", y = "") +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) +
+  theme_pubr()
