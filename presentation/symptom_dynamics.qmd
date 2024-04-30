@@ -1,7 +1,7 @@
 ---
 title: "Modeling Depression Dynamics at the Symptom Level"
 subtitle: "Taking a Computational Modeling Approach"
-institute: "Apr 19, 2024"  #change date
+institute: "May 3, 2024"  #change date
 author: "Kyuri Park"
 format: 
   revealjs:
@@ -37,18 +37,34 @@ library(knitr)
 library(kableExtra)
 ```
 
-
-## Network theory of psychopathology
 <!-- ::: notes -->
+
 <!-- Hello, I am Kyuri, I am a PhD student working at the Computational Science Lab at the university of amsterdam. -->
+
 <!-- I also used to study here for my undergraduate, majoring in psychological methods.  -->
+
 <!-- Then, I went to Utrecht for my master's, then back to Amsterdam.  -->
 
 <!-- So the main project I am currently working on is about modelling depression dynamics with regard to precariousness factors, which are basically all sorts of risk factors such as low income, bad neighbordhood and so on. -->
+
 <!-- So ultimately we want to understand where to intervene in the system to prevent fully-blown depression and hopefully minimize the mental health problems. -->
+
 <!-- That's the grand scheme, but as a first baby step, I've started working on modeling depression symptoms, which is the work that I am planning to present today. -->
+
 <!-- But this is still an on-going work and the goal for me today to share this with you guys is to  pick some of your brains to get some interesting implications and of course improvements for future. But i am already aware of a lot of limitations so I encourage you to approach this with an open mind and full of positivity. And just a heads up, i am not a good public speaker, so if you are confused, you are probably rightfully being so. Feel free to ask for clarification; I will give it another go, as long as the time allows. -->
+
 <!-- ::: -->
+
+## Common cause model
+Mental disorders stem from a single common underlying cause for their various symptoms, following the physical disease model [@hyland2011origins].
+
+::: r-stack
+![](img/commoncause1.png){.absolute top="200" left="200" width="60%"}
+![](img/commoncause2.png){.fragment .absolute top="200" left="200" width="60%"}
+:::
+
+## Network theory of psychopathology
+
 Mental disorder is produced by direct causal interactions between symptoms that reinforce each other via feedback loops.
 [@BorsboomCramer2013].
 
@@ -116,7 +132,6 @@ Accordingly, the two stable states are presumed to be distinguishable by a weakl
 [@borsboom2017network; @cramer_major_2016]
 :::
 
-
 1.  Bistability
 
 2.  Network connectivity
@@ -125,13 +140,11 @@ Accordingly, the two stable states are presumed to be distinguishable by a weakl
 
 4.  Resilience
 
-
 ::: r-stack
 ![](img/hysteresis0.png){.absolute top="380" left="20"} ![](img/hysteresis1.png){.absolute .fragment .fade-in top="380" left="20" fragment-index="1" width="2600"} ![](img/hysteresis2.png){.absolute .fragment .fade-in top="380" left="20" fragment-index="2" width="2600"} ![](img/hysteresis3.png){.absolute .fragment .fade-in top="380" left="20" fragment-index="3" width="2600"} ![](img/hysteresis4.png){.absolute .fragment .fade-in top="380" left="20" fragment-index="4" width="2600"} ![](img/hysteresis5.png){.absolute .fragment .fade-in top="380" left="20" fragment-index="5" width="2600"} ![](img/hysteresis6.png){.absolute .fragment .fade-in top="380" left="20" fragment-index="6" width="2600"} ![](img/hysteresis7.png){.absolute .fragment .fade-in top="380" left="20" fragment-index="7" width="2600"} ![](img/hysteresis8.png){.absolute .fragment .fade-in top="380" left="20" fragment-index="8" width="2600"} ![](img/resilience1.png){.absolute .fragment .fade-in top="380" left="20" fragment-index="9" width="2600"}
-
 :::
-<br>
-<br>
+
+<br> <br>
 
 ::: notes
 Third one is hysteresis.
@@ -163,12 +176,9 @@ Although here I did not indicate the causal directions but I assume these three 
 
 4.  [Resilience]{style="color:#FF0000"}
 
-
 ::: r-stack
-![](img/resilience1.png){.absolute .fragment .fade-out top="380" left="20" width="2600" fragment-index="1"} <!-- ![](img/resilience2.png){.absolute .fragment .fade-up top="380" left="20" fragment-index="1" width="2600"} --> 
-![](img/resilience3.png){.absolute .fragment .fade-up top="380" left="20" width="920" fragment-index="1"}
-![](img/resilience4.png){.absolute .fragment .fade-in top="380" left="20" fragment-index="2" width="1500"}
-![](img/resilience5.png){.absolute .fragment .fade-in top="380" left="20" fragment-index="3" width="1500"}
+![](img/resilience1.png){.absolute .fragment .fade-out top="380" left="20" width="2600" fragment-index="1"} <!-- ![](img/resilience2.png){.absolute .fragment .fade-up top="380" left="20" fragment-index="1" width="2600"} --> ![](img/resilience3.png){.absolute .fragment .fade-up top="380" left="20" width="920" fragment-index="1"}
+![](img/resilience4.png){.absolute .fragment .fade-in top="380" left="20" fragment-index="2" width="1500"} ![](img/resilience5.png){.absolute .fragment .fade-in top="380" left="20" fragment-index="3" width="1500"}
 :::
 
 ::: notes
@@ -179,11 +189,7 @@ Because in this case, the symptom activation does not easily propagate through t
 So in this study, what we are gonna do with our model is that we are going to assess whether we can replicate these features of depression dynamics.
 For example, for resilience, we will specify different levels of resilience within our model and see whether the resulting network models exhibit different structures.
 So this is sort of top-down approach, evaluating whether the proposed features of depression dynamics are supported within our modeling framework.
-<!-- So in this study, with our model that I am going to show, we are going to assess whether we can replicate these features of depression dynamics, except for bistability. -->
-<!-- For bistability, we would more or less presume that our system has bistability and we formalize our model such that it satisfies this condition. -->
-<!-- For the rest, we will see if our model can retrieve such features through our simulation. -->
-<!-- For example, for resilience, we will specify different levels of resilience within our model and examine whether the resulting statistical network models exhibit different structures. -->
-<!-- So this is sort of top-down approach, evaluating whether the proposed features of depression dynamics are supported within our modeling framework. -->
+<!-- So in this study, with our model that I am going to show, we are going to assess whether we can replicate these features of depression dynamics, except for bistability. --> <!-- For bistability, we would more or less presume that our system has bistability and we formalize our model such that it satisfies this condition. --> <!-- For the rest, we will see if our model can retrieve such features through our simulation. --> <!-- For example, for resilience, we will specify different levels of resilience within our model and examine whether the resulting statistical network models exhibit different structures. --> <!-- So this is sort of top-down approach, evaluating whether the proposed features of depression dynamics are supported within our modeling framework. -->
 :::
 
 ## Toy model {.smaller}
@@ -196,7 +202,8 @@ Adjacency matrix (for the weighted directed graph) determined based on insights 
 
 ::: notes
 So this is the toy model we used.
-I didn't really have any data back then, so I relied on insights from some empirical studies and mainly common sense to determine the weights and causal directions, which results in this adjacency matrix, A. So it is literally a toy model.
+I didn't really have any data back then, so I relied on insights from some empirical studies and mainly common sense to determine the weights and causal directions, which results in this adjacency matrix, A.
+So it is literally a toy model.
 
 When visualized in a network, we get this.
 Note that the self-loops are included in our model even though empirical networks did not have those.
@@ -259,9 +266,11 @@ Here, $\beta_i$ represents the sensitivity level of $S_i$.
 A lower $\beta_i$ indicates reduced sensitivity to external triggering factors, making the symptom less prone to activation.
 It is an important parameter, which heavily influences the system's tipping point, so I will talk about this in more detail in the following slide.
 
-$\alpha$ denotes the weight of edges in the network, basically the elements of matrix $\mathbf{A}$. $\alpha_{ii}$ is the diagonal of the matrix A, the self-reinforcing loop.
+$\alpha$ denotes the weight of edges in the network, basically the elements of matrix $\mathbf{A}$.
+$\alpha_{ii}$ is the diagonal of the matrix A, the self-reinforcing loop.
 And $\alpha_{ji}$ represents the impact of $S_j$ on $S_i$, and $\delta_i$ acts as a booster, making the influence of other symptoms on $S_i$ stronger, depending on the current level of $S_i$.
-And here we define $f$ to be a quadratic function, because it seems to be one of the simplest functions I could think of for a monotonic non-linear increasing function, but it was my arbitrary choice. So in the end what it says is that, as the $S_i$ level increases, the effects of other symptoms are amplified by $\delta_i \cdot S_i^2$.
+And here we define $f$ to be a quadratic function, because it seems to be one of the simplest functions I could think of for a monotonic non-linear increasing function, but it was my arbitrary choice.
+So in the end what it says is that, as the $S_i$ level increases, the effects of other symptoms are amplified by $\delta_i \cdot S_i^2$.
 
 And this term is important because this actually adds the nonlinearity into our model because this is the interaction term between $S_i$ and $S_j$, which can be turned on and off by this delta.
 
@@ -289,11 +298,13 @@ Apply a shock (external trigger) to the system and observe its behavior.
 :::
 
 ::: notes
-So to observe how this model behaves, we design a simulation where we apply a shock to the system, which can be seen as an external trigger. 
+So to observe how this model behaves, we design a simulation where we apply a shock to the system, which can be seen as an external trigger.
 
 So the way we operationalize the shock was basically adding a stress to each of the symptom which is essentially the same as increasing beta.
 
-But the question is then, how we defined the beta. And that can be shown with this bifurcation diagram for $\beta$. Let's look at this together.
+But the question is then, how we defined the beta.
+And that can be shown with this bifurcation diagram for $\beta$.
+Let's look at this together.
 So here, the solid lines represent the stable equilibrium, while dashed lines represent unstable equilibrium.
 And the red asterisks highlight critical points or they are also called bifurcation points, where the system transitions from one type of behavior to another.
 
@@ -304,19 +315,17 @@ So when $\beta$ is smaller than the first critical point, only 0 stands as a sta
 And as $\beta$ surpasses this first critical point, both 0 and 1 become stable states (CLICK) which then can be represented by this smooth W shape bi-stable landscape.
 And as $\beta_i$ exceeding $\omega_i$, the second critical point, 0 transitions to an unstable state, leaving 1 as the only stable equilibrium (CLICK), as you can see in this landscape.
 
-
 Presuming inherent bistability in our model as we discussed, we constrain $\beta$ to be within this bistable region.
 So across all symptoms, we set the beta to fall within this range, but slightly leaning towards the stable depressed regime like this (CLICK).
 
-Then, when we give the shock to system, we raise $\beta_i$ like this, closer to the second critical point, where depressed state is the only stable equilibrium. So the symptoms will likely go towards the depressed regime. 
+Then, when we give the shock to system, we raise $\beta_i$ like this, closer to the second critical point, where depressed state is the only stable equilibrium.
+So the symptoms will likely go towards the depressed regime.
 <!-- So across all the symptoms, we increase beta proportionally equal amount, making sure that each symptom experiences a comparable push towards the depressed state.  -->
 
 But there is one exception made, for the $suicidal$ symptom.
 For the suicidal symptom, we set the beta to be smaller to begin with, so it is more challenging to get activated.
-And the reason why we did this is, to make it align with those empirical observations where the suicidal symptom exhibits much lower activation compared to the other symptoms, probably because of its extreme nature. okay?
-
-
-
+And the reason why we did this is, to make it align with those empirical observations where the suicidal symptom exhibits much lower activation compared to the other symptoms, probably because of its extreme nature.
+okay?
 :::
 
 ## Simulation setup (cont.) {.scrollable}
@@ -343,14 +352,13 @@ Resilience levels are adjusted by modifying the self-reinforcing factor ($\alpha
 So in the high-resilience scenario, both parameters are reduced to enhance resilience, and in the low-resilience scenario, they are increased to lower resilience against activation.
 Here, you see the example landscape of symptom anhedonia, so you see that the valley for depressed state becomes deeper and deeper as the resilience level goes down.
 
-
 Here the table shows the exact value I used for the simulation.
 We simulated over 4000 timepoints, and the shock was given at where t = 1000 and the shock lasted for 500 time points.
 And after that, the beta was put back to the original value.
 
 In the plot below, I wanted to show you that how the bistable range differs per symptom given that they have different omega, the aggregated incoming effects from the other symptom.
 The plot here shows bifurcation for four different symptoms, along with their energy landscapes before and after the shock, so the orange one is before, and the red one is after.
-Symptom anhedonia exhibits the widest bistable range as you can see, because it has the largest aggregated effects from other symptoms. 
+Symptom anhedonia exhibits the widest bistable range as you can see, because it has the largest aggregated effects from other symptoms.
 These wider bistable range implies sort of greater buffer to perturbations, resulting in less transitions between the states by random perturbations.
 In contrast, symptom guilty shows the shortest bistable range, as $\omega_{glt}$ is the smallest among the symptoms.
 This limited range indicates more frequent transitions between the states upon perturbations, as also shown by the relatively flatter energy landscape.
@@ -384,8 +392,10 @@ I made this exception so that it can align with those empirical observations whe
 :::
 
 ::: notes
-So the results. Quickly about the set up, so for each iteration, we simulated over 4000 timepoints, and the shock was given at where t = 1000 and the shock lasted for 500 time points.
-And for each scenario, we repeated the simulation for 500 times. Alright?
+So the results.
+Quickly about the set up, so for each iteration, we simulated over 4000 timepoints, and the shock was given at where t = 1000 and the shock lasted for 500 time points.
+And for each scenario, we repeated the simulation for 500 times.
+Alright?
 
 So this is for the baseline resilience scenario.
 So here this plot shows the one example trajectory for each symptom.
@@ -393,15 +403,13 @@ The gray shaded area indicates the period when the shock was given to the system
 The first thing you can see is that, upon receiving the shock, all symptoms except for suicidal became activated.
 Then, some of the symptoms persist in the activated state even after the shock stops, indicating hysteresis.
 Those symptoms with clear hysteresis are turned out to be mostly the nodes that are part of the cycles with relatively high in-degree centrality.
-<!-- Also, there is noticeable fluctuation occurring in the guilty symptom, which is due to its narrow bistable range that makes it prone to flipping with small perturbations. -->
-<!-- This fluctuation also affects concentration, because concentration is mainly influenced by guilty. -->
-<!-- Lastly, motor does not show much of hysteresis, and the reason is that motor is mainly affected by suicidal, which does barely gets activated in this case. -->
+<!-- Also, there is noticeable fluctuation occurring in the guilty symptom, which is due to its narrow bistable range that makes it prone to flipping with small perturbations. --> <!-- This fluctuation also affects concentration, because concentration is mainly influenced by guilty. --> <!-- Lastly, motor does not show much of hysteresis, and the reason is that motor is mainly affected by suicidal, which does barely gets activated in this case. -->
 
 (SCROLL DOWN) Here you see, this one is the median trajectory over 500 simulations.
 And the shaded area represents the interquantile range.
 Again, you see some clear hysteresis effect for some of the symptoms.
 
-(SCROLL DOWN) And if we look at the sum of all symptoms, this is how it looks. 
+(SCROLL DOWN) And if we look at the sum of all symptoms, this is how it looks.
 Again, the red line is median, and shaded area is interquantile range.
 So with the shock the system gets activated and it eventually comes down near the healthy state at the time about 3500.
 The horizontal dotted gray lines represents the diagnostic cutoff points according to the PHQ-9 questionnaire, with the lower line indicating mild depression and the higher one is indicating moderate depression.
@@ -435,7 +443,8 @@ It reaches the full activation quickly upon the shock and maintains a moderate d
 (SCROLL DOWN) And for the networks, as expected, they are denser than the others.
 Especially, the network density before the shock is obviously the highest among all three scenarios.
 
-So in summary, we did find some clear hysteresis effects in our model, and also variations in network connectivity across different time phases as well as different resilience level. And just to point out, these various networks are generated based on the same mechanistic model.
+So in summary, we did find some clear hysteresis effects in our model, and also variations in network connectivity across different time phases as well as different resilience level.
+And just to point out, these various networks are generated based on the same mechanistic model.
 :::
 
 ## Results (cont.)
@@ -471,7 +480,8 @@ Network estimated from aggregated simulated data across time and resilience leve
 Finally, to assess how well our model in general can reconstruct the original toy model, I estimated a Gaussian graphical model based on all the simulated data aggregated across time and resilience levels.
 This is the resulting estimated network model.
 
-(CLICK) Looking at the network structure, we can see that the overall network resembles the skeleton of the original network. Let me remind you the toy model again.
+(CLICK) Looking at the network structure, we can see that the overall network resembles the skeleton of the original network.
+Let me remind you the toy model again.
 It retrieves all the edges except for the one between sad and suicidal, which is likely dropped because of our manipulation over the suicidal symptom.
 
 Also, the network shows a clear clustering structure: most nodes on the left side of the simulated network are not part of any cycles, while the ones on the right side are part of cycles.
@@ -483,7 +493,7 @@ That I found pretty intriguing.
 
 ## Results (cont.) {.scrollable .smaller}
 
-<center>Simulated network   vs.   Original network</center>
+<center>Simulated network vs. Original network</center>
 
 ::: {r-stack}
 ![](img/cent_sim.png){.absolute top="130" left="180" width="300"}
@@ -513,11 +523,10 @@ So I found this very interesting... The implication for this is up to discussion
 ::: {.fragment .fade-in-then-semi-out fragment-index="1"}
 -   The model stands out from the others:
     -   non-linearity
-    -   continuity 
-
+    -   continuity
 :::
 
-![](img/palmer_prediction.png){.absolute top="150" right="50" width="400" .fragment  .fade-in-then-semi-out fragment-index="2"}
+![](img/palmer_prediction.png){.absolute .fragment .fade-in-then-semi-out top="150" right="50" width="400" fragment-index="2"} 
 [@palmer2000predicting]{style="font-size:0.7em;" .absolute top="450" right="70" .fragment .fade-in-then-semi-out fragment-index="2"}
 
 ::: {.fragment .fade-in-then-semi-out fragment-index="3"}
@@ -531,33 +540,38 @@ So I found this very interesting... The implication for this is up to discussion
 -   Other implications?
 :::
 
-
-
 ::: notes
 Alright, so finally discussion.
 This study in my opinion was meaningful in a sense it was one of the first attempts to test the theorized features of depression symptom dynamics using a computational model.
 So instead of fitting a network from data, here we gave you a more of top-down approach.
 
-And how does our model differs or what does this model actually adds to the existing ones? (Han actually asked me this before).
+And how does our model differs or what does this model actually adds to the existing ones?
+(Han actually asked me this before).
 
 I would say first, we've incorporated the non-linearity term that can be controlled by the delta parameter, which makes our model more flexible by being able to capture the nonlinear responses in the dynamics.
 
-And secondly, our model differs in its continuous nature, which allows us to simulate symptom trajectories continuously rather than getting binary responses, such as in the Ising model. 
+And secondly, our model differs in its continuous nature, which allows us to simulate symptom trajectories continuously rather than getting binary responses, such as in the Ising model.
 
-And this continuity can actually provide a significant advantage. Lourens, who unfortunately couldn't join us today, introduced me to this work from Palmer, who mainly works in climate and weather prediction. The core concept of Palmer's work revolves around the idea that with sufficient information about the initial state, we can potentially predict the continuous trajectory of a dynamical system.
+And this continuity can actually provide a significant advantage.
+Lourens, who unfortunately couldn't join us today, introduced me to this work from Palmer, who mainly works in climate and weather prediction.
+The core concept of Palmer's work revolves around the idea that with sufficient information about the initial state, we can potentially predict the continuous trajectory of a dynamical system.
 
-In this case, they were predicting temperature using what they call an ensemble prediction model. This model essentially adds perturbations to the initial conditions and generate trajectories based on stochastic differential equations. In the graph, you see the dashed line, that is the actual temperature, and the gray lines represent trajectories from the model. And here, their predictions were quite okay, as the real temperature fell within the predicted bounds.
+In this case, they were predicting temperature using what they call an ensemble prediction model.
+This model essentially adds perturbations to the initial conditions and generate trajectories based on stochastic differential equations.
+In the graph, you see the dashed line, that is the actual temperature, and the gray lines represent trajectories from the model.
+And here, their predictions were quite okay, as the real temperature fell within the predicted bounds.
 
-So this shows one of the possibilities that such continuous model could also be utilized in psychological research, to make a short-term prediction like this, so for example it could be used to make a short-term prognosis or so. 
-
-
-
+So this shows one of the possibilities that such continuous model could also be utilized in psychological research, to make a short-term prediction like this, so for example it could be used to make a short-term prognosis or so.
 
 But of course, this is just a very start.
 There are much more could be done in the future.
 For example, we would actually like to investigate further on this non-linearity aspect in the dynamics, as we for now just used a very simple expression, but it probably is not as simple as how we defined in reality.
-Also, about the feedback loops and causal directions of the model. It is one of the hot topics, causality and causal discovery. I am also very much interested in this and I've bothered Lourens a lot in the past, trying to understand this more.
-The thing is there are some promising causal algorithms that could learn the causal structure even with the feedback loops present in the model. So hopefully with the data I have now, I would like to delve deeper into this. If anyone working on causal discovery / causal inference, I would like to hear about what you think about this as well.
+Also, about the feedback loops and causal directions of the model.
+It is one of the hot topics, causality and causal discovery.
+I am also very much interested in this and I've bothered Lourens a lot in the past, trying to understand this more.
+The thing is there are some promising causal algorithms that could learn the causal structure even with the feedback loops present in the model.
+So hopefully with the data I have now, I would like to delve deeper into this.
+If anyone working on causal discovery / causal inference, I would like to hear about what you think about this as well.
 Lastly, more of practical aspect; for the follow up of this work, one of the first thing should be done is to calibrate the parameters and do some sensitivity analyses.
 
 And I was really hoping that I could hear what you guys think about this model.
@@ -573,7 +587,7 @@ And if you have any idea on what you can do with this type of models or any inte
 ![Vítor Vasconcelos](img/Vitor.png){.absolute top="10" right="300" width="200" height="214"} [Vítor V. Vasconcelos]{.absolute top="250" right="330"} ![Mike Lees](img/mike.png){.absolute top="10" right="50" width="201"} [Mike Lees]{.absolute top="250" right="110"}
 :::
 
-<br> <br> <br> <br> <br> 
+<br> <br> <br> <br> <br>
 
 ##### References
 
@@ -581,5 +595,9 @@ And if you have any idea on what you can do with this type of models or any inte
 :::
 
 ::: notes
-Thank you very much. I'd like to thank to my supervisors, Vitor Vasconcelos and Mike Lees, who have been guiding me through this work. Also if you have any comments or questions, please feel free to reach out to me via email. I'm always open to discussion and feedback. Alright, thanks a lot again for your attention.
+Thank you very much.
+I'd like to thank to my supervisors, Vitor Vasconcelos and Mike Lees, who have been guiding me through this work.
+Also if you have any comments or questions, please feel free to reach out to me via email.
+I'm always open to discussion and feedback.
+Alright, thanks a lot again for your attention.
 :::
