@@ -178,3 +178,14 @@ p_beta <- diff_result |>
   labs(color = "", fill = "", x = "beta", title = "network density difference", subtitle = "high vs. low resilience", y = "") +
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) +
   theme_pubr()
+
+## during shock -- heatmap
+interactionplot <- diff_result |>
+  tidyr::pivot_longer(!c(sigma, phase), names_to = "beta", values_to = "value") |>
+  filter(phase == "during") |>
+  ggplot(aes(x = factor(beta, levels =c(paste0("beta", 1:10))), y = sigma, fill = value)) +
+  # geom_tile() +
+  geom_raster()+
+  labs(x = "beta", y = "sigma", fill=expression(Delta*density),title = "network density difference", subtitle = "high vs. low resilience (during the shock)" ) +
+  theme_classic() +
+  scale_fill_continuous(high = "#132B43", low = "#56B1F7")

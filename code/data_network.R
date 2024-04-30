@@ -12,6 +12,7 @@ helius2 <- read_sav("data/HELIUS_itemscores.sav")
 # helius2$H1_WlbvRecent9
 # helius2$H1_WlbvRecent_89
 
+
 # clean up depression item scores
 dep_scores <- helius2 |> 
   select(contains("WlbvRecent") & !ends_with("Ingevuld"), ID) |>
@@ -49,6 +50,7 @@ Layout_simnet <- totavgnetwork2$layout
 net_list$H1$layout <- Layout_simnet
 
 plot(net_list$H1)
+plot(net_list$H2)
 
 res_netH1_helius <- centrality_auto(net_list$H1)
 rownames(res_netH1_helius$node.centrality) <- colnames(A)
@@ -78,6 +80,29 @@ totavgnetwork_helius2 <- plot(totavgnetwork_helius)
 totavgnetwork_helius2$layout <- Layout_simnet
 plot(totavgnetwork_helius2)
 
+## bootstrapped samples
+# bootstrap sample of helius
+helius_boots <- bootnet(totavgnetwork_helius, nBoots=1000, type = 'nonparametric')
+helius_boots_cent <- helius_boots$boots |>
+  map(~.$graph |> centrality_auto() |> extract(1) |> 
+        as.data.frame() |> select(node.centrality.Strength) |> 
+        rename(Strength = node.centrality.Strength) |> t() |> as.data.frame()
+      ) |> list_rbind()
+# bootstrap sample of toy model
+sim_boots <- bootnet(totavgnetwork2, nBoots=1000, type = 'nonparametric')
+sim_boots_cent <- sim_boots$boots |>
+  map(~.$graph |> centrality_auto() |> extract(1) |> 
+        as.data.frame() |> select(node.centrality.Strength) |> 
+        rename(Strength = node.centrality.Strength) |> t() |> as.data.frame()
+  ) |> list_rbind()
+
+# saveRDS(helius_boots, file = "helius_bootstrap.Rds")
+
+
+plot(boots, "strength", order = "sample")
+
+
+## plot strength centralities of helius vs. toy model
 # weighted adj mat
 mat <- round(totavgnetwork_helius$graph, 2)
 ifelse(mat < 0.1, 0, mat)
@@ -85,6 +110,7 @@ round(totavgnetwork$graph, 2)
 
 res_totavg_helius <- centrality_auto(totavgnetwork_helius2)
 rownames(res_totavg_helius$node.centrality) <- colnames(A)
+
 
 cent_totavg_helius <- res_totavg_helius$node.centrality$Strength |>as_data_frame() |>  mutate(node = factor(rownames(res_totavg_helius$node.centrality), levels= c(rownames(res_totavg_helius$node.centrality)))
 )

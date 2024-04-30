@@ -230,23 +230,42 @@ abline(v = -1.3, lty=3, col = "lightgray")
 ## fitting aggregated network
 # read all datasets
 aggregated <- readRDS("data/aggregated.rds")
-aggregated_res <- readRDS("data/aggregated_res.rds")
+aggregated_high <- readRDS("data/aggregated_res.rds")
 aggregated_low <- readRDS("data/aggregated_low.rds")
+aggregated2 <- readRDS("data/aggregated_base2.rds")
+aggregated_high2 <- readRDS("data/aggregated_high2.rds")
+aggregated_low2 <- readRDS("data/aggregated_low2.rds")
+
+
 
 avgnet <- aggregated |> dplyr::select(S_anh:S_sui) 
 colnames(avgnet) <- colnames(A)
-avgnet_res <- aggregated_res |> dplyr::select(S_anh:S_sui)
-colnames(avgnet_res) <- colnames(A)
+avgnet_high <- aggregated_high |> dplyr::select(S_anh:S_sui)
+colnames(avgnet_high) <- colnames(A)
 avgnet_low <- aggregated_low |> dplyr::select(S_anh:S_sui)
 colnames(avgnet_low) <- colnames(A)
+avgnet2 <- aggregated2 |> dplyr::select(S_anh:S_sui) 
+colnames(avgnet) <- colnames(A)
+avgnet_high2 <- aggregated_high2 |> dplyr::select(S_anh:S_sui)
+colnames(avgnet_high) <- colnames(A)
+avgnet_low2 <- aggregated_low2 |> dplyr::select(S_anh:S_sui)
+colnames(avgnet_low) <- colnames(A)
 
+# totavgnet2 <- bind_rows(avgnet2, avgnet_high2, avgnet_low2)
 # total average net 
-totavgnet <- avgnet |> bind_rows(avgnet_res, avgnet_low) #|> slice_sample(prop = 0.8)
+totavgnet <- avgnet |> bind_rows(avgnet2, avgnet_high, avgnet_low, avgnet_high2, avgnet_low2) #|> slice_sample(prop = 0.8)
+# # each variable distribution check
+# totavgnet |> hist()
 totavgnetwork <- estimateNetwork(totavgnet, default = "EBICglasso")
+totavgnetwork2 <- estimateNetwork(totavgnet2, default = "EBICglasso")
+
+# saveRDS(totavgnet, file = "all_aggregatedsimdata.Rds")
+#saveRDS(totavgnetwork, file = "overallnetwork.Rds")
+
 # grouping nodes by cycle/nocycle
 grp <- list(`cycle` = 2:6, `no cycle` = c(1,7:9))
 
-
+plot(totavgnetwork)
 totavgnetwork2 <- plot(totavgnetwork,  labels = colnames(A))
 # totavgnetwork2 <- plot(totavgnetwork,  labels = colnames(A), groups = grp, color = c("#F5651C", "#58B5BC"), legend=F, border.color = "white",border.width = 2, label.color = "white")
 
