@@ -88,21 +88,97 @@ helius_boots_cent <- helius_boots$boots |>
         as.data.frame() |> select(node.centrality.Strength) |> 
         rename(Strength = node.centrality.Strength) |> t() |> as.data.frame()
       ) |> list_rbind()
+# saveRDS(helius_boots, file = "helius_bootstrap.Rds")
+# helius_boots <- readRDS("data/helius_bootstrap.Rds")
+
 # bootstrap sample of toy model
-sim_boots <- bootnet(totavgnetwork2, nBoots=1000, type = 'nonparametric')
+sim_boots <- bootnet(totavgnetwork, nBoots=1000, type = 'nonparametric') # using 30%aggdat
 sim_boots_cent <- sim_boots$boots |>
   map(~.$graph |> centrality_auto() |> extract(1) |> 
         as.data.frame() |> select(node.centrality.Strength) |> 
         rename(Strength = node.centrality.Strength) |> t() |> as.data.frame()
   ) |> list_rbind()
 
-# saveRDS(helius_boots, file = "helius_bootstrap.Rds")
+# sim_boots <- readRDS("data/sim_bootstrap100.Rds")
+# sim_boots_cent <- readRDS("data/sim_bootstrap100_cent.Rds")
+cent_dat <- bind_rows(helius_boots_cent, sim_boots_cent, .id= "")
+  
+cent_stats <- cent_dat |>
+  group_by(id) |>
+  summarise(across(
+    .cols = everything(),
+    .fns = list(Mean = mean, SD = sd),
+    .names = "{fn}_{col}"
+  )) |> pivot_longer(!id, names_to = c(".value", "symptom"), names_sep = "_") |>
+  mutate(N = case_when(id == 1 ~ 1000, id ==2 ~ 100),
+         SE = SD / sqrt(N),
+         low.ci = Mean - qnorm(0.975)*SE*100, # consider qt() # interval so small
+         upper.ci = Mean + qnorm(0.975)*SE*100) # consider qt()
 
 
-plot(boots, "strength", order = "sample")
+## centrality plot over bootstrapped samples
+boot_centrailtyPlot <- ggplot(data = cent_stats, 
+       aes(x = Mean, y = factor(symptom, levels= c(rownames(res_netH1_helius$node.centrality))), xmin = low.ci, xmax = upper.ci, 
+           color = id)) +
+  geom_pointrange(alpha=0.5) +
+  # geom_crossbar(width=0.1, alpha = 0.1)+
+  geom_path(aes(group = id))+
+  scale_color_discrete(labels = c("1" = "Helius", "2" = "Toy")) +
+  labs(title = "Strength centrality over bootstrapped samples",
+       x = "",
+       y = "",
+       color = "",
+       caption = "Error bars show the 95% confidence interval (*100)") +
+  ggpubr::theme_classic2()
+
+# ggsave("boot_centrality.png", boot_centrailtyPlot)
 
 
-## plot strength centralities of helius vs. toy model
+
+
+## Edge weight stability plot over bootstrapped samples
+edge_stats <- bind_rows(helius_boots$bootTable, sim_boots$bootTable, .id ="grp") |>
+  select(id, value, grp) |>
+  group_by(id, grp) |>
+  summarise(across(
+    .cols = everything(),
+    .fns = list(Mean = mean, SD = sd),
+    .names = "{fn}")
+  ) |>
+  filter(stringr::str_detect(id, "--")) |>
+  mutate(N = case_when(grp == 1 ~ 1000, grp ==2 ~ 100),
+         SE = SD / sqrt(N),
+         low.ci = Mean - qnorm(0.975)*SE*100, # consider qt() # interval so small
+         upper.ci = Mean + qnorm(0.975)*SE*100)
+  
+# lst_mats <- sim_boots$boots |> map(~.$graph)
+# mat_means <- apply(simplify2array(lst_mats), 1:2, mean) |> as.data.frame()
+# mat_sds <- apply(simplify2array(lst_mats), 1:2, sd)
+
+
+
+boot_edgePlot <- ggplot(data = edge_stats, aes(x = id, y = Mean, ymin = low.ci, ymax = upper.ci, 
+                                  color = grp)) +
+  # geom_pointrange(alpha=0.5, fatten = 2) +
+  geom_errorbar(alpha=0.5, width = 0.4) +
+  # geom_crossbar(width=0.1, alpha = 0.1)+
+  scale_color_discrete(labels = c("1" = "Helius", "2" = "Toy")) +
+  labs(title = "Strength centrality over bootstrapped samples",
+       x = "",
+       y = "",
+       color = "",
+       caption = "Error bars show the 95% confidence interval (*100)") +
+  ggpubr::theme_classic2()+
+  theme(axis.text.x = element_text(angle = 80, vjust = 1, hjust=1),
+        legend.position = "bottom") 
+
+# ggsave("boot_edgePlot2.png", boot_edgePlot, width = 12, height = 7)
+
+
+
+
+
+## plot strength centrality of helius vs. toy model
 # weighted adj mat
 mat <- round(totavgnetwork_helius$graph, 2)
 ifelse(mat < 0.1, 0, mat)

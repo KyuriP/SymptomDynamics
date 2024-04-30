@@ -169,6 +169,7 @@ p_sigma <- diff_result |>
   labs(color = "", fill = "", x = "sigma", title = "network density difference", subtitle = "high vs. low resilience", y = "") +
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) +
   theme_pubr()
+# ggsave("sigmaplot.png", p_sigma)
 
 # given beta value
 p_beta <- diff_result |>
@@ -178,6 +179,7 @@ p_beta <- diff_result |>
   labs(color = "", fill = "", x = "beta", title = "network density difference", subtitle = "high vs. low resilience", y = "") +
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) +
   theme_pubr()
+# ggsave("betaplot.png", p_beta)
 
 ## during shock -- heatmap
 interactionplot <- diff_result |>
@@ -189,3 +191,5 @@ interactionplot <- diff_result |>
   labs(x = "beta", y = "sigma", fill=expression(Delta*density),title = "network density difference", subtitle = "high vs. low resilience (during the shock)" ) +
   theme_classic() +
   scale_fill_continuous(high = "#132B43", low = "#56B1F7")
+
+# ggsave("interactionplot.png", interactionplot)

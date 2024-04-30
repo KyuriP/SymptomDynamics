@@ -245,22 +245,23 @@ colnames(avgnet_high) <- colnames(A)
 avgnet_low <- aggregated_low |> dplyr::select(S_anh:S_sui)
 colnames(avgnet_low) <- colnames(A)
 avgnet2 <- aggregated2 |> dplyr::select(S_anh:S_sui) 
-colnames(avgnet) <- colnames(A)
+colnames(avgnet2) <- colnames(A)
 avgnet_high2 <- aggregated_high2 |> dplyr::select(S_anh:S_sui)
-colnames(avgnet_high) <- colnames(A)
+colnames(avgnet_high2) <- colnames(A)
 avgnet_low2 <- aggregated_low2 |> dplyr::select(S_anh:S_sui)
-colnames(avgnet_low) <- colnames(A)
+colnames(avgnet_low2) <- colnames(A)
 
 # totavgnet2 <- bind_rows(avgnet2, avgnet_high2, avgnet_low2)
 # total average net 
-totavgnet <- avgnet |> bind_rows(avgnet2, avgnet_high, avgnet_low, avgnet_high2, avgnet_low2) #|> slice_sample(prop = 0.8)
+totavgnet <- avgnet |> bind_rows(avgnet2, avgnet_high, avgnet_low, avgnet_high2, avgnet_low2) |> slice_sample(prop = 0.5)
 # # each variable distribution check
 # totavgnet |> hist()
 totavgnetwork <- estimateNetwork(totavgnet, default = "EBICglasso")
 totavgnetwork2 <- estimateNetwork(totavgnet2, default = "EBICglasso")
-
+# saveRDS(totavgnetwork, file = "overallnet_30%aggdat")
 # saveRDS(totavgnet, file = "all_aggregatedsimdata.Rds")
-#saveRDS(totavgnetwork, file = "overallnetwork.Rds")
+# saveRDS(totavgnetwork, file = "overallnetwork.Rds")
+# saveRDS(totavgnetwork2, file = "overallnetwork2.Rds")
 
 # grouping nodes by cycle/nocycle
 grp <- list(`cycle` = 2:6, `no cycle` = c(1,7:9))
