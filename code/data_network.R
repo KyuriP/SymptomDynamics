@@ -36,6 +36,11 @@ dep_list <- dep_scores %>%
   group_by(wave) %>% 
   {setNames(group_split(.), group_keys(.)[[1]])}  %>% 
   map(~.x |>pivot_wider(id_cols = ID, names_from = item_num, values_from = value))
+
+# aggregate all waves
+dep_list |> list_rbind() |> drop_na() |> select(-ID) |>
+  estimateNetwork(default = "EBICglasso") |> plot()
+  
   
 # separate each wave 
 net_list <- dep_list |>
@@ -99,9 +104,12 @@ sim_boots_cent <- sim_boots$boots |>
         rename(Strength = node.centrality.Strength) |> t() |> as.data.frame()
   ) |> list_rbind()
 
+sim_boots_cent <- readRDS("data/sim_bootstrap1000cent_30%agg.Rds")
+sim_boots <- readRDS("data/sim_bootstrap1000_30%agg.Rds")
+
 # sim_boots <- readRDS("data/sim_bootstrap100.Rds")
 # sim_boots_cent <- readRDS("data/sim_bootstrap100_cent.Rds")
-cent_dat <- bind_rows(helius_boots_cent, sim_boots_cent, .id= "")
+cent_dat <- bind_rows(helius_boots_cent, sim_boots_cent, .id= "id")
   
 cent_stats <- cent_dat |>
   group_by(id) |>
@@ -110,7 +118,7 @@ cent_stats <- cent_dat |>
     .fns = list(Mean = mean, SD = sd),
     .names = "{fn}_{col}"
   )) |> pivot_longer(!id, names_to = c(".value", "symptom"), names_sep = "_") |>
-  mutate(N = case_when(id == 1 ~ 1000, id ==2 ~ 100),
+  mutate(N = case_when(id == 1 ~ 1000, id ==2 ~ 1000),
          SE = SD / sqrt(N),
          low.ci = Mean - qnorm(0.975)*SE*100, # consider qt() # interval so small
          upper.ci = Mean + qnorm(0.975)*SE*100) # consider qt()

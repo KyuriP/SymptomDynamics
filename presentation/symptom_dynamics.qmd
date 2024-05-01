@@ -56,11 +56,18 @@ library(kableExtra)
 <!-- ::: -->
 
 ## Common cause model
+
 Mental disorders stem from a single common underlying cause for their various symptoms, following the physical disease model [@hyland2011origins].
 
 ::: r-stack
-![](img/commoncause1.png){.absolute top="200" left="200" width="60%"}
-![](img/commoncause2.png){.fragment .absolute top="200" left="200" width="60%"}
+![](img/commoncause1.png){.absolute top="200" left="200" width="60%"} ![](img/commoncause2.png){.fragment .absolute top="200" left="200" width="60%"}
+:::
+
+::: notes
+So at the very start, the traditional view on mental disorder was this common cause model, which says mental disorder stems from this single underlying cause, here let's say depression.
+So this depression as a latent entity, it causes all the observable symptoms, like this; so this model basically follows from this physical disease model where you have for example, a cancer cell which causes all these various symptoms, and you know if you remove the root cause, the cancer, then the symptoms again go away.
+But is that also the case in depression?
+Does it really make sense to think of depression as a single entity that we can eliminate to cure the symptoms?
 :::
 
 ## Network theory of psychopathology
@@ -89,6 +96,8 @@ Mental disorder is produced by direct causal interactions between symptoms that 
 :::
 
 ::: notes
+And a lot of people start thinking it does not make sense.
+And one of the first persons who pointed out, was Denny Borsboom, and he says we should look at it as a network of symptoms.
 The main foundation for me when I start looking into modelling depression symptom dynamics is the network theory of psychopathology of Denny, which says mental disorder is produced by direct causal interactions between the symptoms.
 And the crucial point here is that, these causal interactions often form feedback loops and they reinforce each other.
 As you can see here, feeling down makes you sleep poorly and lack of sleep makes you feel tired and it sort of forms this vicious cycle.
@@ -166,7 +175,6 @@ Although here I did not indicate the causal directions but I assume these three 
 ::: {#citeborsboom}
 [@borsboom2017network; @cramer_major_2016]
 :::
-
 
 1.  Bistability
 
@@ -254,7 +262,7 @@ $f(x) = x^2$.
 
 ::: notes
 So this is the model we used for symptom dynamics.
-The first top expression shows the ODE, the ordinary differential equation, defining the interaction between the symptoms.
+The first top expression shows the ODE, defining the interaction between the symptoms.
 So the $S_i$ here corresponds to a symptom i.
 Let me go through this equation term by term with you, so you know how we came up with this.
 The first two terms $S_i(1-S_i)$ are typical logistic differential equation, which we put to constrain the symptom level between 0 and 1.
@@ -275,14 +283,11 @@ So in the end what it says is that, as the $S_i$ level increases, the effects of
 And this term is important because this actually adds the nonlinearity into our model because this is the interaction term between $S_i$ and $S_j$, which can be turned on and off by this delta.
 
 Any questions?...
-It would be insane if everything clicks straight away, just let it sink for now, and hopefully it becomes clearer when I show you the plots on how the model behaves.
 
 And this second equation, is just to show that we introduced the noise to our model to capture the inherent randomness observed in symptom dynamics.
 The noise is usually seen as blurring trajectories in deterministic systems, but the noise can actually facilitate transitions between different states, so the strength of this noise is therefore very important.
 Here we control the noise strength with $\sigma_i$.
 And the underlying nature of the noise in our model is Gaussian white noise, which is a common choice for capturing random fluctuations.
-Adding this noise term, we can describe the dynamics of symptoms with this SDE, the stochastic differential equation.
-So that is all the equations I have.
 
 So, this is a quick summary of what are the different parameters doing in our model.
 Are these okay-ish clear?
@@ -393,7 +398,7 @@ I made this exception so that it can align with those empirical observations whe
 
 ::: notes
 So the results.
-Quickly about the set up, so for each iteration, we simulated over 4000 timepoints, and the shock was given at where t = 1000 and the shock lasted for 500 time points.
+Quickly about the set up, so for each iteration, we simulated over 4000 timepoints, and the shock was given at where t was equal to 1000 and the shock lasted for 500 time points.
 And for each scenario, we repeated the simulation for 500 times.
 Alright?
 
@@ -424,7 +429,7 @@ And even after the shock, the network somewhat maintains a decent level of densi
 
 (SCROLL DOWN) And again, this is median trajectories, showing much less hysteresis in general.
 
-(SCROLL DOWN) And the aggregated symptom level also exhibits reduced hysteresis, as the system recovers before where $t = 2000$, shortly after the shock is removed.
+(SCROLL DOWN) And the aggregated symptom level also exhibits reduced hysteresis, as the system recovers before where t was 2000, so shortly after the shock is removed.
 Also, we observe a smoother upward curve during the shock, indicating a slower increasing activation compared to the baseline scenario.
 
 (SCROLL DOWN) Accordingly, the network models also reveal much sparser networks throughout the different stages.
@@ -461,7 +466,7 @@ And just to point out, these various networks are generated based on the same me
 
 ::: notes
 Here again, I just put the network estimated before the shock from each of the scenario side-by-side, so that you can easily compare.
-So this shows distinctive network structures in different level of resilience and just want to emphasize once again that they are based on the same underlying model, and in this case they only slightly differ with a couple of parameter values.
+So this shows distinctive network structures in different level of resilience.
 :::
 
 ## Results (cont.)
@@ -469,11 +474,11 @@ So this shows distinctive network structures in different level of resilience an
 Network estimated from aggregated simulated data across time and resilience levels.
 
 ::: r-stack
-![](img/totalnetwork.png){.absolute top="120" left="0" width="500"} [simulated network]{.absolute bottom="40" left="150" style="font-size: 0.7em;"}
+![](img/totavgnetwork.png){.absolute top="120" left="1" width="500"} [simulated network]{.absolute bottom="40" left="150" style="font-size: 0.7em;"}
 
 ![](img/toymodelnet.png){.fragment .absolute top="120" right="27" width="490" fragment-index="1"} [original network]{.absolute .fragment bottom="40" right="150" fragment-index="1" style="font-size: 0.7em;"}
 
-![](img/totalnetwork_v2.png){.fragment .absolute top="120" left="0" width="500" fragment-index="2"}
+![](img/totavgnetwork_col.png){.fragment .absolute top="126" left="0" fragment-index="2" width="502"}
 :::
 
 ::: notes
@@ -505,7 +510,6 @@ That I found pretty intriguing.
 
 ::: notes
 Then, I looked at the centrality of these networks.
-As you know, the simulated one is undirected network, so I computed the strength centrality and for the original model, I computed the in-strength, which is the green line and the out-strength which is the orange line here.
 So analyzing the strength centrality of the simulated network, I found that they actually quite closely follow the in-strength pattern of the original network.
 (CLICK) See, the patterns aligns quite well, with a deviation in the motor and suicidal symptom.
 This deviation is again, because we manipulated the suicidal symptom to rarely get activated.
@@ -513,6 +517,11 @@ So the motor symptom, which is heavily affected by suicidal now shows a lower st
 
 So I found this very interesting... The implication for this is up to discussion, but given this I wanted to emphasize that to some extent we can gather some information about the dynamics based on statistical networks, however, inferring causal relationships, such as talking about intervention targets or key driving nodes, solely based on statistical networks could go very wrong.
 :::
+
+## Currently.. {background-image="img/bg_sl4.png"}
+
+-   Comparing the HELIUS data network.
+-   Conducting robustness checks across various parameter values.
 
 ## Discussion {background-image="img/bg_sl.png"}
 
