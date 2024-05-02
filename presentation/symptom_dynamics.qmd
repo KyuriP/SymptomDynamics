@@ -37,6 +37,15 @@ library(knitr)
 library(kableExtra)
 ```
 
+
+## Common cause model
+
+Mental disorders stem from a single common underlying cause for their various symptoms, following the physical disease model [@hyland2011origins].
+
+::: r-stack
+![](img/commoncause1.png){.absolute top="200" left="200" width="60%"} ![](img/commoncause2.png){.fragment .absolute top="200" left="200" width="60%"}
+:::
+
 <!-- ::: notes -->
 
 <!-- Hello, I am Kyuri, I am a PhD student working at the Computational Science Lab at the university of amsterdam. -->
@@ -54,18 +63,9 @@ library(kableExtra)
 <!-- But this is still an on-going work and the goal for me today to share this with you guys is to  pick some of your brains to get some interesting implications and of course improvements for future. But i am already aware of a lot of limitations so I encourage you to approach this with an open mind and full of positivity. And just a heads up, i am not a good public speaker, so if you are confused, you are probably rightfully being so. Feel free to ask for clarification; I will give it another go, as long as the time allows. -->
 
 <!-- ::: -->
-
-## Common cause model
-
-Mental disorders stem from a single common underlying cause for their various symptoms, following the physical disease model [@hyland2011origins].
-
-::: r-stack
-![](img/commoncause1.png){.absolute top="200" left="200" width="60%"} ![](img/commoncause2.png){.fragment .absolute top="200" left="200" width="60%"}
-:::
-
 ::: notes
 So at the very start, the traditional view on mental disorder was this common cause model, which says mental disorder stems from this single underlying cause, here let's say depression.
-So this depression as a latent entity, it causes all the observable symptoms, like this; so this model basically follows from this physical disease model where you have for example, a cancer cell which causes all these various symptoms, and you know if you remove the root cause, the cancer, then the symptoms again go away.
+So this depression as a latent entity, it causes all the observable symptoms, like this; so this model basically follows from this physical disease model where you have for example, a cancer cell causes various symptoms like pain, headache, dizziness and etc., and you know if you remove the root cause, the cancer, then the symptoms again all go away.
 But is that also the case in depression?
 Does it really make sense to think of depression as a single entity that we can eliminate to cure the symptoms?
 :::
@@ -449,7 +449,7 @@ It reaches the full activation quickly upon the shock and maintains a moderate d
 Especially, the network density before the shock is obviously the highest among all three scenarios.
 
 So in summary, we did find some clear hysteresis effects in our model, and also variations in network connectivity across different time phases as well as different resilience level.
-And just to point out, these various networks are generated based on the same mechanistic model.
+<!-- And just to point out, these various networks are generated based on the same mechanistic model. -->
 :::
 
 ## Results (cont.)
@@ -489,7 +489,7 @@ This is the resulting estimated network model.
 Let me remind you the toy model again.
 It retrieves all the edges except for the one between sad and suicidal, which is likely dropped because of our manipulation over the suicidal symptom.
 
-Also, the network shows a clear clustering structure: most nodes on the left side of the simulated network are not part of any cycles, while the ones on the right side are part of cycles.
+Also, the network shows a clear clustering structure: most nodes on the upper-left side of the simulated network are part of cycles, while the ones on the bottom-right  are not part of cycles.
 (CLICK).
 If I apply the same coloring scheme, it is easier to see this.
 And also, the guilty symptom sort of acts like a bridge between these two clusters, which can be also seen in the original network structure.
@@ -518,10 +518,32 @@ So the motor symptom, which is heavily affected by suicidal now shows a lower st
 So I found this very interesting... The implication for this is up to discussion, but given this I wanted to emphasize that to some extent we can gather some information about the dynamics based on statistical networks, however, inferring causal relationships, such as talking about intervention targets or key driving nodes, solely based on statistical networks could go very wrong.
 :::
 
-## Currently.. {background-image="img/bg_sl4.png"}
+## Currently...{.scrollable}
 
--   Comparing the HELIUS data network.
+-   Comparing the [HELIUS](https://www.heliusstudy.nl/nl/researchers/the-helius-study/) data network.
+
+![](img/boot_centrality_SD.png){width="40%"}
+
+![](img/boot_edgePlot_SD.png)
+
 -   Conducting robustness checks across various parameter values.
+
+![](img/betaplot.png){width="70%"}
+![](img/sigmaplot.png){width="70%"}
+![](img/interactionplot.png){width="70%"}
+
+::: notes
+So that's what I basically found so far through this study.. Then, what I am currently doing is, well now that I've got hands on this HELIUS data, I've been trying to compare our model to this dataset.
+So here i have some fresh-off plots that I got just yesterday. And mind you, they are still running as I speak at this moment, so these are all preliminary results...
+
+Just to show you some of'em; well this is where I tried to compare the centrality of our simulated network with the HELIUS data network. And what i did was that, I bootstrapped the data, so these are results from 1000 bootstrapped samples for both. 
+But It didn't really spice things up much. You see, with sample sizes as big as they are — we're talking about 24,000 samples for the HELIUS data and over 300,000 samples for my simulated data — the variations were barely there; they are super stable so you see very small standard deviations here. Anyways, the cool thing is, the resulting centrality didn't stray too far from each other, which I thought was pretty neat. Considering that I went into this completely blind, I had zero idea about this HELIUS dataset, so getting it this close for me was a pretty good surprise.
+
+And here I am also comparing the edge weights of data network and our simulated network. So these are all the possible edge sets given my 9 symptom variables. Some of them have quite different values. Like, guilty-suicide, guilty-concentration, and anhedonia-sleep. And these deviations were also reflected in the strength centrality plot. So, those are the nodes that stand out in terms of centrality differences.
+
+And, on top of all that, I've been running some robust checks on our results as well. You see, I kinda pulled those parameter values out of thin air, so now I'm putting them to the test to see if our main findings still hold. I'm tweaking parameters like beta and sigma to see if the differences in network density across different resilience levels are robust against different values of parameters. It's a bit of work in progress, but that's basically where I'm at right now.
+:::
+
 
 ## Discussion {background-image="img/bg_sl.png"}
 
@@ -535,8 +557,8 @@ So I found this very interesting... The implication for this is up to discussion
     -   continuity
 :::
 
-![](img/palmer_prediction.png){.absolute .fragment .fade-in-then-semi-out top="150" right="50" width="400" fragment-index="2"} 
-[@palmer2000predicting]{style="font-size:0.7em;" .absolute top="450" right="70" .fragment .fade-in-then-semi-out fragment-index="2"}
+<!-- ![](img/palmer_prediction.png){.absolute .fragment .fade-in-then-semi-out top="150" right="50" width="400" fragment-index="2"}  -->
+<!-- [@palmer2000predicting]{style="font-size:0.7em;" .absolute top="450" right="70" .fragment .fade-in-then-semi-out fragment-index="2"} -->
 
 ::: {.fragment .fade-in-then-semi-out fragment-index="3"}
 -   Future efforts:
@@ -545,9 +567,9 @@ So I found this very interesting... The implication for this is up to discussion
     -   calibrating parameters
 :::
 
-::: {.fragment .fade-in fragment-index="4"}
--   Other implications?
-:::
+<!-- ::: {.fragment .fade-in fragment-index="4"} -->
+<!-- -   Other implications? -->
+<!-- ::: -->
 
 ::: notes
 Alright, so finally discussion.
@@ -555,36 +577,31 @@ This study in my opinion was meaningful in a sense it was one of the first attem
 So instead of fitting a network from data, here we gave you a more of top-down approach.
 
 And how does our model differs or what does this model actually adds to the existing ones?
-(Han actually asked me this before).
 
 I would say first, we've incorporated the non-linearity term that can be controlled by the delta parameter, which makes our model more flexible by being able to capture the nonlinear responses in the dynamics.
 
-And secondly, our model differs in its continuous nature, which allows us to simulate symptom trajectories continuously rather than getting binary responses, such as in the Ising model.
+And secondly, our model differs in its continuous nature, which allows us to simulate symptom trajectories continuously rather than getting binary responses, such as in the Ising model, which is one of the popular models currently being used in this field.
 
-And this continuity can actually provide a significant advantage.
-Lourens, who unfortunately couldn't join us today, introduced me to this work from Palmer, who mainly works in climate and weather prediction.
-The core concept of Palmer's work revolves around the idea that with sufficient information about the initial state, we can potentially predict the continuous trajectory of a dynamical system.
+<!-- And this continuity can actually provide a significant advantage. -->
+<!-- Lourens introduced me to this work from Palmer, who mainly works in climate and weather prediction. -->
+<!-- The core concept of Palmer's work revolves around the idea that with sufficient information about the initial state, we can potentially predict the continuous trajectory of a dynamical system. -->
 
-In this case, they were predicting temperature using what they call an ensemble prediction model.
-This model essentially adds perturbations to the initial conditions and generate trajectories based on stochastic differential equations.
-In the graph, you see the dashed line, that is the actual temperature, and the gray lines represent trajectories from the model.
-And here, their predictions were quite okay, as the real temperature fell within the predicted bounds.
+<!-- In this case, they were predicting temperature using what they call an ensemble prediction model. -->
+<!-- This model essentially adds perturbations to the initial conditions and generate trajectories based on stochastic differential equations. -->
+<!-- In the graph, you see the dashed line, that is the actual temperature, and the gray lines represent trajectories from the model. -->
+<!-- And here, their predictions were quite okay, as the real temperature fell within the predicted bounds. -->
 
-So this shows one of the possibilities that such continuous model could also be utilized in psychological research, to make a short-term prediction like this, so for example it could be used to make a short-term prognosis or so.
+<!-- So this shows one of the possibilities that such continuous model could also be utilized in psychological research, to make a short-term prediction like this, so for example it could be used to make a short-term prognosis or so. -->
 
 But of course, this is just a very start.
 There are much more could be done in the future.
 For example, we would actually like to investigate further on this non-linearity aspect in the dynamics, as we for now just used a very simple expression, but it probably is not as simple as how we defined in reality.
 Also, about the feedback loops and causal directions of the model.
 It is one of the hot topics, causality and causal discovery.
-I am also very much interested in this and I've bothered Lourens a lot in the past, trying to understand this more.
+I am also very much interested in this.
 The thing is there are some promising causal algorithms that could learn the causal structure even with the feedback loops present in the model.
 So hopefully with the data I have now, I would like to delve deeper into this.
-If anyone working on causal discovery / causal inference, I would like to hear about what you think about this as well.
 Lastly, more of practical aspect; for the follow up of this work, one of the first thing should be done is to calibrate the parameters and do some sensitivity analyses.
-
-And I was really hoping that I could hear what you guys think about this model.
-And if you have any idea on what you can do with this type of models or any interesting extensions for this work, I would love to hear it.
 :::
 
 ## Thank You {background-image="img/bg_sl5.png"}
@@ -604,9 +621,7 @@ And if you have any idea on what you can do with this type of models or any inte
 :::
 
 ::: notes
-Thank you very much.
-I'd like to thank to my supervisors, Vitor Vasconcelos and Mike Lees, who have been guiding me through this work.
-Also if you have any comments or questions, please feel free to reach out to me via email.
-I'm always open to discussion and feedback.
+So that's all I had for today.
+I'd like to thank to my supervisor, Dr. Vitor Vasconcelos who has been guiding me through this work. And also to my potential promotor Mike Lees.
 Alright, thanks a lot again for your attention.
 :::
