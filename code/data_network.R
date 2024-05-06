@@ -38,21 +38,21 @@ dep_list <- dep_scores %>%
   map(~.x |>pivot_wider(id_cols = ID, names_from = item_num, values_from = value))
 
 # aggregate all waves
-dep_list |> list_rbind() |> drop_na() |> select(-ID) |>
-  estimateNetwork(default = "EBICglasso") |> plot()
-  
-  
+helius_aggnet <- dep_list |> list_rbind() |> drop_na() |> select(-ID) |>
+  relocate(sui, .after = mot) |>
+  estimateNetwork(default = "EBICglasso") 
+
+png(file = "helius_totavgnetwork.png",bg = 'transparent', res=300)
+plot(helius_aggnet, layout = aggnetLayout)  
+dev.off()
+
 # separate each wave 
 net_list <- dep_list |>
   map(~.x |>select(-ID) |> relocate(sui, .after = mot) |>
       estimateNetwork(.x, default = "EBICglasso") |>
-        plot(.x)
+        plot(.x,  layout = aggnetLayout)
       )
 
-
-Layout_simnet <- totavgnetwork2$layout
-
-net_list$H1$layout <- Layout_simnet
 
 plot(net_list$H1)
 plot(net_list$H2)
@@ -88,6 +88,7 @@ plot(totavgnetwork_helius2)
 ## bootstrapped samples
 # bootstrap sample of helius
 helius_boots <- bootnet(totavgnetwork_helius, nBoots=1000, type = 'nonparametric')
+plot(helius_boots)
 helius_boots_cent <- helius_boots$boots |>
   map(~.$graph |> centrality_auto() |> extract(1) |> 
         as.data.frame() |> select(node.centrality.Strength) |> 
@@ -120,8 +121,10 @@ cent_stats <- cent_dat |>
   )) |> pivot_longer(!id, names_to = c(".value", "symptom"), names_sep = "_") |>
   mutate(N = case_when(id == 1 ~ 1000, id ==2 ~ 1000),
          SE = SD / sqrt(N),
-         low.ci = Mean - qnorm(0.975)*SE*100, # consider qt() # interval so small
-         upper.ci = Mean + qnorm(0.975)*SE*100) # consider qt()
+         low.ci = Mean - 2*SD, 
+         upper.ci = Mean + 2*SD) 
+         # low.ci = Mean - qnorm(0.975)*SE, # consider qt() # interval so small
+         # upper.ci = Mean + qnorm(0.975)*SE) # consider qt()
 
 
 ## centrality plot over bootstrapped samples
@@ -130,16 +133,16 @@ boot_centrailtyPlot <- ggplot(data = cent_stats,
            color = id)) +
   geom_pointrange(alpha=0.5) +
   # geom_crossbar(width=0.1, alpha = 0.1)+
-  geom_path(aes(group = id))+
-  scale_color_discrete(labels = c("1" = "Helius", "2" = "Toy")) +
-  labs(title = "Strength centrality over bootstrapped samples",
+  geom_path(aes(group = id), alpha=0.5)+
+  scale_color_discrete(labels = c("1" = "Helius", "2" = "Simulated")) +
+  labs(title = "Strength centrality of bootstrapped samples",
        x = "",
        y = "",
        color = "",
-       caption = "Error bars show the 95% confidence interval (*100)") +
+       caption = "Error bars show the 2*SD") +
   ggpubr::theme_classic2()
 
-# ggsave("boot_centrality.png", boot_centrailtyPlot)
+ggsave("boot_centrality_SD.png", boot_centrailtyPlot, width = 5, height = 6)
 
 
 
@@ -156,31 +159,35 @@ edge_stats <- bind_rows(helius_boots$bootTable, sim_boots$bootTable, .id ="grp")
   filter(stringr::str_detect(id, "--")) |>
   mutate(N = case_when(grp == 1 ~ 1000, grp ==2 ~ 100),
          SE = SD / sqrt(N),
-         low.ci = Mean - qnorm(0.975)*SE*100, # consider qt() # interval so small
-         upper.ci = Mean + qnorm(0.975)*SE*100)
-  
+         low.ci = Mean - SD*2, # consider qt() # interval so small
+         upper.ci = Mean + SD*2) # consider qt()
+         # low.ci = Mean - qnorm(0.975)*SE*100, # consider qt() # interval so small
+         # upper.ci = Mean + qnorm(0.975)*SE*100)
+
 # lst_mats <- sim_boots$boots |> map(~.$graph)
 # mat_means <- apply(simplify2array(lst_mats), 1:2, mean) |> as.data.frame()
 # mat_sds <- apply(simplify2array(lst_mats), 1:2, sd)
 
+edge_stats |> mutate(Mean_grp1 = ifelse(grp == 1, Mean, 0))
 
 
-boot_edgePlot <- ggplot(data = edge_stats, aes(x = id, y = Mean, ymin = low.ci, ymax = upper.ci, 
+boot_edgePlot <- edge_stats |> mutate(Mean_grp1 = ifelse(grp == 1, Mean, 0)) |>
+ggplot(aes(x = forcats::fct_reorder(id, desc(Mean_grp1)), y = Mean, ymin = low.ci, ymax = upper.ci, 
                                   color = grp)) +
   # geom_pointrange(alpha=0.5, fatten = 2) +
   geom_errorbar(alpha=0.5, width = 0.4) +
-  # geom_crossbar(width=0.1, alpha = 0.1)+
-  scale_color_discrete(labels = c("1" = "Helius", "2" = "Toy")) +
-  labs(title = "Strength centrality over bootstrapped samples",
+  # geom_crossbar(width=0.2, alpha = 0.5)+
+  scale_color_discrete(labels = c("1" = "Helius", "2" = "Simulated")) +
+  labs(title = "Edge weight of bootstrapped samples",
        x = "",
        y = "",
        color = "",
-       caption = "Error bars show the 95% confidence interval (*100)") +
+       caption = "Error bars show the 2*SD") +
   ggpubr::theme_classic2()+
   theme(axis.text.x = element_text(angle = 80, vjust = 1, hjust=1),
         legend.position = "bottom") 
 
-# ggsave("boot_edgePlot2.png", boot_edgePlot, width = 12, height = 7)
+ggsave("boot_edgePlot_SD.png", boot_edgePlot, width = 12, height = 6)
 
 
 

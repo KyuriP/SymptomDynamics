@@ -1,7 +1,9 @@
 
 ## install packages
 source("code/libraries.R")
-
+## source necessary functions
+source("code/euler_stochastic2.R")
+source("code/mod_specification.R")
 
 # compute density before shock
 # sum(weightMatrix_lowresil) - sum(weightMatrix_highresil)
@@ -10,14 +12,19 @@ source("code/libraries.R")
 # 2nd critical pt: -colSums(A)
 criticalpt1 <- -colSums(A)*(1+9) - 0.3
 criticalpt2 <- -colSums(A)
-betas <- 1:9 |> map(function(x) {seq(criticalpt1[x], criticalpt2[x], length.out=10)}) |>
+betas <- 1:9 |> purrr::map(function(x) {seq(criticalpt1[x], criticalpt2[x], length.out=10)}) |>
+  set_names(names(criticalpt1)) |> as.data.frame() |> set_names(paste0("Beta_", colnames(A))) 
+sigmas <- seq(0.005, 0.02, length.out = 10) # 0.1 = sqrt(2*0.005) - 0.2 = sqrt(2*0.02)
+
+# for 30s
+betas <- 1:9 |> purrr::map(function(x) {seq(criticalpt1[x], criticalpt2[x], length.out= 30)}) |>
   set_names(names(criticalpt1)) |> as.data.frame() |> set_names(paste0("Beta_", colnames(A))) 
 
-sigmas <- seq(0.0707, 0.1414, length.out = 10) # 0.1/sqrt(2) - 0.2/sqrt(2)
+sigmas <- seq(0.0707, 0.1414, length.out = 30) # 0.1/sqrt(2) - 0.2/sqrt(2)
 
 
 # Function computes the density of matrix
-compute_density <- function(choice = "base", Beta = NULL, Sigma, n_sim = 10){
+compute_density <- function(choice = "base", Beta = NULL, Sigma, n_sim = 30){
   
   # A matrix
   A <- matrix(c( .30, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -34,7 +41,7 @@ compute_density <- function(choice = "base", Beta = NULL, Sigma, n_sim = 10){
   ## define "f"
   f <- function(x) x^2
   
-  dif_eq <- 1:9 |> map(function(x){
+  dif_eq <- 1:9 |> purrr::map(function(x){
     lhs <- paste0("dS", paste0("_",colnames(A)[x]))
     sumAj <- paste0("S", paste0("_",colnames(A)[-x]), collapse = ",") 
     rhs <- stringr::str_replace_all(
@@ -43,7 +50,7 @@ compute_density <- function(choice = "base", Beta = NULL, Sigma, n_sim = 10){
   })
   
   # define stochastic part:
-  sto_eq <-  1:9 |> map(function(x){
+  sto_eq <-  1:9 |> purrr::map(function(x){
     lhs <- paste0("dS", paste0("_",colnames(A)[x]))
     rhs <- 1  # change as you need
     form <- as.formula(paste(lhs,"~", rhs))
@@ -93,7 +100,7 @@ compute_density <- function(choice = "base", Beta = NULL, Sigma, n_sim = 10){
   t_shock <- 1000 # time that shock begins
   shock_duration <- 500 # shock duration time points
   n_sims = n_sim
-  aggregated <- map(1:n_sims, ~ euler_stochastic2(
+  aggregated <- purrr::map(1:n_sims, ~ euler_stochastic2(
     deterministic_rate = dif_eq,
     stochastic_rate = sto_eq,
     initial_condition = init,
@@ -135,15 +142,103 @@ compute_density <- function(choice = "base", Beta = NULL, Sigma, n_sim = 10){
 }
 
 
-## results
+## results over 30nsims
+res_highs <- purrr::map(1:nrow(betas), function(x) purrr::map_dfr(1:length(sigmas), function(y) compute_density(choice = "high", Beta = betas[x,], Sigma = sigmas[y]),.id = "id") |> mutate(sigma = sigmas[as.numeric(id)]))
+res_lows <- purrr::map(1:nrow(betas), function(x) purrr::map_dfr(1:length(sigmas), function(y) compute_density(choice = "low", Beta = betas[x,], Sigma = sigmas[y]),.id = "id") |> mutate(sigma = sigmas[as.numeric(id)]))
 
-res_highs <- map(1:nrow(betas), function(x) map_dfr(1:length(sigmas), function(y) compute_density(choice = "high", Beta = betas[x,], Sigma = sigmas[y]),.id = "id") |> mutate(sigma = sigmas[as.numeric(id)]))
-res_lows <- map(1:nrow(betas), function(x) map_dfr(1:length(sigmas), function(y) compute_density(choice = "low", Beta = betas[x,], Sigma = sigmas[y]),.id = "id") |> mutate(sigma = sigmas[as.numeric(id)]))
+# saveRDS(res_highs, "res_highs_30sim.rds") 
+# saveRDS(res_lows, "res_lows_30sim.rds") 
+res_high30 <- res_highs |> purrr::map(~.x |> tidyr::pivot_longer(!c(id, sigma)))
+res_low30 <- res_lows |> purrr::map(~.x |> tidyr::pivot_longer(!c(id, sigma)))
 
 
-## over 10 beta and 10 sigma
+diff_result30 <- purrr::map2_dfc(res_low30, res_high30, \(x,y) x$value - y$value) |> 
+  rename_with(~paste0("beta", 1:nrow(betas))) |>
+  mutate(sigma = rep(sigmas, each=3),
+         phase = rep(c("before", "during", "after"), 10)) 
+
+# given sigma value
+p_sigma30 <-  diff_result30 |>
+  tidyr::pivot_longer(!c(sigma, phase), names_to = "beta", values_to = "value") |>
+  ggplot(aes(x = as.factor(round(sigma,3)), y = value, color = factor(phase, levels=c("before", "during", "after")), fill = factor(phase, levels=c("before", "during", "after")))) +
+  geom_boxplot(alpha =0.3,   outlier.size = 1) +
+  labs(color = "", fill = "", x = "sigma", title = "network density difference", subtitle = "high vs. low resilience", y = "") +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) +
+  theme_pubr()
+# ggsave("sigmaplot30.png", p_sigma30)
+
+p_beta30 <-  diff_result30 |>
+  tidyr::pivot_longer(!c(sigma, phase), names_to = "beta", values_to = "value") |>
+  ggplot(aes(x = factor(beta, levels =c(paste0("beta", 1:10))), y = value, color = factor(phase, levels=c("before", "during", "after")), fill = factor(phase, levels=c("before", "during", "after")))) +
+  geom_boxplot(alpha =0.3,   outlier.size = 1) +
+  labs(color = "", fill = "", x = "beta", title = "network density difference", subtitle = "high vs. low resilience", y = "") +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) +
+  theme_pubr()
+# ggsave("betaplot30.png", p_beta30)
+
+interaction30 <- diff_result30 |>
+  tidyr::pivot_longer(!c(sigma, phase), names_to = "beta", values_to = "value") |>
+  filter(phase == "during") |>
+  ggplot(aes(x = factor(beta, levels =c(paste0("beta", 1:10))), y = sigma, fill = value)) +
+  # geom_tile() +
+  geom_raster()+
+  labs(x = "beta", y = "sigma", fill=expression(Delta*density),title = "network density difference", subtitle = "high vs. low resilience (during the shock)" ) +
+  theme_classic() +
+  # scale_fill_continuous(high = "#132B43", low = "#56B1F7")
+  scale_fill_gradient2(high = "#56B1F7", mid = "white", low = "red")
+# ggsave("interaction30.png", interaction30)
+
+
+
+## over 30 beta and 30 sigma (10nsims)
+high_resil30 <- readRDS("data/res_highs30.rds")
+low_resil30 <- readRDS("data/res_lows30.rds")
+
+high_resil30 <- high_resil30 |> purrr::map(~.x |> tidyr::pivot_longer(!c(id, sigma)))
+low_resil30 <- low_resil30 |> purrr::map(~.x |> tidyr::pivot_longer(!c(id, sigma)))
+
+diff_30pars <- purrr::map2_dfc(low_resil30, high_resil30, \(x,y) x$value - y$value) |> 
+  rename_with(~paste0("beta", 1:nrow(betas))) |>
+  mutate(sigma = rep(sigmas, each=3),
+         phase = rep(c("before", "during", "after"), 30)) 
+
+# given sigma value
+p_sigma30par <-  diff_30pars |>
+  tidyr::pivot_longer(!c(sigma, phase), names_to = "beta", values_to = "value") |>
+  ggplot(aes(x = as.factor(round(sigma,3)), y = value, color = factor(phase, levels=c("before", "during", "after")), fill = factor(phase, levels=c("before", "during", "after")))) +
+  geom_boxplot(alpha =0.3,   outlier.size = 1) +
+  labs(color = "", fill = "", x = "sigma", title = "network density difference", subtitle = "high vs. low resilience", y = "") +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) +
+  theme_pubr()
+# ggsave("sigmaplot30.png", p_sigma30)
+
+p_beta30par <-  diff_30pars |>
+   tidyr::pivot_longer(!c(sigma, phase), names_to = "beta", values_to = "value") |>
+   ggplot(aes(x = factor(beta, levels =c(paste0("beta", 1:30))), y = value, color = factor(phase, levels=c("before", "during", "after")), fill = factor(phase, levels=c("before", "during", "after")))) +
+   geom_boxplot(alpha =0.3,   outlier.size = 1) +
+   labs(color = "", fill = "", x = "beta", title = "network density difference", subtitle = "high vs. low resilience", y = "") +
+   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) +
+   theme_pubr()
+# ggsave("betaplot30.png", p_beta30)
+
+interaction30par <- diff_30pars |>
+   tidyr::pivot_longer(!c(sigma, phase), names_to = "beta", values_to = "value") |>
+   filter(phase == "during") |>
+   ggplot(aes(x = factor(beta, levels =c(paste0("beta", 1:30))), y = sigma, fill = value)) +
+   # geom_tile() +
+   geom_raster()+
+   labs(x = "beta", y = "sigma", fill=expression(Delta*density),title = "network density difference", subtitle = "high vs. low resilience (during the shock)" ) +
+   theme_classic() +
+   # scale_fill_continuous(high = "#132B43", low = "#56B1F7")
+ scale_fill_gradient2(high = "#56B1F7", mid = "white", low = "red")
+# ggsave("interaction30.png", interaction30)
+
+ 
+ 
+## over 10 beta and 10 sigma (10nsims)
 high_resil <- readRDS("data/res_highs.rds")
 low_resil <- readRDS("data/res_lows.rds")
+
 
 high_resil %<>%  map(~as.data.frame(.x) |>
                     tidyr::pivot_longer(everything())|>

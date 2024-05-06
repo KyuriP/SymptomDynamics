@@ -7,7 +7,7 @@
 ## install packages
 source("code/libraries.R")
 
-rm(list=ls())
+# rm(list=ls())
 
 ## source necessary functions
 source("code/euler_stochastic2.R")
@@ -254,32 +254,42 @@ colnames(avgnet_low2) <- colnames(A)
 # totavgnet2 <- bind_rows(avgnet2, avgnet_high2, avgnet_low2)
 # total average net 
 totavgnet <- avgnet |> bind_rows(avgnet2, avgnet_high, avgnet_low, avgnet_high2, avgnet_low2) |> slice_sample(prop = 0.5)
+totavgnet <- avgnet |> bind_rows(avgnet_high, avgnet_low) 
 # # each variable distribution check
 # totavgnet |> hist()
 totavgnetwork <- estimateNetwork(totavgnet, default = "EBICglasso")
 totavgnetwork2 <- estimateNetwork(totavgnet2, default = "EBICglasso")
-# saveRDS(totavgnetwork, file = "overallnet_30%aggdat")
+# saveRDS(totavgnetwork, file = "overallnet_30%aggdat.Rds")
 # saveRDS(totavgnet, file = "all_aggregatedsimdata.Rds")
 # saveRDS(totavgnetwork, file = "overallnetwork.Rds")
 # saveRDS(totavgnetwork2, file = "overallnetwork2.Rds")
 
+
+totavgnet <- plot(totavgnetwork,  labels = colnames(A))
+
+#swap their locations (con & glt)
+conloc <- totavgnet$layout[7,]
+gltloc <- totavgnet$layout[6,]
+totavgnet$layout[6,] <- conloc
+totavgnet$layout[7,] <- gltloc
+totavgnet$layout[6,] <- c(0.4, -0.2)
+totavgnet$layout[9,2] <- -0.8
+
+aggnetLayout <- totavgnet$layout
+# saveRDS(aggnetLayout, file = "aggLayout.Rds")
+
+# png(file = "totavgnetwork.png", width="90%", bg = 'transparent')
+plot(totavgnet,  layout = aggnetLayout,  labels = colnames(A), groups = grp, color = c("white", "white"), legend=F, layout = aggnetLayout)
+# dev.off()
+plot(totavgnetwork2)
+
 # grouping nodes by cycle/nocycle
 grp <- list(`cycle` = 2:6, `no cycle` = c(1,7:9))
 
-plot(totavgnetwork)
-totavgnetwork2 <- plot(totavgnetwork,  labels = colnames(A))
-# totavgnetwork2 <- plot(totavgnetwork,  labels = colnames(A), groups = grp, color = c("#F5651C", "#58B5BC"), legend=F, border.color = "white",border.width = 2, label.color = "white")
-
-#swap their locations (con & glt)
-conloc <- totavgnetwork2$layout[7,]
-gltloc <- totavgnetwork2$layout[6,]
-totavgnetwork2$layout[6,] <- conloc
-totavgnetwork2$layout[7,] <- gltloc
-
-
-# png(file = "net_comp.png", width=2000, height=1000, bg = 'transparent')
+# png(file = "totavgnetwork_col.png", width="100%", bg = 'transparent')
+totavgnetwork_col <- plot(totavgnetwork,  labels = colnames(A), groups = grp, color = c("#F5651C", "#58B5BC"), legend=F, border.color = "white",border.width = 2, label.color = "white", layout = aggnetLayout)
+plot(totavgnetwork_col)
 # dev.off()
-plot(totavgnetwork2)
 
 
 # compute centrality

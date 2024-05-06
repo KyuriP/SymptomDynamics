@@ -524,8 +524,6 @@ So I found this very interesting... The implication for this is up to discussion
 
 ![](img/boot_centrality_SD.png){width="40%"}
 
-![](img/boot_edgePlot_SD.png)
-
 -   Conducting robustness checks across various parameter values.
 
 ![](img/betaplot.png){width="70%"}
@@ -539,9 +537,8 @@ So here i have some fresh-off plots that I got just yesterday. And mind you, the
 Just to show you some of'em; well this is where I tried to compare the centrality of our simulated network with the HELIUS data network. And what i did was that, I bootstrapped the data, so these are results from 1000 bootstrapped samples for both. 
 But It didn't really spice things up much. You see, with sample sizes as big as they are — we're talking about 24,000 samples for the HELIUS data and over 300,000 samples for my simulated data — the variations were barely there; they are super stable so you see very small standard deviations here. Anyways, the cool thing is, the resulting centrality didn't stray too far from each other, which I thought was pretty neat. Considering that I went into this completely blind, I had zero idea about this HELIUS dataset, so getting it this close for me was a pretty good surprise.
 
-And here I am also comparing the edge weights of data network and our simulated network. So these are all the possible edge sets given my 9 symptom variables. Some of them have quite different values. Like, guilty-suicide, guilty-concentration, and anhedonia-sleep. And these deviations were also reflected in the strength centrality plot. So, those are the nodes that stand out in terms of centrality differences.
 
-And, on top of all that, I've been running some robust checks on our results as well. You see, I kinda pulled those parameter values out of thin air, so now I'm putting them to the test to see if our main findings still hold. I'm tweaking parameters like beta and sigma to see if the differences in network density across different resilience levels are robust against different values of parameters. It's a bit of work in progress, but that's basically where I'm at right now.
+Besides, I've been also running some robust checks on our results as well. You see, I kinda pulled those parameter values out of thin air, so now I'm putting them to the test to see if our main findings still hold. I'm tweaking parameters like beta and sigma to see if the differences in network density across different resilience levels are robust against different values of parameters. It's a bit of work in progress, but that's basically where I'm at right now.
 :::
 
 
