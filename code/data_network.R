@@ -30,17 +30,90 @@ dep_scores <- helius2 |>
             item_num == "7"~ "con",
             item_num == "89" ~ "mot",
             item_num == "10" ~ "sui")
-            )
+            ) |>
+  # filter out those neg values (-1: missing and -2: Ingevoerd bij HELIUS-2)
+  filter(value >=0)
+
+## check the distribution
+dep_scores |> 
+  ggplot(aes(x=value))+
+  geom_histogram() +
+  facet_wrap(~item_num)
+
+
+dep_scores |>
+  group_by(item_num) |>
+  summarize(mean = mean(value), stddv = sd(value))
+
 
 dep_list <- dep_scores %>% 
   group_by(wave) %>% 
   {setNames(group_split(.), group_keys(.)[[1]])}  %>% 
   map(~.x |>pivot_wider(id_cols = ID, names_from = item_num, values_from = value))
 
+
+## polychoric corr network
+polynet <- dep_list |> list_rbind() |> drop_na() |> select(-ID) |>
+  estimateNetwork(default = "EBICglasso", corMethod = "cor_auto")
+cent_poly_helius <- centrality_auto(polynet)
+
+## nonparanormal transformation
+library("huge")
+norm_helius <- dep_list |> list_rbind() |> drop_na() |> select(-ID) |> 
+  estimateNetwork(default = "EBICglasso") 
+cent_norm_helius <- centrality_auto(norm_helius)
+
+## sick ppl only
+sick_dep_scores <- helius2 |> 
+  select(contains("WlbvRecent") & !ends_with("Ingevuld"), contains("PHQ9_deprsymp"), ID) |>
+  filter(H1_PHQ9_deprsymp == 1 | H2_PHQ9_deprsymp == 1 | Cov1_PHQ9_deprsymp == 1 | Cov2_PHQ9_deprsymp == 1 | Cov3_PHQ9_deprsymp == 1) |>
+  select(!ends_with("deprsymp")) |>
+  pivot_longer(-ID, names_to = "wave1", values_to = "value") |>
+  mutate(wave = str_extract(wave1, "[^_]+"), item_num = str_extract(wave1,  "(\\d+)(?!.*\\d)")) |>
+  drop_na() |>
+  select(-wave1) %>% 
+  filter(!(item_num == "8" | item_num == "9")) |>
+  mutate(item_num = case_when(item_num == "1" ~ "anh",
+                              item_num == "2"~ "sad",
+                              item_num == "3"~ "slp",
+                              item_num == "4"~ "ene",
+                              item_num == "5"~ "app",
+                              item_num == "6"~ "glt",
+                              item_num == "7"~ "con",
+                              item_num == "89" ~ "mot",
+                              item_num == "10" ~ "sui")
+  ) |>
+  # filter out those neg values (-1: missing and -2: Ingevoerd bij HELIUS-2)
+  filter(value >= 0)
+
+# check distribution
+sick_dep_scores |>
+  ggplot(aes(x=value))+
+  geom_histogram() +
+  facet_wrap(~item_num)
+
+# aggregate all waves
+sick_list <- sick_dep_scores %>% 
+  group_by(wave) %>% 
+  {setNames(group_split(.), group_keys(.)[[1]])}  %>% 
+  map(~.x |>pivot_wider(id_cols = ID, names_from = item_num, values_from = value))
+
+helius_sick_agg <- sick_list |> list_rbind() |> drop_na() |> select(-ID) |>
+  relocate(sui, .after = mot) |>
+  estimateNetwork(default = "EBICglasso") 
+plot(helius_sick_agg)
+
+centralityPlot(helius_sick_agg, scale = "z-scores")
+# sick net centrality
+cent_sickhelius <- centrality_auto(helius_sick_agg)
+
+
+
 # aggregate all waves
 helius_aggnet <- dep_list |> list_rbind() |> drop_na() |> select(-ID) |>
   relocate(sui, .after = mot) |>
   estimateNetwork(default = "EBICglasso") 
+
 
 png(file = "helius_totavgnetwork.png",bg = 'transparent', res=300)
 plot(helius_aggnet, layout = aggnetLayout)  

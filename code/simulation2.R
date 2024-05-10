@@ -232,6 +232,7 @@ abline(v = -1.3, lty=3, col = "lightgray")
 aggregated <- readRDS("data/aggregated.rds")
 aggregated_high <- readRDS("data/aggregated_res.rds")
 aggregated_low <- readRDS("data/aggregated_low.rds")
+
 aggregated2 <- readRDS("data/aggregated_base2.rds")
 aggregated_high2 <- readRDS("data/aggregated_high2.rds")
 aggregated_low2 <- readRDS("data/aggregated_low2.rds")
@@ -251,7 +252,7 @@ colnames(avgnet_high2) <- colnames(A)
 avgnet_low2 <- aggregated_low2 |> dplyr::select(S_anh:S_sui)
 colnames(avgnet_low2) <- colnames(A)
 
-# totavgnet2 <- bind_rows(avgnet2, avgnet_high2, avgnet_low2)
+# totavgnet <- bind_rows(avgnet, avgnet_high, avgnet_low)
 # total average net 
 totavgnet <- avgnet |> bind_rows(avgnet2, avgnet_high, avgnet_low, avgnet_high2, avgnet_low2) |> slice_sample(prop = 0.5)
 totavgnet <- avgnet |> bind_rows(avgnet_high, avgnet_low) 
@@ -264,8 +265,9 @@ totavgnetwork2 <- estimateNetwork(totavgnet2, default = "EBICglasso")
 # saveRDS(totavgnetwork, file = "overallnetwork.Rds")
 # saveRDS(totavgnetwork2, file = "overallnetwork2.Rds")
 
-
-totavgnet <- plot(totavgnetwork,  labels = colnames(A))
+# overallnet <- readRDS("data/overallnetwork.Rds")
+#totavgnet <- 
+plot(totavgnetwork,  labels = colnames(A))
 
 #swap their locations (con & glt)
 conloc <- totavgnet$layout[7,]
