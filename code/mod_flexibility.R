@@ -5,6 +5,16 @@ source("code/libraries.R")
 source("code/euler_stochastic2.R")
 source("code/mod_specification.R")
 
+## standardizing function (Sacha qgraph)
+scale2 <- function(x) {
+  if (all(is.na(x))) return(NA)
+  if (sd(x,na.rm=TRUE)!=0){
+    return((x-mean(x,na.rm=TRUE))/sd(x,na.rm=TRUE))
+  } else {
+    return(rep(0, length(x)))
+  }
+}
+
 ## set the seed
 set.seed(123)
 
@@ -134,6 +144,8 @@ totavgnetworkb1_sim500 <- estimateNetwork(totavgnetb1, default = "EBICglasso")
 totavgnetworkb2_sim500 <- estimateNetwork(totavgnetb2, default = "EBICglasso")
 # saveRDS(totavgnetworkb1_sim500, "estnetwork_beta1.rds") # beta_bistable1
 # saveRDS(totavgnetworkb1_sim500, "estnetwork_beta2.rds") # beta_bistable1
+totavgnetworkb1_sim500 <- readRDS("data/estnetwork_beta1.rds")
+totavgnetworkb2_sim500 <- readRDS("data/estnetwork_beta2.rds")
 
 
 plot(totavgnetworkb1_sim500)
@@ -153,13 +165,13 @@ str_b1 <- cent_b1$node.centrality$Strength |>
   as_data_frame() |>  
   mutate(node = factor(rownames(cent_b1$node.centrality), 
                        levels= c(rownames(cent_b1$node.centrality)))
-  )
+  )|> mutate(value = scale2(value))
 
 str_b2 <- cent_b2$node.centrality$Strength |>
   as_data_frame() |>  
   mutate(node = factor(rownames(cent_b2$node.centrality), 
                        levels= c(rownames(cent_b2$node.centrality)))
-  )
+  )|> mutate(value = scale2(value))
 
 str_helius <- cent_helius$node.centrality$Strength |>
   as_data_frame() |>  
@@ -167,11 +179,18 @@ str_helius <- cent_helius$node.centrality$Strength |>
                        levels= c(rownames(cent_helius$node.centrality)))
   )|> mutate(value = scale2(value))
 
+str_heliusH1 <- cent_heliusH1$node.centrality$Strength |>
+  as_data_frame() |>  
+  mutate(node = factor(rownames(cent_heliusH1$node.centrality), 
+                       levels= c(rownames(cent_heliusH1$node.centrality)))
+  )|> mutate(value = scale2(value))
+
 str_poly_helius <- cent_poly_helius$node.centrality$Strength |>
   as_data_frame() |>  
   mutate(node = factor(rownames(cent_poly_helius$node.centrality), 
                        levels= c(rownames(cent_poly_helius$node.centrality)))
-  )
+  )  |> mutate(value = scale2(value))
+
 
 str_norm_helius <- cent_norm_helius$node.centrality$Strength |>
   as_data_frame() |>  
@@ -187,34 +206,27 @@ str_sick_helius <- cent_sickhelius$node.centrality$Strength |>
 
 str_helius$dummy <- "Strength"
 
-## standardizing function (Sacha qgraph)
-scale2 <- function(x) {
-  if (all(is.na(x))) return(NA)
-  if (sd(x,na.rm=TRUE)!=0){
-    return((x-mean(x,na.rm=TRUE))/sd(x,na.rm=TRUE))
-  } else {
-    return(rep(0, length(x)))
-  }
-}
 
 strength_cent <- bind_rows(str_b1, str_b2, .id="id") |> 
   pivot_wider(names_from = id, names_prefix = "beta") |>
-  mutate(beta1 = scale2(beta1), beta2 = scale2(beta2)) |>
   rowwise() |>
   mutate(avg = mean(c(beta1, beta2))) |>
   full_join(str_helius) |>
   rename("helius" = value) |>
   pivot_longer(c(avg, helius), names_to = "grp", values_to = "avg")
-strength_cent$dummy <- "Strength"
+strength_cent$dummy <- "Standardized Strength"
 
-strength_cent |>
+
+cent_helius_compare <- strength_cent |>
   ggplot(aes(x = avg, y = node, group = grp, color = grp)) + 
   geom_point(alpha = 0.7) +
   geom_path() +
-  scale_color_manual(values = alpha(c("deepskyblue4", "indianred3"), alpha = 0.7)) +
-  geom_errorbarh(aes(xmin = beta1, xmax = beta2), color = "deepskyblue4", alpha = 0.3) +
-  theme_pubr()
+  scale_color_manual(values = alpha(c("deepskyblue4", "indianred3"),  0.7), labels = c("Simulated", "HELIUS")) +
+  geom_errorbarh(aes(xmin = beta1, xmax = beta2), color = "deepskyblue4", alpha = 0.3, height = 0.5) +
   theme_bw() +
   labs(x = "", y = "", color = "") +
-  theme(text=element_text(size=15)) +
+  theme(text=element_text(size=23),
+        legend.position = "bottom") +
   facet_grid(. ~ dummy)
+
+ggsave("cent_helius_compare.png", plot = cent_helius_compare, width = 4.5, height =5.5, dpi = 300)

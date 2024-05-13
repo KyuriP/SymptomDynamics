@@ -252,7 +252,7 @@ colnames(avgnet_high2) <- colnames(A)
 avgnet_low2 <- aggregated_low2 |> dplyr::select(S_anh:S_sui)
 colnames(avgnet_low2) <- colnames(A)
 
-# totavgnet <- bind_rows(avgnet, avgnet_high, avgnet_low)
+# totavgnet2 <- bind_rows(avgnet2, avgnet_high2, avgnet_low2)
 # total average net 
 totavgnet <- avgnet |> bind_rows(avgnet2, avgnet_high, avgnet_low, avgnet_high2, avgnet_low2) |> slice_sample(prop = 0.5)
 totavgnet <- avgnet |> bind_rows(avgnet_high, avgnet_low) 
@@ -260,14 +260,14 @@ totavgnet <- avgnet |> bind_rows(avgnet_high, avgnet_low)
 # totavgnet |> hist()
 totavgnetwork <- estimateNetwork(totavgnet, default = "EBICglasso")
 totavgnetwork2 <- estimateNetwork(totavgnet2, default = "EBICglasso")
+plot(totavgnetwork,  labels = colnames(A))
 # saveRDS(totavgnetwork, file = "overallnet_30%aggdat.Rds")
 # saveRDS(totavgnet, file = "all_aggregatedsimdata.Rds")
 # saveRDS(totavgnetwork, file = "overallnetwork.Rds")
 # saveRDS(totavgnetwork2, file = "overallnetwork2.Rds")
 
-# overallnet <- readRDS("data/overallnetwork.Rds")
-#totavgnet <- 
-plot(totavgnetwork,  labels = colnames(A))
+# totavgnetwork <- readRDS("data/overallnetwork.Rds")
+totavgnet <- plot(totavgnetwork,  labels = colnames(A))
 
 #swap their locations (con & glt)
 conloc <- totavgnet$layout[7,]
@@ -277,8 +277,12 @@ totavgnet$layout[7,] <- gltloc
 totavgnet$layout[6,] <- c(0.4, -0.2)
 totavgnet$layout[9,2] <- -0.8
 
-aggnetLayout <- totavgnet$layout
+# aggnetLayout <- totavgnet$layout
 # saveRDS(aggnetLayout, file = "aggLayout.Rds")
+aggnetLayout <- readRDS("data/aggLayout.Rds")
+
+totavgnet$layout <- aggnetLayout
+# saveRDS(totavgnet, file = "overallNetworkvar.rds")
 
 # png(file = "totavgnetwork.png", width="90%", bg = 'transparent')
 plot(totavgnet,  layout = aggnetLayout,  labels = colnames(A), groups = grp, color = c("white", "white"), legend=F, layout = aggnetLayout)
@@ -319,13 +323,15 @@ cent_totavg_plot <- cent_totavg |>
 ## create Fig16 (overall net)
 library(patchwork)
 
-figpatches <- cent_totavg_plot + ~plot(totavgnetwork,  labels = colnames(A), node.width=2, main = "population network") 
+figpatches <- cent_helius_compare + ~plot(totavgnet,  labels = colnames(A), node.width=2, main = "population network") 
 
-# pdf(file = "totalnetwork.pdf", width = 12, height = 8)
+# pdf(file = "totalnetwork_heliuscompare_ts15.pdf", width = 12, height = 9)
 old_par <- par(mar = c(0, 2, 0, 0), bg = NA)
-wrap_elements(panel = ~plot(totavgnetwork2,  labels = colnames(A), edge.color = "deepskyblue4"), clip = FALSE) + cent_totavg_plot + plot_layout(widths = c(1.7, 1))
+wrap_elements(panel = ~plot(totavgnet,  labels = colnames(A), edge.color = "deepskyblue4"), clip = FALSE) + cent_helius_compare + plot_layout(widths = c(1.8, 1)) + plot_annotation(tag_levels = 'a', tag_prefix = "(", tag_suffix = ")") &
+  theme(plot.tag = element_text(size = 20))
+
 par(old_par)
-dev.off()
+# dev.off()
 
 
 ## overall network per resilience level
@@ -414,28 +420,6 @@ cent_phase_plot <- centrality_phase |>
     facet_wrap(~resilience, labeller = as_labeller(c("res_before" = "before shock", "res_during" = "during shock", "res_after" = "after shock"))) 
 
 
-
-# beforeGGM <- qgraph(cor_auto(beforeshock),
-#                     graph = 'glasso',
-#                     layout = 'spring',
-#                     theme = 'colorblind',
-#                     sampleSize = nrow(beforeshock),
-#                     title = "Before shock")
-# # fix layout
-# L <- beforeGGM$layout
-# duringGGM <- qgraph(cor_auto(duringshock),
-#                    graph = 'glasso',
-#                    theme = 'colorblind',
-#                    sampleSize = nrow(duringshock),
-#                    title = "During shock",
-#                    layout = L)
-# 
-# afterGGM <- qgraph(cor_auto(aftershock),
-#                    graph = 'glasso',
-#                    theme = 'colorblind',
-#                    sampleSize = nrow(aftershock),
-#                    title = "After shock",
-#                    layout = L)
 
 
 

@@ -12,7 +12,6 @@ helius2 <- read_sav("data/HELIUS_itemscores.sav")
 # helius2$H1_WlbvRecent9
 # helius2$H1_WlbvRecent_89
 
-
 # clean up depression item scores
 dep_scores <- helius2 |> 
   select(contains("WlbvRecent") & !ends_with("Ingevuld"), ID) |>
@@ -51,6 +50,14 @@ dep_list <- dep_scores %>%
   {setNames(group_split(.), group_keys(.)[[1]])}  %>% 
   map(~.x |>pivot_wider(id_cols = ID, names_from = item_num, values_from = value))
 
+
+## H1 wave only
+H1depscores <- dep_list$H1 |> drop_na() |> select(-ID)
+H1depscores |> summarise_all(list(mean = mean, sd=sd))
+
+helius_H1net <- dep_list$H1 |> drop_na() |> select(-ID) |>
+  relocate(sui, .after = mot) |>
+  estimateNetwork(default = "EBICglasso") 
 
 ## polychoric corr network
 polynet <- dep_list |> list_rbind() |> drop_na() |> select(-ID) |>
@@ -103,16 +110,15 @@ helius_sick_agg <- sick_list |> list_rbind() |> drop_na() |> select(-ID) |>
   estimateNetwork(default = "EBICglasso") 
 plot(helius_sick_agg)
 
-centralityPlot(helius_sick_agg, scale = "z-scores")
 # sick net centrality
 cent_sickhelius <- centrality_auto(helius_sick_agg)
-
 
 
 # aggregate all waves
 helius_aggnet <- dep_list |> list_rbind() |> drop_na() |> select(-ID) |>
   relocate(sui, .after = mot) |>
   estimateNetwork(default = "EBICglasso") 
+
 
 
 png(file = "helius_totavgnetwork.png",bg = 'transparent', res=300)
@@ -130,8 +136,8 @@ net_list <- dep_list |>
 plot(net_list$H1)
 plot(net_list$H2)
 
-res_netH1_helius <- centrality_auto(net_list$H1)
-rownames(res_netH1_helius$node.centrality) <- colnames(A)
+cent_heliusH1 <- centrality_auto(helius_H1net)
+rownames(cent_heliusH1$node.centrality) <- colnames(A)
 
 cent_netH1_helius <- res_netH1_helius$node.centrality$Strength |>as_data_frame() |>  mutate(node = factor(rownames(res_netH1_helius$node.centrality), levels= c(rownames(res_netH1_helius$node.centrality)))
 )
