@@ -1,4 +1,14 @@
+.libPaths(c('/gpfs/home1/kpark/rpackages',.libPaths()))
+
+library(modelr)
+library(dplyr)
+library(purrr)
+library(tidyr)
+library(qgraph)
+library(bootnet)
+library(deSolve)
 library(magrittr)
+library(stringr)
 
 ## source necessary functions
 euler_stochastic2 <- function (deterministic_rate, stochastic_rate, initial_condition, 
@@ -68,9 +78,9 @@ f <- function(x) x^2
 # 2nd critical pt: -colSums(A)
 criticalpt1 <- -colSums(A)*(1+9) - 0.3
 criticalpt2 <- -colSums(A)
-betas <- 1:9 |> purrr::map(function(x) {seq(criticalpt1[x], criticalpt2[x], length.out=100)}) |>
+betas <- 1:9 |> purrr::map(function(x) {seq(criticalpt1[x], criticalpt2[x], length.out=10)}) |>
   purrr::set_names(names(criticalpt1)) |> as.data.frame() |> purrr::set_names(paste0("Beta_", colnames(A))) 
-sigmas <- seq(0.005, 0.02, length.out = 100) # 0.1 = sqrt(2*0.005) - 0.2 = sqrt(2*0.02)
+sigmas <- seq(0.005, 0.02, length.out = 10) # 0.1 = sqrt(2*0.005) - 0.2 = sqrt(2*0.02)
 
 
 
@@ -170,21 +180,21 @@ compute_density <- function(choice = "base", Beta = NULL, Sigma, n_sim = 50){
   beforeshock <- aggregated |> 
     filter(t < t_shock) |> 
     select(S_anh:S_sui) |> 
-    estimateNetwork(default = "EBICglasso") |> 
+    bootnet::estimateNetwork(default = "EBICglasso") |> 
     suppressMessages() |> suppressWarnings() |>
     {\(x) x$graph}() |> sum()
   # during shock
   duringshock <- aggregated |> 
     filter(t >= t_shock & t <= t_shock + shock_duration) |> 
     select(S_anh:S_sui) |>
-    estimateNetwork(default = "EBICglasso")|> 
+    bootnet::estimateNetwork(default = "EBICglasso")|> 
     suppressMessages() |> suppressWarnings() |>
     {\(x) x$graph}() |> sum()
   # after shock
   aftershock <- aggregated |> 
     filter(t >=t_shock + shock_duration) |> 
     select(S_anh:S_sui) |>
-    estimateNetwork(default = "EBICglasso")|> 
+    bootnet::estimateNetwork(default = "EBICglasso")|> 
     suppressMessages() |> suppressWarnings() |>
     {\(x) x$graph}() |> sum()
   
