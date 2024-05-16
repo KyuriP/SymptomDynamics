@@ -6,6 +6,20 @@
 ## install packages
 source("code/libraries.R")
 
+## define MyTheme
+Mytheme <- theme(plot.title = element_text( size = 14, hjust=0.5),
+                  plot.subtitle = element_text(face = "italic", size = 15, hjust=0.5),
+                  axis.text=element_text( size = 11),
+                  #axis.text.x = element_text(angle = 45, hjust = 1.2, vjust =1.2),
+                  axis.title = element_text( size = 12),
+                  legend.text = element_text( size = 12),
+                  legend.position="bottom",
+                  strip.text = element_text(size=12),
+                  strip.background = element_rect(fill="#f0f0f0", linetype = "solid", color="gray"),
+                  strip.placement = "outside",
+                  panel.border = element_rect(color = "#DCDCDC", fill = NA)
+)
+
 # import HELIUS data
 helius2 <- read_sav("data/HELIUS_itemscores.sav")
 # helius2$H1_WlbvRecent8
@@ -55,9 +69,64 @@ dep_list <- dep_scores %>%
 H1depscores <- dep_list$H1 |> drop_na() |> select(-ID)
 H1depscores |> summarise_all(list(mean = mean, sd=sd))
 
+# get the distributions
+H1dep_distribution <- H1depscores |> pivot_longer(everything(), names_to = "symptom", values_to = "val") |>
+  ggplot(aes(x = val)) +
+  #geom_histogram(bins = 10) + 
+  # add histograms
+  geom_histogram(aes(y = after_stat(density)),bins = 9) +
+  # add density
+  geom_density(adjust=3)+
+  facet_wrap(~symptom, labeller = as_labeller(
+                                             c("anh" = "anhedonia",
+                                               "app" = "appetite",
+                                               "con" = "concentration",
+                                               "ene" = "energy",
+                                               "glt" = "guilt",
+                                               "mot" = "motor",
+                                               "sad" = "sadness",
+                                               "slp" = "sleep",
+                                               "sui" = "suicidal"))) +
+  labs(y = "", x = "") +
+  Mytheme
+
+# ggsave(H1dep_distribution, filename = "dep_dist.pdf", width = 20, height = 13, dpi = 300, units = "cm")
+
 helius_H1net <- dep_list$H1 |> drop_na() |> select(-ID) |>
   relocate(sui, .after = mot) |>
   estimateNetwork(default = "EBICglasso") 
+
+Names <- c("anh" = "anhedonia",
+           "app" = "appetite",
+           "con" = "concentration",
+           "ene" = "energy",
+           "glt" = "guilt",
+           "mot" = "motor",
+           "sad" = "sadness",
+           "slp" = "sleep",
+           "sui" = "suicidal")
+helius_H1net_plot <- plot(helius_H1net, threshold = 0.05)
+
+# pdf(file = "heliusH1net.pdf", width=15, height=10, bg = 'transparent')
+qgraph(helius_H1net_plot, labels = colnames(A), nodeNames = Names, layout = aggnetLayout, legend.cex = 1.2)
+# dev.off()
+
+# cent_H1_helius <- centrality_auto(helius_H1net_plot)
+# rownames(cent_H1_helius$node.centrality) <- colnames(A)
+# 
+# cent_netH1_helius <- cent_H1_helius$node.centrality$Strength |>as_data_frame() |>  mutate(node = factor(rownames(cent_H1_helius$node.centrality), levels= c(rownames(cent_H1_helius$node.centrality)))
+# )
+# 
+# cent_netH1_helius$dummyB <- "Strength"
+# cent_netH1_helius |>
+#   ggplot(aes(x=value, y = node, group=1)) + 
+#   geom_point(color = "deepskyblue4") + 
+#   geom_path(color = "deepskyblue4") + 
+#   theme_bw() +
+#   labs(x = "", y = "", color = "") +
+#   theme(text=element_text(size=15))+
+#   facet_grid(. ~ dummyB)
+
 
 ## polychoric corr network
 polynet <- dep_list |> list_rbind() |> drop_na() |> select(-ID) |>

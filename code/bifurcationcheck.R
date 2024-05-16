@@ -1,16 +1,17 @@
 library(deSolve)
-library(phaaseR)
+library(phaseR)
 library(deBif)
 
 model<-function(t,state,parms)
   { with(as.list(c(state,parms)), 
          { 
-         dS <- S*(1 - S)*(b + a*S + W*(1 + d*(S^2)))   
+         # dS <- S*(1 - S)*(b + a*S + W*(1 + d*(S^2)))
+         dS <- (b + a*S + W*(1 + d*(S^2)))
          return(list(dS)) 
          })
 } 
 
-perms <- c(a = 1, b = -1, W = 1, d = 1) #pisanamedvectorofparameters 
+perms <- c(a = 1, b = -3, W = 1, d = 1) #pisanamedvectorofparameters 
 state <- c(S = 0.3) #sisthestate
 
 times <-seq(0, 100,by= 0.01)
