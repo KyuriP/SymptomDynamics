@@ -225,8 +225,6 @@ abline(v = -1.3, lty=3, col = "lightgray")
 
 # dev.off()
 
-
-
 ## fitting aggregated network
 # read all datasets
 aggregated <- readRDS("data/aggregated.rds")

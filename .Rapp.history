@@ -1,0 +1,2 @@
+load("/Users/Kyuri1/Desktop/Depressive_symptom_dynamics/DepressionDynamics/estnetwork_beta1.rds")
+load("/Users/Kyuri1/Desktop/Depressive_symptom_dynamics/DepressionDynamics/estnetwork_beta2.rds")

@@ -58,7 +58,7 @@ dep_scores |>
   group_by(item_num) |>
   summarize(mean = mean(value), stddv = sd(value))
 
-
+## divide by wave
 dep_list <- dep_scores %>% 
   group_by(wave) %>% 
   {setNames(group_split(.), group_keys(.)[[1]])}  %>% 
@@ -187,7 +187,6 @@ cent_sickhelius <- centrality_auto(helius_sick_agg)
 helius_aggnet <- dep_list |> list_rbind() |> drop_na() |> select(-ID) |>
   relocate(sui, .after = mot) |>
   estimateNetwork(default = "EBICglasso") 
-
 
 
 png(file = "helius_totavgnetwork.png",bg = 'transparent', res=300)

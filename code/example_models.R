@@ -244,4 +244,22 @@ plotcomb <- ggpubr::ggarrange(plotA, plotB, widths = c(1.15,1), common.legend = 
 
 ggsave("centrality_comb.pdf", plot = plotcomb, width = 25, height =20, units = "cm", dpi = 300)
 
+## a simpler toy model based on helius
+
+round(ifelse(helius_aggnet$graph < 0.05, 0, helius_aggnet$graph),2)
+round(ifelse(helius_aggnet$graph>0.05, helius_aggnet$graph, 0),2)
+
+A_hel <- matrix(c( .30, 0, 0, 0, .12, 0, 0, 0, 0,
+                   .39, .30, .10, 0, 0, .13, 0, .12, .14,
+                   0, 0, .30, .3, .12, 0, 0, 0, 0,
+                   .23, 0, 0, .30, 0, 0, .12, 0, 0,
+                   0, 0, 0, .20, .30, 0, 0, 0, 0,
+                   0, .13, 0, 0, .12, .30, .14, .13, .21,
+                   0, 0, 0, 0, 0, 0, .30, 0.25, 0,
+                   0, 0, 0, 0, 0, 0, 0, .30, 0,
+                   0, 0, 0, 0, 0, 0, 0, .12, .30), 9, 9, byrow = T)
+rownames(A_hel) <- colnames(A_hel) <- c("anh", "sad", "slp", "ene", "app", "glt", "con", "mot", "sui")
+
+qgraph(A_hel, theme = 'colorblind')
+
 
