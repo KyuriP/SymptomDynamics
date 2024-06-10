@@ -16,6 +16,7 @@ betas <- 1:9 |> purrr::map(function(x) {seq(criticalpt1[x], criticalpt2[x], leng
   set_names(names(criticalpt1)) |> as.data.frame() |> set_names(paste0("Beta_", colnames(A))) 
 sigmas <- seq(0.005, 0.02, length.out = 50) # 0.1 = sqrt(2*0.005) - 0.2 = sqrt(2*0.02)
 
+sigmalab <- seq(0.1, 0.2, length.out =50)
 # for 30s
 # betas <- 1:9 |> purrr::map(function(x) {seq(criticalpt1[x], criticalpt2[x], length.out= 30)}) |>
 #   set_names(names(criticalpt1)) |> as.data.frame() |> set_names(paste0("Beta_", colnames(A))) 
@@ -157,8 +158,26 @@ res_low50 <- res_lows |> purrr::map(~.x |> tidyr::pivot_longer(!c(id, sigma)))
 
 diff_result50 <- purrr::map2_dfc(res_low50, res_high50, \(x,y) x$value - y$value) |> 
   rename_with(~paste0("beta", 1:nrow(betas))) |>
-  mutate(sigma = rep(sigmas, each = 3),
+  mutate(sigma = rep(sigmalab, each = 3),
          phase = rep(c("before", "during", "after"), 50)) 
+
+# given beta value
+p_beta50 <-  diff_result50 |>
+  tidyr::pivot_longer(!c(sigma, phase), names_to = "beta", values_to = "value") |>
+  ggplot(aes(x = factor(beta, levels =c(paste0("beta", 1:50))), y = value, color = factor(phase, levels=c("before", "during", "after")), fill = factor(phase, levels=c("before", "during", "after")))) +
+  geom_boxplot(alpha =0.3,   outlier.size = 0.5) +
+  # labs(color = "", fill = "", x = "", title = expression("Network density difference given beta ("~bold(beta)~") value"), subtitle = "high vs. low resilience (low - high)", y = "") +
+  labs(color = "", fill = "", x = "", title = expression("(a) Given beta ("~bold(beta)~") value"), y = "") +
+  scale_color_brewer(palette = "Set2") +
+  scale_fill_brewer(palette = "Set2") +
+  # create x-axis tick labs with Betas
+  scale_x_discrete(labels = do.call(expression, lapply(1:50, function(x) bquote(beta[.(x)]))))+
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 30, vjust = 1.4, hjust=1),
+      plot.title = element_text(size = 18),
+      plot.subtitle = element_text(size=16),
+      legend.text = element_text(size = 15)) 
+# ggsave("betaplot50.pdf", p_beta50,  width = 40, height = 15, units = "cm")
 
 # given sigma value
 p_sigma50 <-  diff_result50 |>
@@ -168,32 +187,20 @@ p_sigma50 <-  diff_result50 |>
   scale_color_brewer(palette = "Set2") +
   scale_fill_brewer(palette = "Set2") +
   #scale_x_discrete(labels = as.character(round(sigma,3)))+
-  labs(color = "", fill = "", x = "", title = expression("Network density difference given sigma ("~sigma~") value"), subtitle = "high vs. low resilience (low - high)", y = "") +
+  #labs(color = "", fill = "", x = "", title = expression("Network density difference given sigma ("~sigma~") value"), subtitle = "high vs. low resilience (low - high)", y = "") +
+  labs(color = "", fill = "", x = "", title = expression("(b) Given sigma ("~sigma~") value"), y = "") +
   theme_pubr() +
   theme(axis.text.x = element_text(angle = 70, vjust = 1, hjust=1),
-        plot.title = element_text(size = 20),
+        plot.title = element_text(size = 18),
         plot.subtitle = element_text(size=16),
-        legend.text = element_text(size = 12)) 
+        legend.text = element_text(size = 15)) 
+# ggsave("sigmaplot50.pdf", p_sigma50,  width = 40, height = 15, units = "cm")
 
-#ggsave("sigmaplot50.pdf", p_sigma50,  width = 40, height = 20, units = "cm")
+robust_plot <- ggpubr::ggarrange(p_beta50, p_sigma50, nrow=2, common.legend = TRUE, legend ="bottom") #|> annotate_figure(robust_plot, top = text_grob("Network density difference between high and low resilience (Low - High)", size = 23))
+
+ggsave("robustplot.pdf", robust_plot,  width = 40, height = 30, units = "cm")
 
 
-p_beta50 <-  diff_result50 |>
-  tidyr::pivot_longer(!c(sigma, phase), names_to = "beta", values_to = "value") |>
-  ggplot(aes(x = factor(beta, levels =c(paste0("beta", 1:50))), y = value, color = factor(phase, levels=c("before", "during", "after")), fill = factor(phase, levels=c("before", "during", "after")))) +
-  geom_boxplot(alpha =0.3,   outlier.size = 0.5) +
-  labs(color = "", fill = "", x = "", title = expression("Network density difference given beta ("~bold(beta)~") value"), subtitle = "high vs. low resilience (low - high)", y = "") +
-  scale_color_brewer(palette = "Set2") +
-  scale_fill_brewer(palette = "Set2") +
-  # create x-axis tick labs with Betas
-  scale_x_discrete(labels = do.call(expression, lapply(1:50, function(x) bquote(beta[.(x)]))))+
-  theme_pubr() +
-  theme(axis.text.x = element_text(angle = 30, vjust = 1.4, hjust=1),
-      plot.title = element_text(size = 20),
-      plot.subtitle = element_text(size=16),
-      legend.text = element_text(size = 12)) 
-
-#ggsave("betaplot50.pdf", p_beta50,  width = 40, height = 20, units = "cm")
 
 
 interaction50 <- diff_result50 |>
@@ -218,13 +225,13 @@ interaction50 <- diff_result50 |>
         plot.subtitle = element_text(size=16),
         legend.text = element_text(size = 12),
         legend.title = element_text(size=15),
-        legend.key.height  = unit(5, "lines"),
+        legend.key.height  = unit(3, "lines"),
         # facet title font size
         strip.text.x = element_text(size=15),
         # space between facets
         panel.spacing.x = unit(2, "lines")) 
 
-#ggsave("interaction50.pdf", interaction50,  width = 50, height = 20, units = "cm")
+ggsave("interaction50.pdf", interaction50,  width = 32, height = 13, units = "cm")
 
 
 # ## over 30 beta and 30 sigma (10nsims)
