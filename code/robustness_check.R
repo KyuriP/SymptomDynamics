@@ -260,6 +260,19 @@ hist_den <- res_high50 |> bind_rows(res_low50) |>
 ggsave("hist_density1.pdf", hist_den,  width = 20, height = 10, units = "cm")
 
 
+
+## sobol indices
+library(sensobol)
+library(data.table)
+
+# names(res_high50) <- names(res_low50) <-  paste0("beta", 1:50)
+names(res_high50) <- names(res_low50) <-  betas$Beta_anh
+combined_dat <- purrr::map2(res_low50, res_high50, \(x,y) bind_rows(x,y, .id = "id")) |> 
+  list_rbind(names_to = "betas") |> 
+  select(betas, sigma, value)  |>
+  mutate(betas = as.numeric(betas))
+
+
 # ## over 30 beta and 30 sigma (10nsims)
 # high_resil30 <- readRDS("data/res_highs30.rds")
 # low_resil30 <- readRDS("data/res_lows30.rds")
