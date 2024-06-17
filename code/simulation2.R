@@ -87,7 +87,7 @@ eachsym <- sde_out |>
 
 
 ## aggregate symptom level
-n_sims <- 10
+n_sims <- 500
 
 # run simulation n_sims times
 aggregated <- map(1:n_sims, ~ euler_stochastic2(
