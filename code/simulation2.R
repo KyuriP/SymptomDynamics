@@ -277,7 +277,7 @@ totavgnet$layout[9,2] <- -0.8
 
 # aggnetLayout <- totavgnet$layout
 # saveRDS(aggnetLayout, file = "aggLayout.Rds")
-aggnetLayout <- readRDS("data/aggLayout.Rds")
+# aggnetLayout <- readRDS("data/aggLayout.Rds")
 
 totavgnet$layout <- aggnetLayout
 # saveRDS(totavgnet, file = "overallNetworkvar.rds")
@@ -321,7 +321,7 @@ cent_totavg_plot <- cent_totavg |>
 ## create Fig16 (overall net)
 library(patchwork)
 
-figpatches <- cent_helius_compare + ~plot(totavgnet,  labels = colnames(A), node.width=2, main = "population network") 
+figpatches <- cent_helius_compare + ~plot(totavgnet,  labels = colnames(A), node.width=2, main = "population network")  #"cent_helius_compare" from "mod_flexibility.R"
 
 # pdf(file = "totalnetwork_heliuscompare_ts15.pdf", width = 12, height = 9)
 old_par <- par(mar = c(0, 2, 0, 0), bg = NA)

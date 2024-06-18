@@ -189,9 +189,9 @@ helius_aggnet <- dep_list |> list_rbind() |> drop_na() |> select(-ID) |>
   estimateNetwork(default = "EBICglasso") 
 
 
-png(file = "helius_totavgnetwork.png",bg = 'transparent', res=300)
+# png(file = "helius_totavgnetwork.png",bg = 'transparent', res=300)
 plot(helius_aggnet, layout = aggnetLayout)  
-dev.off()
+# dev.off()
 
 # separate each wave 
 net_list <- dep_list |>

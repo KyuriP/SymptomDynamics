@@ -3,7 +3,7 @@ source("code/libraries.R")
 library(data.table)
 
 
-
+## Create combined result figure 
 # load data
 low <- readRDS("data/aggregated_low.rds") |> data.table::data.table()
 med <- readRDS("data/aggregated.rds") |> data.table::data.table()
@@ -85,12 +85,12 @@ nodenames <- c("anhedonia", "sad", "sleep", "energy", "appetite", "guilty", "con
 
 # pdf(file = "triplenetworks2_v2.pdf", width = 16, height = 9)
 
-png(file = "triplenet_low.png", width = 1800, height = 900)
+# png(file = "triplenet_low.png", width = 1800, height = 900)
 par(mfrow = c(1, 3), mar = c(3, 9, 6, 0.5), xpd = NA, oma = c(0, 2, 0.5, 0))
 
 plot(beforeshock, layout = net_layout, maximum = max_value, labels = colnames(A), node.width=2, border.color = "#CC3300", edge.color = "#CC3300")
 #title("(a) Before shock", line = 3, cex.main = 5)
-mtext("High resilience", side=2, padj = 1, cex=3.5, col="black", outer= T, font =2)
+mtext("Low resilience", side=2, padj = 1, cex=3.5, col="black", outer= T, font =2)
 
 plot(duringshock, layout = net_layout, maximum = max_value,  labels = colnames(A),node.width=2, border.color = "#CC3300", edge.color = "#CC3300")
 #title("(b) During shock", line = 3, cex.main = 5)
@@ -101,4 +101,148 @@ plot(aftershock, layout = net_layout, maximum = max_value, labels = colnames(A),
 abline(v = -3.9, lty=3, col = "darkgray")
 abline(v = -1.3, lty=3, col = "darkgray")
 
-dev.off()
+# dev.off()
+
+
+
+##  Create ref & sim networks comparison fig
+
+## standardizing function (Sacha qgraph)
+scale2 <- function(x) {
+  if (all(is.na(x))) return(NA)
+  if (sd(x,na.rm=TRUE)!=0){
+    return((x-mean(x,na.rm=TRUE))/sd(x,na.rm=TRUE))
+  } else {
+    return(rep(0, length(x)))
+  }
+}
+
+
+
+# png(file = "network_comparison.png", width = 2300, height = 1000)
+
+# ref network
+par(mfrow = c(1, 3), mar = c(1, 9, 4, 0.5), xpd = NA, oma = c(0, 2, 3, 0))
+
+diag(A) <- 0.1
+
+ref_net <- qgraph(A, theme = 'colorblind', color = c("lightsteelblue1", rep("bisque",5), rep("lightsteelblue1",3)), border.color = "white",border.width = 2, edge.width = 0.8, curve = 0.3, curveAll = T, label.color = "black",  asize= 8,  diag = T, layout = manual_layout, node.width=2, edge.color = "deepskyblue4")
+title("Reference network", line = 3, cex.main = 5.5, adj = 0.5)
+# p_ref <- recordPlot()  
+
+# sim network
+sim_net <- qgraph(totavgnet, labels = colnames(A), layout = manual_layout, node.width=2, edge.color = "indianred3")
+title("Simulated network", line = 3, cex.main = 5.5, adj = 0.5)
+# p_networks <- recordPlot()  
+
+# helius network
+hel_net <- plot(helius_H1net, labels = colnames(A), layout = manual_layout, minimum = 0.03, node.width=2, edge.color ="darkseagreen4")
+title("Data network", line = 3, cex.main = 5.5, adj = 0.5)
+# p_hel <- recordPlot()  
+
+# dev.off()
+
+# compute centrality
+cent_refnet <- centrality_auto(ref_net)
+rownames(cent_refnet$node.centrality) <- colnames(A)
+
+cent_simnet <- centrality_auto(totavgnetwork)
+rownames(cent_simnet$node.centrality) <- colnames(A)
+
+cent_helius <- centrality_auto(helius_H1net)
+rownames(cent_helius$node.centrality) <- colnames(A)
+
+str_refnet <- cent_refnet$node.centrality$InStrength |> # in-strength
+  as_data_frame() |>  
+  mutate(node = factor(rownames(cent_refnet$node.centrality), 
+                       levels= c(rownames(cent_refnet$node.centrality)))
+         # standardize
+  ) |> mutate(value = scale2(value))
+
+str_simnet <- cent_simnet$node.centrality$Strength |>
+  as_data_frame() |>  
+  mutate(node = factor(rownames(cent_simnet$node.centrality), 
+                       levels= c(rownames(cent_simnet$node.centrality)))
+         # standardize
+  ) |> mutate(value = scale2(value))
+
+str_heliusnet <- cent_helius$node.centrality$Strength |>
+  as_data_frame() |>  
+  mutate(node = factor(rownames(cent_helius$node.centrality), 
+                       levels= c(rownames(cent_helius$node.centrality)))
+         # standardize
+  )|> mutate(value = scale2(value))
+
+## b1, b2 strength centrality from "mod_flexibility.R"
+str_b1 <- cent_b1$node.centrality$Strength |>
+  as_data_frame() |>  
+  mutate(node = factor(rownames(cent_b1$node.centrality), 
+                       levels= c(rownames(cent_b1$node.centrality)))
+  )|> mutate(value = scale2(value))
+
+str_b2 <- cent_b2$node.centrality$Strength |>
+  as_data_frame() |>  
+  mutate(node = factor(rownames(cent_b2$node.centrality), 
+                       levels= c(rownames(cent_b2$node.centrality)))
+  )|> mutate(value = scale2(value))
+
+
+combined_cent <- bind_rows(str_b1, str_b2, .id="id") |> 
+  pivot_wider(names_from = id, names_prefix = "beta") |>
+  rowwise() |>
+  mutate(sim = mean(c(beta1, beta2))) |>
+  full_join(str_heliusnet) |>
+  rename("helius" = value) |>
+  full_join(str_refnet) |>
+  rename("ref" = value) |>
+  pivot_longer(c(sim, helius, ref), names_to = "grp", values_to = "val")
+combined_cent$dummyA <- "Standardized (In-)Strength"
+combined_cent$dummyB <- "Standardized Strength"
+
+## all three centralities in one 
+cent_all <- combined_cent |>
+  ggplot(aes(x = val, y = node, group = grp, color = grp)) + 
+  geom_point(alpha = 0.7) +
+  geom_path() +
+  scale_color_manual(values = alpha(c("darkseagreen4", "deepskyblue4", "indianred3"),  0.7), labels = c("HELIUS", "Reference", "Simulated")) +
+  geom_errorbarh(aes(xmin = beta1, xmax = beta2), color = "indianred3", alpha = 0.3, height = 0.5) +
+  theme_bw() +
+  labs(x = "", y = "", color = "") +
+  theme(text=element_text(size=15),
+        legend.position = "bottom") +
+  facet_grid(. ~ dummy)
+# grab legend from all cent plot
+legend <- cowplot::get_legend(cent_all)
+
+## centrality plot for toy vs sim
+cent1 <- combined_cent |> filter(grp == 'ref' | grp == 'sim') |>
+  ggplot(aes(x=node, y = val, group=grp, color = grp)) + 
+  geom_point() + 
+  geom_path() + 
+  geom_errorbar(aes(ymin = beta1, ymax = beta2), color = "indianred3", alpha = 0.2, width = 0.4) +
+  scale_color_manual(values = alpha(c("deepskyblue4", "indianred3"),  0.7), labels = c("Reference", "Simulated")) +
+  ylim(-2.5,2) +
+  theme_bw() +
+  labs(x = "", y = "", color = "") +
+  theme(text=element_text(size=15),
+        legend.position = "none") +
+  facet_wrap(. ~ dummyA, strip.position = "left")
+  
+## centrality plot for toy vs sim
+cent2 <- combined_cent |> filter(grp == 'helius' | grp == 'sim') |>
+  ggplot(aes(x=node, y = val, group=grp, color = grp)) + 
+  geom_point() + 
+  geom_path() + 
+  geom_errorbar(aes(ymin = beta1, ymax = beta2), color = "indianred3", alpha = 0.2, width = 0.4) +
+  scale_color_manual(values = alpha(c("darkseagreen4", "indianred3"),  0.7), labels = c("HELIUS", "Simulated")) +
+  theme_bw() +
+  labs(x = "", y = "", color = "") +
+  ylim(-2.5,2) +
+  theme(text=element_text(size=15),
+        legend.position = "none") +
+  facet_wrap(. ~ dummyB, strip.position = "left")
+
+# put them together
+centrality_comp <- cowplot::plot_grid(cent1, cent2, legend, ncol=1, align='v', rel_heights = c(4,4,1))
+ggsave("centrality_comp.png", plot = centrality_comp, width = 20, height = 17, units = "cm", dpi = 300)
+

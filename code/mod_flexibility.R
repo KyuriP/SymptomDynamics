@@ -86,24 +86,33 @@ aggregated_low_beta2_sim500 <- map(1:n_sims, ~ euler_stochastic2(
 
 
 ## save datasets
-saveRDS(aggregated_base_beta1_sim500, "aggregated500_base_beta1.rds") # beta_bistable1, scenario = base, nsim = 500
-saveRDS(aggregated_high_beta1_sim500, "aggregated500_high_beta1.rds") # beta_bistable1, scenario = high, nsim = 500
-saveRDS(aggregated_low_beta1_sim500, "aggregated500_low_beta1.rds") # beta_bistable1, scenario = low, nsim = 500
-saveRDS(aggregated_base_beta2_sim500, "aggregated500_base_beta2.rds") # beta_bistable2, scenario = base, nsim = 500
-saveRDS(aggregated_high_beta2_sim500, "aggregated500_high_beta2.rds") # beta_bistable2, scenario = high, nsim = 500
-saveRDS(aggregated_low_beta2_sim500, "aggregated500_low_beta2.rds") # beta_bistable2, scenario = low, nsim = 500
+# saveRDS(aggregated_base_beta1_sim500, "aggregated500_base_beta1.rds") # beta_bistable1, scenario = base, nsim = 500
+# saveRDS(aggregated_high_beta1_sim500, "aggregated500_high_beta1.rds") # beta_bistable1, scenario = high, nsim = 500
+# saveRDS(aggregated_low_beta1_sim500, "aggregated500_low_beta1.rds") # beta_bistable1, scenario = low, nsim = 500
+# saveRDS(aggregated_base_beta2_sim500, "aggregated500_base_beta2.rds") # beta_bistable2, scenario = base, nsim = 500
+# saveRDS(aggregated_high_beta2_sim500, "aggregated500_high_beta2.rds") # beta_bistable2, scenario = high, nsim = 500
+# saveRDS(aggregated_low_beta2_sim500, "aggregated500_low_beta2.rds") # beta_bistable2, scenario = low, nsim = 500
 
-avgnetb1 <- aggregated_base_beta1_sim500 |> dplyr::select(S_anh:S_sui) 
+aggregated_base_beta1_sim500 <- readRDS("data/aggregated500_base_beta1.rds") # beta_bistable1, scenario = base, nsim = 500
+aggregated_high_beta1_sim500 <- readRDS("data/aggregated500_high_beta1.rds") # beta_bistable1, scenario = high, nsim = 500
+aggregated_low_beta1_sim500 <- readRDS("data/aggregated500_low_beta1.rds") # beta_bistable1, scenario = low, nsim = 500
+aggregated_base_beta2_sim500 <- readRDS("data/aggregated500_base_beta2.rds") # beta_bistable2, scenario = base, nsim = 500
+aggregated_high_beta2_sim500 <- readRDS("data/aggregated500_high_beta2.rds") # beta_bistable2, scenario = high, nsim = 500
+aggregated_low_beta2_sim500 <- readRDS("data/aggregated500_low_beta2.rds") # beta_bistable2, scenario = low, nsim = 500
+
+rm(aggregated_base_beta1_sim500, aggregated_high_beta1_sim500, aggregated_low_beta1_sim500, aggregated_base_beta2_sim500, aggregated_high_beta2_sim500, aggregated_low_beta2_sim500)
+
+avgnetb1 <- aggregated_base_beta1_sim500 |> dplyr::select(S_anh:S_sui) |> data.table::data.table()
 colnames(aggregated_base_beta1_sim500) <- colnames(A)
-avgnet_highb1 <- aggregated_high_beta1_sim500 |> dplyr::select(S_anh:S_sui)
+avgnet_highb1 <- aggregated_high_beta1_sim500 |> dplyr::select(S_anh:S_sui) |> data.table::data.table()
 colnames(aggregated_high_beta1_sim500) <- colnames(A)
-avgnet_lowb1 <- aggregated_low_beta1_sim500 |> dplyr::select(S_anh:S_sui)
+avgnet_lowb1 <- aggregated_low_beta1_sim500 |> dplyr::select(S_anh:S_sui) |> data.table::data.table()
 colnames(aggregated_low_beta1_sim500) <- colnames(A)
-avgnetb2 <- aggregated_base_beta2_sim500 |> dplyr::select(S_anh:S_sui) 
+avgnetb2 <- aggregated_base_beta2_sim500 |> dplyr::select(S_anh:S_sui) |> data.table::data.table()
 colnames(aggregated_base_beta2_sim500) <- colnames(A)
-avgnet_highb2 <- aggregated_high_beta2_sim500 |> dplyr::select(S_anh:S_sui)
+avgnet_highb2 <- aggregated_high_beta2_sim500 |> dplyr::select(S_anh:S_sui) |> data.table::data.table()
 colnames(aggregated_high_beta2_sim500) <- colnames(A)
-avgnet_lowb2 <- aggregated_low_beta2_sim500 |> dplyr::select(S_anh:S_sui)
+avgnet_lowb2 <- aggregated_low_beta2_sim500 |> dplyr::select(S_anh:S_sui) |> data.table::data.table()
 colnames(aggregated_low_beta2_sim500) <- colnames(A)
 
 # saveRDS(aggregated, "aggregated_base_beta1.rds") # beta_bistable1, scenario = base, nsim = 300
@@ -130,20 +139,16 @@ colnames(aggregated_low_beta2_sim500) <- colnames(A)
 
 # totavgnet2 <- bind_rows(avgnet2, avgnet_high2, avgnet_low2)
 # total average net 
-totavgnetb1 <- avgnetb1 |> bind_rows(avgnet_highb1, avgnet_lowb1)
-totavgnetb2 <- avgnetb2 |> bind_rows(avgnet_highb2, avgnet_lowb2)
+totavgnetb1 <- data.table::rbindlist(list(avgnetb1, avgnet_highb1, avgnet_lowb1))
+totavgnetb2 <- data.table::rbindlist(list(avgnetb2, avgnet_highb2, avgnet_lowb2)) 
 
-totavgnetworkb1 <- estimateNetwork(totavgnetb1, default = "EBICglasso")
-totavgnetworkb2 <- estimateNetwork(totavgnetb2, default = "EBICglasso")
-# saveRDS(totavgnetworkb1, "estnetwork_beta1.rds") # beta_bistable1
-# saveRDS(totavgnetworkb2, "estnetwork_beta2.rds") # beta_bistable1
-# totavgnetworkb1 <- readRDS("data/estnetwork_beta1.rds")
-# totavgnetworkb2 <- readRDS("data/estnetwork_beta2.rds")
+# saveRDS(totavgnetb1, "data/alldat_beta1.rds") # beta_bistable1
+# saveRDS(totavgnetb2, "data/alldat_beta2.rds") # beta_bistable2
 
 totavgnetworkb1_sim500 <- estimateNetwork(totavgnetb1, default = "EBICglasso")
 totavgnetworkb2_sim500 <- estimateNetwork(totavgnetb2, default = "EBICglasso")
-# saveRDS(totavgnetworkb1_sim500, "estnetwork_beta1.rds") # beta_bistable1
-# saveRDS(totavgnetworkb1_sim500, "estnetwork_beta2.rds") # beta_bistable1
+# saveRDS(totavgnetworkb1_sim500, "data/estnetwork_beta1.rds") # beta_bistable1
+# saveRDS(totavgnetworkb2_sim500, "data/estnetwork_beta2.rds") # beta_bistable1
 totavgnetworkb1_sim500 <- readRDS("data/estnetwork_beta1.rds")
 totavgnetworkb2_sim500 <- readRDS("data/estnetwork_beta2.rds")
 
