@@ -29,7 +29,7 @@ mod_spec <- function(scenario = "base", init_val = 0, ...){
   # Beta_bistable <- c(-1.355, -0.95, -0.905, -1.165, -0.935, -0.575, -0.845, -1.285, -2.30) |> set_names(paste0("Beta_", colnames(A))) # -omega * (1 + appx 0.375)
   # Beta_bistable <- c(-1.309, -0.972, -0.891, -1.134, -0.918, -0.580, -0.837, -1.242, -2.30) |> set_names(paste0("Beta_", colnames(A))) # -omega * (1 + 0.35)
 
-  Beta_sick <- c(-0.91, -0.66, -0.60, -0.78, -0.62, -0.37, -0.56, -0.86, -1.30) |> set_names(paste0("Beta_", colnames(A))) #- A_j + dist*5
+  Beta_sick <- c(-0.91, -0.66, -0.60, -0.78, -0.62, -0.37, -0.56, -0.86, -1.30) |> set_names(paste0("Beta_", colnames(A))) #- A_j + dist*5 (appx: -omega*(0.92))
   
   ## delta 
   delta <- rep(9, 9) |> set_names(paste0("delta_", colnames(A)))
