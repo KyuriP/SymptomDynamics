@@ -20,7 +20,7 @@
 module load 2023
 module load R-bundle-CRAN/2023.12-foss-2023a
 
-
+Rscript simulation.R 
 
 	
 Rscript /gpfs/home1/kpark/code/test123.R

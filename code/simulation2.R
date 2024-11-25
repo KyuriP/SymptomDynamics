@@ -112,7 +112,7 @@ aggregated <- map(1:n_sims, ~ euler_stochastic2(
 # saveRDS(aggregated, "aggregated_4.rds") # delta = 9 with old beta
 
 ## read datasets
-# aggregated <- readRDS("aggregated2.rds")
+# aggregated <- readRDS("data/aggregated2.rds")
 
 ## IQR function
 inter_quantile <- function(x, probs = c(0.25, 0.5, 0.75)) {
@@ -189,7 +189,8 @@ duringshock <- aggregated |>
   estimateNetwork(default = "EBICglasso")
 # after shock
 aftershock <- aggregated |> 
-  filter(t >= 3000) |> 
+  # filter(t >= 3000) |> # keep the burn-in the same ! BUT use the old layout with t >= 3000 condition so old figure works --- this change practically doesn't change network a bit.
+  filter(t > t_shock + shock_duration + burnin) |>
   select(S_anh:S_sui) |>
   estimateNetwork(default = "EBICglasso")
 
@@ -210,13 +211,15 @@ net_layout <- averageLayout(beforeshock,
 # create node names
 nodenames <- c("anhedonia", "sad", "sleep", "energy", "appetite", "guilty", "concentration", "motor", "suicidal")
 
-# pdf(file = "triplenetworks2_v2.pdf", width = 16, height = 9)
+# pdf(file = "triplenetworks2_v2.pdf", width = 16, height = 9) 
+# pdf(file = "triplenetworks2_v22.pdf", width = 16, height = 9) #add grey background during shock
 par(mfrow = c(1, 3), mar = c(3, 0.5, 5, 0.5), xpd = NA)
 plot(beforeshock, layout = net_layout, maximum = max_value, labels = colnames(A), node.width=2)
 title("(a) Before shock", line = 3, cex.main = 3)
 
 plot(duringshock, layout = net_layout, maximum = max_value,  labels = colnames(A),node.width=2)
 title("(b) During shock", line = 3, cex.main = 3)
+rect(-1.3, -2, 1.3, 2.0, col = rgb(0.5, 0.5, 0.5 ,alpha=0.1), border=FALSE) # add gray shade
 
 plot(aftershock, layout = net_layout, maximum = max_value, labels = colnames(A), node.width=2)
 title("(c) After shock", line = 3, cex.main = 3)

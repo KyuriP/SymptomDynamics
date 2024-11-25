@@ -1,7 +1,7 @@
 ---
 title: "Modeling Depression Dynamics at the Symptom Level"
 subtitle: "Taking a Computational Modeling Approach"
-institute: "May 3, 2024"  #change date
+institute: "Sep 27, 2024"  #change date
 author: "Kyuri Park"
 format: 
   revealjs:
@@ -518,7 +518,7 @@ So the motor symptom, which is heavily affected by suicidal now shows a lower st
 So I found this very interesting... The implication for this is up to discussion, but given this I wanted to emphasize that to some extent we can gather some information about the dynamics based on statistical networks, however, inferring causal relationships, such as talking about intervention targets or key driving nodes, solely based on statistical networks could go very wrong.
 :::
 
-## Currently...{.scrollable}
+## Currently...{.scrollable visibility="hidden"}
 
 -   Comparing the [HELIUS](https://www.heliusstudy.nl/nl/researchers/the-helius-study/) data network.
 
@@ -619,6 +619,6 @@ Lastly, more of practical aspect; for the follow up of this work, one of the fir
 
 ::: notes
 So that's all I had for today.
-I'd like to thank to my supervisor, Dr. Vitor Vasconcelos who has been guiding me through this work. And also to my potential promotor Mike Lees.
+I'd like to thank to my supervisor, Dr. Vitor Vasconcelos who has been guiding me through this work. And also to my promotor Mike Lees.
 Alright, thanks a lot again for your attention.
 :::
