@@ -1,10 +1,17 @@
 ## =========================================================
-## Model specification
+## Model Specification
 ##
-## specify parameter values given the chosen scenario
-## define differential equations
-## 
-## return: list of relevant parameters and equations
+## This script defines the dynamical model of symptoms based on 
+## differential equations and user-specified resilience scenarios.
+## Key steps include:
+## - Specification of parameter values (e.g., adjacency matrix, beta values, 
+##   and delta values) based on the chosen resilience scenario.
+## - Definition of deterministic and stochastic components of the model 
+##   using differential equations.
+## - Initialization of symptom values.
+##
+## Output: A list containing relevant model parameters and equations for 
+## further simulation and analysis.
 ## =========================================================
 ## install packages
 source("code/libraries.R")
