@@ -24,3 +24,6 @@ aggregated3.rds
 .DS_Store
 .DS_Store
 *.rds
+/mockup1
+/mockup2
+/presentation
