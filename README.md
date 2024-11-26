@@ -1,9 +1,14 @@
-<div>
-  <img src="https://github.com/KyuriP/DepressionDynamics/blob/main/figures/DDlogo.png" width="10%" height="10%">
-  <h1>Computational Modeling of Depression Dynamics</h1>
-  <p>
-This repository contains the analysis scripts and figures used in the paper: 
-**"The Individual- and Population-level Mechanistic Implications of Statistical Networks of Symptoms"**  </p>
+<div style="display: flex; align-items: center;">
+  <div>
+    <img src="https://github.com/KyuriP/DepressionDynamics/blob/main/figures/DDlogo.png" alt="Depression Dynamics Logo" width="100">
+  </div>
+  <div style="margin-left: 15px;">
+    <h1 style="margin: 0;">Computational Modeling of Depression Dynamics</h1>
+    <p style="margin: 0;">
+      This repository contains the analysis scripts and figures used in the paper: 
+      <strong>The Individual- and Population-level Mechanistic Implications of Statistical Networks of Symptoms</strong>
+    </p>
+  </div>
 </div>
 
 
