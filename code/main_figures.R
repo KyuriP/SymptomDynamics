@@ -1,21 +1,30 @@
+## =========================================================
+## Main Figures
+##
+## This script generates:
+## - Figure 2: Median aggregate symptom levels and GGMs over time 
+##             for individuals with high and low resilience.
+## - Figure 3: Comparison of overall network structures derived from aggregated simulated data, 
+##             the reference mechanistic network, and the empirical network constructed from HELIUS data.
+## =========================================================
 
+## install packages
 source("code/libraries.R")
-library(data.table)
+## source necessary functions
+source("code/utils.R")
 
-
-## Create combined result figure 
+## ---------------------------------------
+## Figure 2: Create combined result figure
+## ---------------------------------------
 # load data
 low <- readRDS("data/aggregated_low.rds") |> data.table::data.table()
 med <- readRDS("data/aggregated.rds") |> data.table::data.table()
 high <- readRDS("data/aggregated_res.rds") |> data.table::data.table()
 
-## IQR function
-inter_quantile <- function(x, probs = c(0.25, 0.5, 0.75)) {
-  tibble(
-    val = quantile(x, probs, na.rm = TRUE),
-    quant = probs
-  )
-}
+# shock 
+t_shock <- 1000 # time that shock begins
+shock_duration <- 500 # shock duration time points
+timelength <- 4000 # length of simulation
 
 # shock period 
 shock_period <- data.frame(time = 0:timelength) |>
@@ -41,13 +50,12 @@ p_comb <- ggplot(data = comb) +
   geom_hline(yintercept = 10/3, linetype = 2, color = "azure4", lwd = 0.1) +
   theme_classic(base_size = 13) +
   theme(legend.position = "top")
+# ggsave("totalsym_comb.png", plot = p_comb, width = 20, height =10, units = "cm", dpi = 300)
 
-
-ggsave("totalsym_comb.png", plot = p_comb, width = 20, height =10, units = "cm", dpi = 300)
 
 ## fitting statistical networks
 burnin <- 100
-aggregated <- low
+aggregated <- low #high
 # before shock
 beforeshock <- aggregated |> 
   filter(t > burnin & t < t_shock) |> 
@@ -60,7 +68,8 @@ duringshock <- aggregated |>
   estimateNetwork(default = "EBICglasso")
 # after shock
 aftershock <- aggregated |> 
-  filter(t >= 3000) |> 
+  # filter(t >= 3000) |> 
+  filter(t > t_shock + shock_duration + burnin) |> 
   select(S_anh:S_sui) |>
   estimateNetwork(default = "EBICglasso")
 
@@ -78,7 +87,7 @@ max_value <- max(
 #                             aftershock)
 # save layout used in the paper
 # saveRDS(net_layout, "data/net_layout.rds")
-# net_layout <- readRDS("data/net_layout.rds")
+net_layout <- readRDS("data/net_layout.rds")
 
 # create node names
 nodenames <- c("anhedonia", "sad", "sleep", "energy", "appetite", "guilty", "concentration", "motor", "suicidal")
@@ -88,15 +97,15 @@ nodenames <- c("anhedonia", "sad", "sleep", "energy", "appetite", "guilty", "con
 # png(file = "triplenet_low.png", width = 1800, height = 900)
 par(mfrow = c(1, 3), mar = c(3, 9, 6, 0.5), xpd = NA, oma = c(0, 2, 0.5, 0))
 
-plot(beforeshock, layout = net_layout, maximum = max_value, labels = colnames(A), node.width=2, border.color = "#CC3300", edge.color = "#CC3300")
+plot(beforeshock, layout = net_layout, maximum = max_value, labels = nodenames, node.width=2, border.color = "#CC3300", edge.color = "#CC3300")
 #title("(a) Before shock", line = 3, cex.main = 5)
 mtext("Low resilience", side=2, padj = 1, cex=3.5, col="black", outer= T, font =2)
 
-plot(duringshock, layout = net_layout, maximum = max_value,  labels = colnames(A),node.width=2, border.color = "#CC3300", edge.color = "#CC3300")
+plot(duringshock, layout = net_layout, maximum = max_value,  labels = nodenames,node.width=2, border.color = "#CC3300", edge.color = "#CC3300")
 #title("(b) During shock", line = 3, cex.main = 5)
 rect(-1.3, -2, 1.3, 2.0, col = rgb(0.5, 0.5, 0.5 ,alpha=0.1), border=FALSE) 
 
-plot(aftershock, layout = net_layout, maximum = max_value, labels = colnames(A), node.width=2, border.color = "#CC3300", edge.color = "#CC3300")
+plot(aftershock, layout = net_layout, maximum = max_value, labels = nodenames, node.width=2, border.color = "#CC3300", edge.color = "#CC3300")
 #title("(c) After shock", line = 3, cex.main = 5)
 abline(v = -3.9, lty=3, col = "darkgray")
 abline(v = -1.3, lty=3, col = "darkgray")
@@ -105,33 +114,54 @@ abline(v = -1.3, lty=3, col = "darkgray")
 
 
 
-##  Create ref & sim networks comparison fig
 
-## standardizing function (Sacha qgraph)
-scale2 <- function(x) {
-  if (all(is.na(x))) return(NA)
-  if (sd(x,na.rm=TRUE)!=0){
-    return((x-mean(x,na.rm=TRUE))/sd(x,na.rm=TRUE))
-  } else {
-    return(rep(0, length(x)))
-  }
-}
+## --------------------------------------------------
+## Figure 3: Create ref & sim networks comparison fig
+## --------------------------------------------------
+
+# set layout for all three networks
+manual_layout <- matrix(c( -1.00000000,-0.3697451,
+                           -0.25362943,-0.4206165,
+                           -0.86442347, 0.4941126,
+                           -0.08080896, 0.3245454,
+                           0.49177041, 0.9000000,
+                           0.43942364,-0.1656119,
+                           0.99799343, 0.2837986,
+                           1.00000000,-0.7135021,
+                           0.41570786,-1.0000000), 9, 2, byrow=T)
+
+# weigthed adjacency matrix for reference network
+A <- matrix(c( .30, 0, 0, 0, 0, 0, 0, 0, 0,
+               .33, .30, .14, .15, 0, .13, 0, 0, .15,
+               .13, .14, .30, .22, .23, 0, 0, 0, 0,
+               .21, .15, .22, .30, 0, 0, .12, 0, 0,
+               0, 0, 0, .17, .30, 0, 0, 0, 0,
+               0, .13, 0, 0, .15, .30, .2, .15, .22,
+               0, 0, 0, 0, 0, 0, .30, .17, 0,
+               0, 0, 0, 0, 0, 0, 0, .30, 0,
+               0, 0, 0, 0, 0, 0, 0, .3, 0.30), 9, 9, byrow = T)
+rownames(A) <- colnames(A) <- c("anh", "sad", "slp", "ene", "app", "glt", "con", "mot", "sui")
+diag(A) <- 0.1 # for plotting purpose
+
+# simulated network (saved result from `main_simulation.R`)
+totavgnetwork <- readRDS("data/overallnetwork.Rds")
+totavgnet <- plot(totavgnetwork, labels = nodenames)
+
+# data network (saved result from `data_network.R`)
+helius_H1net <- readRDS("data/helius_H1net.rds")
 
 
-
+## plot networks
 # png(file = "network_comparison.png", width = 2300, height = 1000)
-
 # ref network
 par(mfrow = c(1, 3), mar = c(1, 9, 4, 0.5), xpd = NA, oma = c(0, 2, 3, 0))
-
-diag(A) <- 0.1
 
 ref_net <- qgraph(A, theme = 'colorblind', color = c("lightsteelblue1", rep("bisque",5), rep("lightsteelblue1",3)), border.color = "white",border.width = 2, edge.width = 0.8, curve = 0.3, curveAll = T, label.color = "black",  asize= 8,  diag = T, layout = manual_layout, node.width=2, edge.color = "deepskyblue4")
 title("Reference network", line = 3, cex.main = 5.5, adj = 0.5)
 # p_ref <- recordPlot()  
 
 # sim network
-sim_net <- qgraph(totavgnet, labels = colnames(A), layout = manual_layout, node.width=2, edge.color = "indianred3")
+sim_net <- qgraph(totavgnet, labels = nodenames, layout = manual_layout, node.width=2, edge.color = "indianred3")
 title("Simulated network", line = 3, cex.main = 5.5, adj = 0.5)
 # p_networks <- recordPlot()  
 
@@ -142,7 +172,8 @@ title("Data network", line = 3, cex.main = 5.5, adj = 0.5)
 
 # dev.off()
 
-# compute centrality
+
+## compute centrality
 cent_refnet <- centrality_auto(ref_net)
 rownames(cent_refnet$node.centrality) <- colnames(A)
 
@@ -173,7 +204,15 @@ str_heliusnet <- cent_helius$node.centrality$Strength |>
          # standardize
   )|> mutate(value = scale2(value))
 
+
 ## b1, b2 strength centrality from "mod_flexibility.R"
+totavgnetworkb1_sim500 <- readRDS("data/estnetwork_beta1.rds")
+totavgnetworkb2_sim500 <- readRDS("data/estnetwork_beta2.rds")
+cent_b1 <- centrality_auto(totavgnetworkb1_sim500)
+rownames(cent_b1$node.centrality) <- nodenames
+cent_b2 <- centrality_auto(totavgnetworkb2_sim500)
+rownames(cent_b2$node.centrality) <- nodenames
+
 str_b1 <- cent_b1$node.centrality$Strength |>
   as_data_frame() |>  
   mutate(node = factor(rownames(cent_b1$node.centrality), 
@@ -244,5 +283,5 @@ cent2 <- combined_cent |> filter(grp == 'helius' | grp == 'sim') |>
 
 # put them together
 centrality_comp <- cowplot::plot_grid(cent1, cent2, legend, ncol=1, align='v', rel_heights = c(4,4,1))
-ggsave("centrality_comp.png", plot = centrality_comp, width = 20, height = 17, units = "cm", dpi = 300)
+# ggsave("centrality_comp.png", plot = centrality_comp, width = 20, height = 17, units = "cm", dpi = 300)
 

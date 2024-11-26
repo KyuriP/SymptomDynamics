@@ -294,6 +294,6 @@ combplot <- ggpubr::ggarrange(bif_anh, bif_glt, anh_ls, glt_ls, bif_slp,bif_sui,
 
 combplot_leg <- ggarrange(combplot, legends, ncol=1, heights = c(10, 1), align = "hv")
 
-ggsave("symptoms_bif1.pdf", plot = combplot_leg, units="in", width=12, height=14, bg = 'transparent')
+# ggsave("symptoms_bif1.pdf", plot = combplot_leg, units="in", width=12, height=14, bg = 'transparent')
 
 
