@@ -1,6 +1,8 @@
-<div align="left">
-<img src="https://github.com/KyuriP/DepressionDynamics/blob/main/figures/DDlogo.png" width=10% height=10% align="left">
-<h1>Computational Modeling of Depression Dynamics</h1> 
+<div style="display: inline-block; vertical-align: middle;">
+  <img src="https://github.com/KyuriP/DepressionDynamics/blob/main/figures/DDlogo.png" alt="Depression Dynamics Logo" width="100">
+</div>
+<div style="display: inline-block; vertical-align: middle; margin-left: 15px;">
+  <h1 style="margin: 0; display: inline;">Computational Modeling of Depression Dynamics</h1>
 </div>
 
 This repository contains the analysis scripts and figures used in the paper: 
