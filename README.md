@@ -36,13 +36,13 @@ The study explores the mechanisms driving depressive symptom dynamics using a co
 
 
 
-## Citation
+<!--## Citation
 
 If you use this repository or find the work helpful, please cite:
 
 > Kyuri Park, Lourens Waldorp, and Vítor V. Vasconcelos.  
 > "The Individual- and Population-level Mechanistic Implications of Statistical Networks of Symptoms (2024)"  
-> [Link to Preprint](#) (update link)
+> [Link to Preprint](#) (update link)-->
 
 
 
