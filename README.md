@@ -6,7 +6,8 @@
 # Computational Modeling of Depression Dynamics
 
 This repository contains the analysis scripts and figures used in the paper:  
-**The Individual- and Population-level Mechanistic Implications of Statistical Networks of Symptoms**
+<a href="https://files.osf.io/v1/resources/ysqtr/providers/osfstorage/678cd117dcc1e9281090083b?action=download&direct&version=3" target="_blank"><b>The Individual- and Population-level Mechanistic Implications of Statistical Networks of Symptoms</b></a>
+
 
 
 
