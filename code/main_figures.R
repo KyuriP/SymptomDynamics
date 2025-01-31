@@ -152,12 +152,12 @@ helius_H1net <- readRDS("data/helius_H1net.rds")
 
 
 ## plot networks
-# png(file = "network_comparison.png", width = 2300, height = 1000)
+# png(file = "network_comparison_v2.png", width = 2300, height = 1000)
 # ref network
 par(mfrow = c(1, 3), mar = c(1, 9, 4, 0.5), xpd = NA, oma = c(0, 2, 3, 0))
 
 ref_net <- qgraph(A, theme = 'colorblind', color = c("lightsteelblue1", rep("bisque",5), rep("lightsteelblue1",3)), border.color = "white",border.width = 2, edge.width = 0.8, curve = 0.3, curveAll = T, label.color = "black",  asize= 8,  diag = T, layout = manual_layout, node.width=2, edge.color = "deepskyblue4")
-title("Reference network", line = 3, cex.main = 5.5, adj = 0.5)
+title("Mechanistic network", line = 3, cex.main = 5.5, adj = 0.5)
 # p_ref <- recordPlot()  
 
 # sim network
@@ -167,7 +167,7 @@ title("Simulated network", line = 3, cex.main = 5.5, adj = 0.5)
 
 # helius network
 hel_net <- plot(helius_H1net, labels = colnames(A), layout = manual_layout, minimum = 0.03, node.width=2, edge.color ="darkseagreen4")
-title("Data network", line = 3, cex.main = 5.5, adj = 0.5)
+title("Empirical network", line = 3, cex.main = 5.5, adj = 0.5)
 # p_hel <- recordPlot()  
 
 # dev.off()
@@ -259,7 +259,7 @@ cent1 <- combined_cent |> filter(grp == 'ref' | grp == 'sim') |>
   geom_point() + 
   geom_path() + 
   geom_errorbar(aes(ymin = beta1, ymax = beta2), color = "indianred3", alpha = 0.2, width = 0.4) +
-  scale_color_manual(values = alpha(c("deepskyblue4", "indianred3"),  0.7), labels = c("Reference", "Simulated")) +
+  scale_color_manual(values = alpha(c("deepskyblue4", "indianred3"),  0.7), labels = c("Mechanistic", "Simulated")) +
   ylim(-2.5,2) +
   theme_bw() +
   labs(x = "", y = "", color = "") +
