@@ -1,3 +1,4 @@
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.14801084.svg)](https://doi.org/10.5281/zenodo.14801084)
 [![GPLv3 License](https://img.shields.io/badge/License-GPL%20v3-yellow.svg)](https://opensource.org/licenses/) 
 [![Active](http://img.shields.io/badge/Status-Active-green.svg)](https://github.com/KyuriP/Thesis_KP)
 <img src="https://raw.githubusercontent.com/KyuriP/DepressionDynamics/main/figures/DDlogo.png" alt="Depression Dynamics Logo" width="100" align="left" style="margin-right: 15px;">
