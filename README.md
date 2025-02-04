@@ -1,14 +1,11 @@
 [![GPLv3 License](https://img.shields.io/badge/License-GPL%20v3-yellow.svg)](https://opensource.org/licenses/) 
 [![Active](http://img.shields.io/badge/Status-Active-green.svg)](https://github.com/KyuriP/Thesis_KP)
-
 <img src="https://raw.githubusercontent.com/KyuriP/DepressionDynamics/main/figures/DDlogo.png" alt="Depression Dynamics Logo" width="100" align="left" style="margin-right: 15px;">
 
-# Computational Modeling of Depression Dynamics
+# Computational Modeling of Depression Symptom Dynamics
 
 This repository contains the analysis scripts and figures used in the paper:  
 <a href="https://files.osf.io/v1/resources/ysqtr/providers/osfstorage/678cd117dcc1e9281090083b?action=download&direct&version=3" target="_blank"><b>The Individual- and Population-level Mechanistic Implications of Statistical Networks of Symptoms</b></a>
-
-
 
 
 ## Overview
