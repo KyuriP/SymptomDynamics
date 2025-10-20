@@ -138,9 +138,9 @@ legend("bottom",
        border = "black",
        horiz = TRUE,
        bty = "n",
-       cex = 5,       # ⬅ larger font size
-       pt.cex = 5,      # ⬅ larger color boxes
+       cex = 5,       # larger font size
+       pt.cex = 5,      # larger color boxes
        text.col = "black",
        xpd = TRUE,
-       y.intersp = 5)  # ⬅ increase line spacing
+       y.intersp = 5)  # increase line spacing
 
